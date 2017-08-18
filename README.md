@@ -1,2 +1,7 @@
-# assignment-1-starter
-Starter code for assignment 1
+# Survey Website
+## Get into development
+1. Get into environment
+type in terminal
+source bin/activate
+2. Run the app
+python run.py
