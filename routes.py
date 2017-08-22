@@ -4,4 +4,4 @@ from server import app
 
 @app.route("/")
 def index():
-    return "hello world!"
+    return "hello world! - This is our website"
