@@ -3,7 +3,7 @@ import csv
 class question():
     """docstring for question."""
     # allocate the location of the csv file
-    _csv_fileName = "ques.csv"
+
     # a dict to store all the instance of this object
     _questDisct = {}
 
@@ -16,11 +16,11 @@ class question():
         return "this is a tree object"
 
 
-    def get_csvName():
-        return _csv_fileName;
+    def get_csvName(cls):
+        return "question.csv";
 
     def __init__(self, row= None):
-        super(question, self).__init__()
+        # super(question, self).__init__()
         if row != None:
             # initialise for node object
             self.id = int(row[0])
@@ -60,29 +60,30 @@ class question():
                 return_list.append(_questDisct[i] )
             return return_list
 
-class myCSV():
-    """docstring for myCSV."""
-    def __init__(self):
-        super(myCSV, self).__init__()
+# class myCSV():
+#     """docstring for myCSV."""
+#     def __init__(self):
+#         pass
 
-    def write(obj):
-        with open(obj.get_csvName(),'a') as csv_out:
-            writer = csv.writer(csv_out)
-            writer.writerow(obj.csv_writeRow())
-
-    def read(obj):
-        with open(obj.get_csvName(),'r') as csv_in:
-            reader = csv.reader(csv_in)
-            for row in reader:
-                # calling back the passed in obj to deal with the csv
-                obj.csv_readRow(row)
+def write(obj):
+    with open("question.csv",'a') as csv_out:
+        writer = csv.writer(csv_out)
+        writer.writerow(obj.csv_writeRow())
+    # pass
+def read(obj):
+    with open(obj.get_csvName(),'r') as csv_in:
+        reader = csv.reader(csv_in)
+        for row in reader:
+            # calling back the passed in obj to deal with the csv
+            obj.csv_readRow(row)
 
 
 
 
 if __name__ == '__main__':
     # unittests
-    myCSV.write(question);
+    # ques = question()
+    write(question.get_csvName());
     # this_survey = survey('1511-17s1')
     # 1.q1
     # 2.q2
@@ -92,5 +93,5 @@ if __name__ == '__main__':
     #     [2,q2,answers]
     # ]
     # this_survey.add_question()
-
-    question.find_question([1,2])
+    #
+    # question.find_question([1,2])
