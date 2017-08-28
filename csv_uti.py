@@ -30,7 +30,7 @@ if __name__ == '__main__':
         def __init__(self):
             super(validClass, self).__init__()
         def csv_name(cls):
-            return "quest.csv"
+            return "question.csv"
         def csv_readRow(cls,row):
             print(row)
         def csv_content(self):
