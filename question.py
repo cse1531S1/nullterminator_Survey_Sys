@@ -114,7 +114,7 @@ class getQuestion():
         return temp
 
 
-class addQuestion():
+class addQ():
     """docstring for addQuestion."""
     def __init__(self, quest_tree):
         # super(addQuestion, self).__init__()
@@ -192,5 +192,5 @@ if __name__ == '__main__':
     quest_find  = getQuestion(quest_tree())
     print(quest_find.findQ([1,0,3]))
 
-    question_add = addQuestion(quests2)
+    question_add = addQ(quests2)
     question_add.add_Q("q3",["q3a0","q3a1"])
