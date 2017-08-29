@@ -117,7 +117,7 @@ class getQuestion():
 class addQuestion():
     """docstring for addQuestion."""
     def __init__(self, quest_tree):
-        super(addQuestion, self).__init__()
+        # super(addQuestion, self).__init__()
         self._qTree =quest_tree
     def is_valid_Q(self,question = "", answers = []):
         if len(question)<= 0:
@@ -187,10 +187,10 @@ if __name__ == '__main__':
     # # write the new question into the csv
     # csv_util.append_csv(quests)
 
-
+    quests2 = quest_tree()
     print ("find the question with a new class")
-    quest_find  = getQuestion(quests)
+    quest_find  = getQuestion(quest_tree())
     print(quest_find.findQ([1,0,3]))
 
-    question_add = addQuestion(quests)
+    question_add = addQuestion(quests2)
     question_add.add_Q("q3",["q3a0","q3a1"])
