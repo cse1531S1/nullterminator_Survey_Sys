@@ -49,6 +49,8 @@ class quest_tree():
         # rewrite all the row in the csv file
         return cls.find_question();
 
+    def push_buffer(cls,node):
+        cls.buffer_obj.append(node)
     def __init__(self):
         super(quest_tree, self).__init__()
         if quest_tree.max_id ==0:
@@ -74,6 +76,12 @@ class quest_tree():
                     print ("fail on find question", i)
             return return_list
 
+    def get_new_id(cls):
+        # assign a new id to return
+        cls.max_id +=1
+        return cls.max_id
+
+
     def add_question(cls,question = "", answers = []):
         if len(answers)<2 or question == "":
             # fail to create the question
@@ -88,9 +96,51 @@ class quest_tree():
         new_node = cls.csv_readRow(row)
         # add it into buffer to be adding to csv
         cls.buffer_obj.append(new_node)
-
-
         return 1
+
+class getQuestion():
+    """docstring for getQuestion."""
+    def __init__(self,qTree):
+        super(getQuestion, self).__init__()
+        self._qTree = qTree
+    # def fname(arg):
+    #     pass
+    def findQ(self,qId = None):
+        tmp_list = self._qTree.find_question(qId)
+        temp = []
+        # reformate the list
+        for item in tmp_list:
+            temp.append([item[0],item[1],item[2:]])
+        return temp
+
+
+class addQuestion():
+    """docstring for addQuestion."""
+    def __init__(self, quest_tree):
+        super(addQuestion, self).__init__()
+        self._qTree =quest_tree
+    def is_valid_Q(self,question = "", answers = []):
+        if len(question)<= 0:
+            return "question has not define"
+        if len(answers) <2:
+            return "answer is not enough"
+        return 0
+    def add_Q(self, question = "", answers = []):
+        if self.is_valid_Q(question, answers)== 0:
+            # valid question
+            # try to assign a new queston id for this question
+            this_id = self._qTree.get_new_id()
+            # put all the information into a list
+            row = [this_id,question]
+            for answer in answers:
+                row.append(answer)
+
+            # translate the list into node and assign this question into dictionary
+            q_node=self._qTree.csv_readRow(row)
+            # push this node to be write
+            self._qTree.push_buffer(q_node)
+            csv_util.append_csv(self._qTree)
+
 
 class quest_node():
     """docstring for quest_node."""
@@ -132,7 +182,15 @@ if __name__ == '__main__':
         print(this)
 
 
-    print("try to add the question into the file")
-    quests.add_question("q3",["q3a0","q3a1"])
-    # write the new question into the csv
-    csv_util.append_csv(quests)
+    # print("try to add the question into the file")
+    # quests.add_question("q3",["q3a0","q3a1"])
+    # # write the new question into the csv
+    # csv_util.append_csv(quests)
+
+
+    print ("find the question with a new class")
+    quest_find  = getQuestion(quests)
+    print(quest_find.findQ([1,0,3]))
+
+    question_add = addQuestion(quests)
+    question_add.add_Q("q3",["q3a0","q3a1"])

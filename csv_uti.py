@@ -13,7 +13,7 @@ class csv_util():
                 obj.csv_readRow(row)
     def write_csv(obj):
         # input content must be an array
-        with open(obj.csv_name(),'w') as csv_out:
+        with open(obj.csv_name(),'w+') as csv_out:
             writer = csv.writer(csv_out)
             writer.writerow(obj.csv_content())
     def append_csv(obj):
