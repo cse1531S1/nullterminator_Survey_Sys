@@ -35,7 +35,7 @@ class quest_tree():
         new_node = quest_node(this_id, row[1],row[2:])
         # assing this question node into the dictionary to be search
         quest_tree._questDisct[this_id] = new_node
-
+        return new_node
 
     def csv_append(cls):
         # append the content at the end of the csv
@@ -50,7 +50,7 @@ class quest_tree():
         return cls.find_question();
 
     def __init__(self):
-        # super(question, self).__init__()
+        super(quest_tree, self).__init__()
         if quest_tree.max_id ==0:
             # initialize the class
             csv_util.read_csv(self)
@@ -74,11 +74,23 @@ class quest_tree():
                     print ("fail on find question", i)
             return return_list
 
-    # def add_question(cls,question = "", answers = []):
-    #     if len(answers)==0 || question == "":
-    #         # invalid input
+    def add_question(cls,question = "", answers = []):
+        if len(answers)<2 or question == "":
+            # fail to create the question
+            return 0
+        # else:
+        # give the new question a new id, add quesitons and answers in the list
+        row = [cls.max_id+1,question]
+        for answer in answers:
+            row.append(answer)
+
+        # add it into the dict
+        new_node = cls.csv_readRow(row)
+        # add it into buffer to be adding to csv
+        cls.buffer_obj.append(new_node)
 
 
+        return 1
 
 class quest_node():
     """docstring for quest_node."""
@@ -118,3 +130,9 @@ if __name__ == '__main__':
     this_quest_list = quests.find_question()
     for this in this_quest_list:
         print(this)
+
+
+    print("try to add the question into the file")
+    quests.add_question("q3",["q3a0","q3a1"])
+    # write the new question into the csv
+    csv_util.append_csv(quests)

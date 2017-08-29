@@ -20,7 +20,8 @@ class csv_util():
         # input content must be an array
         with open(obj.csv_name(),'a') as csv_out:
             writer = csv.writer(csv_out)
-            writer.writerow(obj.csv_append())
+            for row in obj.csv_append():
+                writer.writerow(row)
 
 
 
@@ -36,7 +37,7 @@ if __name__ == '__main__':
         def csv_content(self):
             return [1,2,3]
         def csv_append(self):
-            return [1,2,3,4]
+            return [[1,2,3,4]]
 
 
 
