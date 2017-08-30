@@ -1,11 +1,10 @@
 from flask import Flask, redirect, render_template, request, url_for
-from math import sqrt, sin, cos, tan, log
 from server import app
 import csv
 
-emptystring=""
-user_input=""
 
+
+## read in the courses.csv file and put all the courses into courselist 
 def course():
     with open('courses.csv','r') as csv_in:
         reader = csv.reader(csv_in)
@@ -20,6 +19,9 @@ def course():
 
 
 
+
+## This funcation is used for creating a sample question list
+## THe question structure is:[question_id, question,"answer1","answer2","answer3","..."]
 def question():
     question_list=[]
     question_number0=1
@@ -40,6 +42,12 @@ def question():
     print(question_list)
     return question_list
 
+
+
+## for different question, I want to know how many answers it has
+##so that I could print out their answer collectly.
+##hence, this function will retirn a list[4,3,2], 
+##because question1 has 4 answer, question2 has 3 answer,question3 has 2 answer.
 def list_number_of_answer(question_list):
     list_number_of_answer=[]
     for i in range(len(question_list)):
@@ -48,6 +56,9 @@ def list_number_of_answer(question_list):
     return list_number_of_answer
  
 
+
+
+##This function is used to store the selected question to an coursequestion.csv file.
 def storedquestion(qid=[],coursename=""):
     print(qid)
     with open('%s.csv' % coursename,'w+') as csv_out:
@@ -60,38 +71,35 @@ def storedquestion(qid=[],coursename=""):
                     writer.writerow(all_question[i]) 
 
 
+
+##THis function is being used when teacher click no question for their survey, and it could return a warning web page. 
 @app.route("/coursepage/warning", methods=["GET", "POST"])
 def warning():
     return("hey, please go back and add your answer!")
 
 
-    
-@app.route("/coursepage/<string:coursename>/studentsurvey", methods=["GET", "POST"])
-def student_part(coursename=""):
-    with open('%s.csv' % coursename,'r') as csv_in:
-        reader = csv.reader(csv_in)
-        courselist=[]
-        for row in reader:
-            courselist.append(row)
-    return courselist
 
 
 
-
+##THis function is used read in the generated coursequestion.csv file, and make it a courselist.
+## after that, you could print out the coursequestionlist to show waht is your final survey 
 @app.route("/coursepage/<string:coursename>/finalsurvey", methods=["GET", "POST"])
 def finalsurvey(coursename):
     with open('%s.csv'% coursename,'r') as csv_in:
         reader = csv.reader(csv_in)
-        questionlist=[]
+        coursequestionlist=[]
         for row in reader:
-            questionlist.append(row)
-        print(questionlist)
-    return render_template("finalsurvey.html", course_name=coursename, questionfield=questionlist,length=len(questionlist), number_of_answer=list_number_of_answer(questionlist) )      
+            coursequestionlist.append(row)
+        ##print(questionlist)
+    return render_template("finalsurvey.html", course_name=coursename, questionfield=coursequestionlist,length=len(coursequestionlist), number_of_answer=list_number_of_answer(coursequestionlist) )      
 
 
 
 
-
+##first, it will show all the question have been created.
+##Then, teacher chooses his desired questions
+##All the questions being chosen will be used to create a csv file
+## if no question chosen, it won't create csv file.
 @app.route("/coursepage/<string:coursename>", methods=["GET", "POST"])
 def coursepage(coursename):
     if request.method == "POST":
@@ -101,13 +109,15 @@ def coursepage(coursename):
             return redirect(url_for('finalsurvey',coursename=coursename))
         else:
             return redirect(url_for('warning'))
-        
+##The return statement of function question() is the list of all the questions         
     return render_template("surveycreate.html", course_name=coursename, questionfield=question(),length=len(question()), number_of_answer=list_number_of_answer(question()) )
 
 
 
 
 
+##THis is the function to show all the course
+##The return statement of function course() is the list of all the function 
 @app.route("/selectcourse", methods=["GET", "POST"])
 def course_adding():
    

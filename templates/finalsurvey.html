@@ -5,17 +5,17 @@
    </head>
    <body>
         <h1> This is your course: {{course_name}} </h1>
-      <h1> This is your final survey!! </h1>
+      <h1> These are the questions chosen for survey!! </h1>
 
         {%if questionfield != []%}
          
             {%for i in range(length):%}        
 
                 <Form method="POST">
-         <p> {{questionfield[i][0]}}.{{questionfield[i][1]}}  </p>
-       
+         <p> Q{{questionfield[i][0]}}.{{questionfield[i][1]}}  [Answer]  </p>
+          
                 {%for j in range(number_of_answer[i]):%}
-                      <p>  {{questionfield[i][j+2]}}</p>
+                      <p> {{questionfield[i][j+2]}}</p>
      
                 {%endfor%}
             {%endfor%}
