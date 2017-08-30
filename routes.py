@@ -10,9 +10,12 @@ def course():
     with open('courses.csv','r') as csv_in:
         reader = csv.reader(csv_in)
         courselist=[]
+        newrow=""
         for row in reader:
-            courselist.append(row)
+            newrow=''.join(row)
+            courselist.append(newrow)
     del courselist[0]
+    courselist.pop()
     return courselist
 
 
@@ -55,6 +58,13 @@ def storedquestion(qid=[],coursename=""):
                 if (i+1) == int(qid[j]):
                     print(all_question[i])
                     writer.writerow(all_question[i]) 
+
+
+@app.route("/coursepage/warning", methods=["GET", "POST"])
+def warning():
+    return("hey, please go back and add your answer!")
+
+
     
 @app.route("/coursepage/<string:coursename>/studentsurvey", methods=["GET", "POST"])
 def student_part(coursename=""):
@@ -86,8 +96,12 @@ def finalsurvey(coursename):
 def coursepage(coursename):
     if request.method == "POST":
         selected_q = request.form.getlist("check_list[]") 
-        storedquestion(selected_q,coursename) #create a csv file
-        return redirect(url_for('finalsurvey',coursename=coursename))
+        if selected_q != []:
+            storedquestion(selected_q,coursename) #create a csv file
+            return redirect(url_for('finalsurvey',coursename=coursename))
+        else:
+            return redirect(url_for('warning'))
+        
     return render_template("surveycreate.html", course_name=coursename, questionfield=question(),length=len(question()), number_of_answer=list_number_of_answer(question()) )
 
 
