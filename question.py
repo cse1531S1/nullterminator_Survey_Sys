@@ -106,12 +106,7 @@ class getQuestion():
     # def fname(arg):
     #     pass
     def findQ(self,qId = None):
-        tmp_list = self._qTree.find_question(qId)
-        temp = []
-        # reformate the list
-        for item in tmp_list:
-            temp.append([item[0],item[1],item[2:]])
-        return temp
+        return self._qTree.find_question(qId)
 
 
 class addQ():
