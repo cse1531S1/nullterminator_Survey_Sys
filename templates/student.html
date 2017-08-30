@@ -1,11 +1,11 @@
 <!doctype html>
 <html>
    <head>
-   <title>survey~create </title>
+   <title>Student - {{course_name}}</title>
    </head>
    <body>
-        <h1> This is your course: {{course_name}} </h1>
-      <h1> This is your final survey!! </h1>
+        <h1>This is your course: {{course_name}}</h1>
+      <h2>Please answer all questions.</h2>
 
         {%if questionfield != []%}
          
@@ -22,8 +22,7 @@
         {%else%}
             </br></br>
         {%endif%}
-        <p>URL for student: localhost:8080/student/{{course_name}}</p>
-      </From>
+        <p><input type="submit" value="Submit"></p>
       </Form>
    </body>
 </html>

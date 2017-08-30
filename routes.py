@@ -64,11 +64,7 @@ def finalsurvey(coursename):
         for row in reader:
             questionlist.append(row)
         print(questionlist)
-    return render_template("finalsurvey.html", course_name=coursename, questionfield=questionlist,length=len(questionlist), number_of_answer=list_number_of_answer(questionlist) )      
-
-
-
-
+    return render_template("finalsurvey.html", course_name=coursename, questionfield=questionlist,length=len(questionlist), number_of_answer=list_number_of_answer(questionlist))
 
 @app.route("/coursepage/<string:coursename>", methods=["GET", "POST"])
 def coursepage(coursename):
@@ -78,18 +74,21 @@ def coursepage(coursename):
         return redirect(url_for('finalsurvey',coursename=coursename))
     return render_template("surveycreate.html", course_name=coursename, questionfield=question(),length=len(question()), number_of_answer=list_number_of_answer(question()) )
 
-
-
-
-
 @app.route("/selectcourse", methods=["GET", "POST"])
 def course_adding():
    
     if request.method == "POST":
         return redirect(url_for('coursepage', coursename=request.form["co"]))
     return render_template("courselect.html", course=course(), length=len(course()) )
-
-
-
-
-
+    
+@app.route("/student/<string:coursename>", methods=["GET", "POST"])
+def student(coursename):
+    if request.method == "POST":
+        return render_template("finish_survey.html")
+    with open('%s.csv'% coursename,'r') as csv_in:
+        reader = csv.reader(csv_in)
+        questionlist=[]
+        for row in reader:
+            questionlist.append(row)
+        print(questionlist)
+    return render_template("student.html", course_name=coursename, questionfield=questionlist,length=len(questionlist), number_of_answer=list_number_of_answer(questionlist))
