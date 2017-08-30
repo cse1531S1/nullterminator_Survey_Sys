@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Update General Question</title>
+    </head>
+    <body>
+        {% if questions %}
+
+            <form class="" action="{{request}}" method="post">
+                {% for q in questions %}
+                    <input type="checkbox" name="q_id" value="{{ q[0] }}" checked="" > {{q[1]}}<br>
+                    {% for answer in q[2:] %}
+                        {{answer}}
+                    {% endfor %}<br>
+                {% endfor %}
+                <button type="submit" name="button">Update General Question</button>
+            </form>
+        {% else %}
+            <p>This site currently has no question</p>
+        {% endif %}
+    </body>
+</html>

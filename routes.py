@@ -1,6 +1,7 @@
 from flask import Flask, redirect, render_template, request, url_for
 from server import app
 from question import quest_tree,addQ
+from q_set import q_set
 
 @app.route("/")
 def index():
@@ -22,5 +23,16 @@ def add_question():
             # get back the successful page to user
             return render_template("success_add_q.html",add_more = url_for("add_question"))
         # invalid input, push back what user has been input, and push the error message
-        return render_template("add_q.html",request = url_for("addQuestion"),error = add_q.is_valid_Q(question,answers),question = question, answers = request.form["answers"])
-    return render_template("add_q.html",request = url_for("addQuestion"))
+        return render_template("add_q.html",request = url_for("add_question"),error = add_q.is_valid_Q(question,answers),question = question, answers = request.form["answers"])
+    return render_template("add_q.html",request = url_for("add_question"))
+
+
+@app.route("/qset",methods = ["POST","GET"])
+def quest_set():
+    msg= ""
+    q_list  = quest_tree().find_question()
+    # print(q_list)
+    if request.method == "POST":
+        msg = "update successfully"
+    # else : or default respond
+    return render_template("q_set.html",request = url_for("quest_set"),msg= msg,questions = q_list)
