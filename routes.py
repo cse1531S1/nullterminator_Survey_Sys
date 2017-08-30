@@ -15,8 +15,6 @@ def course():
     del courselist[0]
     return courselist
 
-
-
 def question():
     question_list=[]
     question_number0=1
@@ -41,9 +39,8 @@ def list_number_of_answer(question_list):
     list_number_of_answer=[]
     for i in range(len(question_list)):
         list_number_of_answer.append(len(question_list[i])-2)
-    print(list_number_of_answer)
+    #print(list_number_of_answer)
     return list_number_of_answer
- 
 
 def storedquestion(qid=[],coursename=""):
     print(qid)
@@ -65,9 +62,6 @@ def student_part(coursename=""):
             courselist.append(row)
     return courselist
 
-
-
-
 @app.route("/coursepage/<string:coursename>/finalsurvey", methods=["GET", "POST"])
 def finalsurvey(coursename):
     with open('%s.csv'% coursename,'r') as csv_in:
@@ -78,10 +72,6 @@ def finalsurvey(coursename):
         print(questionlist)
     return render_template("finalsurvey.html", course_name=coursename, questionfield=questionlist,length=len(questionlist), number_of_answer=list_number_of_answer(questionlist) )      
 
-
-
-
-
 @app.route("/coursepage/<string:coursename>", methods=["GET", "POST"])
 def coursepage(coursename):
     if request.method == "POST":
@@ -89,10 +79,6 @@ def coursepage(coursename):
         storedquestion(selected_q,coursename) #create a csv file
         return redirect(url_for('finalsurvey',coursename=coursename))
     return render_template("surveycreate.html", course_name=coursename, questionfield=question(),length=len(question()), number_of_answer=list_number_of_answer(question()) )
-
-
-
-
 
 @app.route("/selectcourse", methods=["GET", "POST"])
 def course_adding():
@@ -103,12 +89,17 @@ def course_adding():
 
 @app.route("/student/<string:coursename>", methods=["GET", "POST"])
 def student(coursename):
-    if request.method == "POST":
-        return render_template("finish_survey.html")
     with open('%s.csv'% coursename,'r') as csv_in:
         reader = csv.reader(csv_in)
         questionlist=[]
         for row in reader:
             questionlist.append(row)
-        print(questionlist)
+    if request.method == "POST":
+        answerlist = []
+        for i in range(len(questionlist)):
+            answerlist.append(request.form[str(i)])
+        with open('student_%s'%coursename,'a') as csv_out:
+            writer = csv.writer(csv_out)
+            writer.writerow(answerlist)
+        return render_template("finish_survey.html")
     return render_template("student.html", course_name=coursename, questionfield=questionlist,length=len(questionlist), number_of_answer=list_number_of_answer(questionlist))
