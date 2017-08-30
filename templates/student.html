@@ -1,11 +1,11 @@
 <!doctype html>
 <html>
    <head>
-   <title>Student - {{course_name}}</title>
+   <title>survey~create </title>
    </head>
    <body>
-        <h1>This is your course: {{course_name}}</h1>
-      <h2>Please answer all questions.</h2>
+        <h1> This is your course: {{course_name}} </h1>
+      <h1> This is your final survey!! </h1>
 
         {%if questionfield != []%}
          
@@ -13,16 +13,17 @@
 
                 <Form method="POST">
          <p> {{questionfield[i][0]}}.{{questionfield[i][1]}}  </p>
-                answer-->
+       
                 {%for j in range(number_of_answer[i]):%}
-                        {{questionfield[i][2][j]}}
+                      <p><input type="radio" name="co" value="{{questionfield[i][j+2]}}" >{{questionfield[i][j+2]}}</p>
      
                 {%endfor%}
             {%endfor%}
         {%else%}
             </br></br>
         {%endif%}
-        <p><input type="submit" value="Submit"></p>
+        <input type="submit" value="Submit">
+      </From>
       </Form>
    </body>
 </html>
