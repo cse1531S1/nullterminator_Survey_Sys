@@ -15,8 +15,10 @@
          <p> <input type="checkbox" name="check_list[]" value="{{questionfield[i][0]}}" >{{questionfield[i][0]}}.{{questionfield[i][1]}}  </p>
                 
                 {%for j in range(number_of_answer[i]):%}
-                <p>{{questionfield[i][2][j]}}</p>
-     
+            
+                 
+                        <p>{{questionfield[i][j+2]}}</p>
+                               
                 {%endfor%}
             {%endfor%}
         {%else%}

@@ -13,9 +13,9 @@
 
                 <Form method="POST">
          <p> {{questionfield[i][0]}}.{{questionfield[i][1]}}  </p>
-                answer-->
+       
                 {%for j in range(number_of_answer[i]):%}
-                        {{questionfield[i][2][j]}}
+                      <p>  {{questionfield[i][j+2]}}</p>
      
                 {%endfor%}
             {%endfor%}
