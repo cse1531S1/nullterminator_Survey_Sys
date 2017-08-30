@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+   <head>
+   <title>survey~create </title>
+   </head>
+   <body>
+        <h1> This is your course: {{course_name}} </h1>
+      <h1> This is your final survey!! </h1>
+
+        {%if questionfield != []%}
+         
+            {%for i in range(length):%}        
+
+                <Form method="POST">
+         <p> {{questionfield[i][0]}}.{{questionfield[i][1]}}  </p>
+                answer-->
+                {%for j in range(number_of_answer[i]):%}
+                        {{questionfield[i][2][j]}}
+     
+                {%endfor%}
+            {%endfor%}
+        {%else%}
+            </br></br>
+        {%endif%}
+        
+      </From>
+      </Form>
+   </body>
+</html>
+      
