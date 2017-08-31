@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>course~select</title>
+    </head>
+
+    <body>
+    <h1>This is course selection page</h1>
+        {%if course != ""%}
+         
+            {%for i in range(length):%}        
+
+                <Form method="POST">
+                <p><input type="radio" name="co" value="{{course[i]}}" >{{course[i]}}</p>
+            {%endfor%}
+        {%else%}
+            </br></br>
+        {%endif%}
+        <input type="submit" value="Submit">
+      </From>
+</body>
+</html>
