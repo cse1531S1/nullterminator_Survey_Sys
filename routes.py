@@ -78,6 +78,7 @@ def course_adding():
 
 @app.route("/student/<string:coursename>", methods=["GET", "POST"])
 def student(coursename):
+    error = None
     with open('%s.csv'% coursename,'r') as csv_in:
         reader = csv.reader(csv_in)
         questionlist=[]
@@ -86,9 +87,13 @@ def student(coursename):
     if request.method == "POST":
         answerlist = []
         for i in range(len(questionlist)):
-            answerlist.append(request.form[str(i)])
-        with open('student_%s'%coursename,'a') as csv_out:
+            try:
+                answerlist.append(request.form[str(i)])
+            except :
+                error="you must have to finish the survey"
+                
+        with open('student_%s.csv'%coursename,'a') as csv_out:
             writer = csv.writer(csv_out)
             writer.writerow(answerlist)
         return render_template("finish_survey.html")
-    return render_template("student.html", course_name=coursename, questionfield=questionlist,length=len(questionlist), number_of_answer=list_number_of_answer(questionlist))
+    return render_template("student.html", course_name=coursename,error = error, questionfield=questionlist,length=len(questionlist), number_of_answer=list_number_of_answer(questionlist))
