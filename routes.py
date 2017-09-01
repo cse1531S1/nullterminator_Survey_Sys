@@ -4,6 +4,7 @@ import csv
 
 
 
+
 ## read in the courses.csv file and put all the courses into courselist 
 def course():
     with open('courses.csv','r') as csv_in:
@@ -57,7 +58,6 @@ def list_number_of_answer(question_list):
  
 
 
-
 ##This function is used to store the selected question to an coursequestion.csv file.
 def storedquestion(qid=[],coursename=""):
     print(qid)
@@ -79,8 +79,6 @@ def warning():
 
 
 
-
-
 ##THis function is used read in the generated coursequestion.csv file, and make it a courselist.
 ## after that, you could print out the coursequestionlist to show waht is your final survey 
 @app.route("/coursepage/<string:coursename>/finalsurvey", methods=["GET", "POST"])
@@ -92,7 +90,6 @@ def finalsurvey(coursename):
             coursequestionlist.append(row)
         ##print(questionlist)
     return render_template("finalsurvey.html", course_name=coursename, questionfield=coursequestionlist,length=len(coursequestionlist), number_of_answer=list_number_of_answer(coursequestionlist) )      
-
 
 
 
@@ -115,7 +112,6 @@ def coursepage(coursename):
 
 
 
-
 ##THis is the function to show all the course
 ##The return statement of function course() is the list of all the function 
 @app.route("/selectcourse", methods=["GET", "POST"])
@@ -125,7 +121,7 @@ def course_adding():
         return redirect(url_for('coursepage', coursename=request.form["co"]))
     return render_template("courselect.html", course=course(), length=len(course()) )
 
-
+	
 
 
 
