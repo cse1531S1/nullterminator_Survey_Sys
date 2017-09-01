@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Student - {{course_name}}</title>
+    </head>
+    <body>
+        <h1>This is your course: {{course_name}}</h1>
+        <h2>Please answer all questions.</h2>
+        <Form method="POST">
+        {%if error == <something>%}
+            <p><font color = "red">You did not answer all questions!</font></p>
+        {%endif%}
+        {%if questionfield != []%}
+         
+            {%for i in range(length):%}        
+                <p>{{questionfield[i][0]}}. {{questionfield[i][1]}}  </p>
+                {%for j in range(number_of_answer[i]):%}
+                    <p><input type="radio" name="{{i}}" value="{{j+1}}">{{questionfield[i][j+2]}}</p>
+                {%endfor%}
+            {%endfor%}
+        {%else%}
+            </br></br>
+        {%endif%}
+        <input type="submit" value="Submit">
+        
+        </Form>
+    </body>
+</html>

@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+   <head>
+   <title>survey~create </title>
+   </head>
+   <body>
+        <h1> This is your course: {{course_name}} </h1>
+      <h1> please click your desired question number for your survey </h1>
+
+        {%if questionfield != []%}
+         
+            {%for i in range(length):%}        
+
+                <Form method="POST">
+         <p> <input type="checkbox" name="check_list[]" value="{{questionfield[i][0]}}" >{{questionfield[i][0]}}.{{questionfield[i][1]}}  </p>
+                
+                {%for j in range(number_of_answer[i]):%}
+            
+                 
+                        <p>{{questionfield[i][j+2]}}</p>
+                               
+                {%endfor%}
+            {%endfor%}
+        {%else%}
+            </br></br>
+        {%endif%}
+        <input type="submit" value="Submit">
+      </From>
+      </Form>
+   </body>
+</html>
+      
