@@ -1,6 +1,6 @@
 from flask import Flask, redirect, render_template, request, url_for
 from server import app
-from question import quest_tree,addQ
+from question import quest_tree,addQ,delQ,getQ
 
 @app.route("/")
 def index():
@@ -24,3 +24,12 @@ def add_question():
         # invalid input, push back what user has been input, and push the error message
         return render_template("add_q.html",request = url_for("add_question"),error = add_q.is_valid_Q(question,answers),question = question, answers = request.form["answers"])
     return render_template("add_q.html",request = url_for("add_question"))
+
+@app.route("/delquest",methods= ["POST","GET"])
+def del_question():
+    if request.method== "POST":
+        # try to delete the question that uesr want
+        # create the instance of del_question class
+        del_q = delQ(quest_tree())
+        
+    return render_template("del_q.html",request= url_for("del_question"))
