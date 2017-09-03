@@ -98,10 +98,30 @@ class quest_tree():
         cls.buffer_obj.append(new_node)
         return 1
 
-class getQuestion():
+    def delete_question(cls, question_id):
+        try:
+            # delet the record in the in self dictionary
+            del cls._questDisct[int (question_id)]
+            # successfully delete question
+            return 1
+        except KeyError:
+            print("Fail on delet question", question_id)
+            return 0
+
+class deleteQ():
+    def __init__(self, qTree):
+        self._qTree = qTree 
+    def doDel(self,qID=None):
+        if qID:
+            # if qid != None hence do the delete
+            if self._qTree.delete_question(qID)== 1:
+                # write the change into the csv file
+                csv_util.write_csv(self._qTree)
+
+class getQ():
     """docstring for getQuestion."""
     def __init__(self,qTree):
-        super(getQuestion, self).__init__()
+        super(getQ, self).__init__()
         self._qTree = qTree
     # def fname(arg):
     #     pass
@@ -184,8 +204,13 @@ if __name__ == '__main__':
 
     quests2 = quest_tree()
     print ("find the question with a new class")
-    quest_find  = getQuestion(quest_tree())
+    quest_find  = getQ(quest_tree())
     print(quest_find.findQ([1,0,3]))
 
     question_add = addQ(quests2)
     question_add.add_Q("q3",["q3a0","q3a1"])
+
+
+    #test function for delete_question
+    qDel = deleteQ(quests2)
+    qDel.doDel(5)

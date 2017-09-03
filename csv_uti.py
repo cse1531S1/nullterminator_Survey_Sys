@@ -15,7 +15,8 @@ class csv_util():
         # input content must be an array
         with open(obj.csv_name(),'w+') as csv_out:
             writer = csv.writer(csv_out)
-            writer.writerow(obj.csv_content())
+            for row in obj.csv_content():
+                writer.writerow(row)
     def append_csv(obj):
         # input content must be an array
         with open(obj.csv_name(),'a') as csv_out:
