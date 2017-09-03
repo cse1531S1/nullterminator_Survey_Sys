@@ -111,12 +111,14 @@ class quest_tree():
 class deleteQ():
     def __init__(self, qTree):
         self._qTree = qTree 
-    def doDel(self,qID=None):
-        if qID:
+    def doDel(self,qID=[]):
+        if len(qID)!= 0:
             # if qid != None hence do the delete
-            if self._qTree.delete_question(qID)== 1:
-                # write the change into the csv file
-                csv_util.write_csv(self._qTree)
+            for qid in qID:
+                
+                self._qTree.delete_question(qid)
+            # write the change into the csv file
+            csv_util.write_csv(self._qTree)
 
 class getQ():
     """docstring for getQuestion."""
@@ -213,4 +215,5 @@ if __name__ == '__main__':
 
     #test function for delete_question
     qDel = deleteQ(quests2)
-    qDel.doDel(5)
+    # couldn't delete the question while flying
+    #qDel.doDel([5])
