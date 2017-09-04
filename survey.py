@@ -47,4 +47,30 @@ class survey:
             list_number_of_answer.append(len(question_list[i])-2)
         print(list_number_of_answer)
         return list_number_of_answer
-    
+        
+        
+## Given a course name, go get a related coursequestion csv file      
+## read out all the questions       
+## put it into a coursequestionlist               
+    def coursequestionlist(self,coursename=""):
+        with open('%s.csv'% coursename,'r') as csv_in:
+            reader = csv.reader(csv_in)
+            coursequestionlist=[]
+            for row in reader:
+                coursequestionlist.append(row)
+        return coursequestionlist
+        
+ 
+## read in a courselist csv file
+## put all the course names in to courselist        
+    def courselist(self):
+        with open('courses.csv','r') as csv_in:
+            reader = csv.reader(csv_in)
+            courselist=[]
+            newrow=""
+            for row in reader:
+                newrow=''.join(row)
+                courselist.append(newrow)
+            del courselist[0]
+            courselist.pop()
+        return courselist
