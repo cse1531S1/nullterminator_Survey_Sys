@@ -20,13 +20,8 @@ def warning():
 ## after that, you could print out the coursequestionlist to show waht is your final survey 
 @app.route("/coursepage/<string:coursename>/finalsurvey", methods=["GET", "POST"])
 def finalsurvey(coursename):
-    with open('%s.csv'% coursename,'r') as csv_in:
-        reader = csv.reader(csv_in)
-        coursequestionlist=[]
-        for row in reader:
-            coursequestionlist.append(row)
-        ##print(questionlist)
-    return render_template("finalsurvey.html", course_name=coursename, questionfield=coursequestionlist,length=len(coursequestionlist), number_of_answer=s.list_number_of_answer(coursequestionlist) )      
+    
+    return render_template("finalsurvey.html", course_name=coursename, questionfield=s.coursequestionlist(coursename),length=len(s.coursequestionlist(coursename)), number_of_answer=s.list_number_of_answer(s.coursequestionlist(coursename)) )      
 
 
 
@@ -58,16 +53,11 @@ def course_adding():
    
     if request.method == "POST":
         return redirect(url_for('addquestions', coursename=request.form["co"]))
-    with open('courses.csv','r') as csv_in:
-        reader = csv.reader(csv_in)
-        courselist=[]
-        newrow=""
-        for row in reader:
-            newrow=''.join(row)
-            courselist.append(newrow)
-    del courselist[0]
-    courselist.pop()
+ 
+    courselist = s.courselist()
     return render_template("courselect.html", course=courselist, length=len(courselist) )
+
+
 
 @app.route("/student/<string:coursename>", methods=["GET", "POST"])
 def student(coursename):
