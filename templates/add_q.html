@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Please add a question</title>
+    </head>
+    <body>
+        {% if error!=None %}
+            <p>{{error}}</p>
+        {% endif %}
+        <form class="" action="{{request}}" method="POST">
+            <input type="text" name="question" value="{{question}}" placeholder="Question">
+            <input type="text" name="answers" value="{{answers}}" placeholder="Answer1, Answer2, ..">
+            <button type="submit" name="">Add a Question</button>
+        </form>
+    </body>
+</html>
