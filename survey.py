@@ -8,22 +8,14 @@ class survey:
         with open('%s.csv' % coursename,'w+') as csv_out:
             writer = csv.writer(csv_out)
             print(q_list)
+            # i if the new order of each question
+            i = 0
             for question in q_list:
+                # increment the i and save the count into each question
+                i+= 1
+                question[0]= i
+                # write the questions into csv files.
                 writer.writerow(question)
-
-
-
-## for different question, I want to know how many answers it has
-##so that I could print out their answer collectly.
-##hence, this function will retirn a list[4,3,2],
-##because question1 has 4 answer, question2 has 3 answer,question3 has 2 answer.
-    def list_number_of_answer(self,question_list):
-        list_number_of_answer=[]
-        for i in range(len(question_list)):
-            list_number_of_answer.append(len(question_list[i])-2)
-        print(list_number_of_answer)
-        return list_number_of_answer
-
 
 ## Given a course name, go get a related coursequestion csv file
 ## read out all the questions
@@ -35,7 +27,6 @@ class survey:
             for row in reader:
                 coursequestionlist.append(row)
         return coursequestionlist
-
 
 ## read in a courselist csv file
 ## put all the course names in to courselist

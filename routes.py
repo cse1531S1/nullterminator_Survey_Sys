@@ -16,10 +16,10 @@ def index():
 
 ##THis function is used read in the generated coursequestion.csv file, and make it a courselist.
 ## after that, you could print out the coursequestionlist to show waht is your final survey
-@app.route("/coursepage/<string:coursename>/finalsurvey", methods=["GET", "POST"])
+@app.route("/survey/<string:coursename>", methods=["GET", "POST"])
 def finalsurvey(coursename):
     s = survey()
-    return render_template("finalsurvey.html", course_name=coursename, questionfield=s.coursequestionlist(coursename),length=len(s.coursequestionlist(coursename)), number_of_answer=s.list_number_of_answer(s.coursequestionlist(coursename)) )
+    return render_template("finalsurvey.html", course_name=coursename, quest_list=s.coursequestionlist(coursename) )
 
 
 
