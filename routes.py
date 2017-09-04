@@ -11,11 +11,6 @@ def index():
     return "hello world! - This is our website"
 
 
-##THis function is being used when teacher click no question for their survey, and it could return a warning web page.
-@app.route("/coursepage/warning", methods=["GET", "POST"])
-def warning():
-    return("hey, please go back and add your answer!")
-
 
 
 
@@ -42,13 +37,13 @@ def addquestions(coursename):
     get_question = getQ(quest_tree())
     if request.method == "POST":
         selected_q = request.form.getlist("selected_q")
+        print(selected_q)
         if selected_q != []:
             # the admin has selected some questions for this survey
 
             s.choosequestion(get_question.findQ(selected_q),coursename) #create a csv file
             return redirect(url_for('finalsurvey',coursename=coursename))
         else:
-            # print ("here ")
             error = "please add at least one question for this survey."
 
     # getting all the question

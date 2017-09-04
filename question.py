@@ -71,7 +71,7 @@ class quest_tree():
                 # searching all the given values
                 try:
 
-                    return_list.append(cls._questDisct[i].getlist() )
+                    return_list.append(cls._questDisct[int(i)].getlist() )
                 except KeyError:
                     print ("fail on find question", i)
             return return_list

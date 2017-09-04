@@ -7,7 +7,9 @@ class survey:
     def choosequestion(self,q_list=[],coursename=""):
         with open('%s.csv' % coursename,'w+') as csv_out:
             writer = csv.writer(csv_out)
-            writer.writerow(q_list)
+            print(q_list)
+            for question in q_list:
+                writer.writerow(question)
 
 
 
