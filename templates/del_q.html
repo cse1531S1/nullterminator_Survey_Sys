@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Manage Questions</title>
+    </head>
+    <body>
+        {% if q_list %}
+            <form class="" action="{{request}}" method="post">
+                {% for q in q_list %}
+                <!-- show up the information for each questoin -->
+                    <div class="">
+                        <input type="checkbox" name="qid" value="{{q[0]}}">
+                        <div class="">
+                            {{q[1]}} <br>
+                            <!-- print all the answers -->
+                            {% for ans in q[2:] %}
+                                {{ans}},
+                            {% endfor %}
+                            <br>
+                        </div>
+                    </div>
+                {% endfor %}
+                <button type="submit" name="button">Delete Questions</button>
+            </form>
+        {% else %}
+            <p>This system currently donesn't have any question.</p>
+        {% endif %}
+    </body>
+</html>
