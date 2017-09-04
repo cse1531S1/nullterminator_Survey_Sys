@@ -1,99 +1,91 @@
 from flask import Flask, redirect, render_template, request, url_for
-from math import sqrt, sin, cos, tan, log
 from server import app
+from survey import *
+from respond import respondent
 import csv
 
-emptystring=""
-user_input=""
 
-def course():
-    with open('courses.csv','r') as csv_in:
-        reader = csv.reader(csv_in)
-        courselist=[]
-        for row in reader:
-            courselist.append(row)
-    del courselist[0]
-    return courselist
+s = survey()
 
-def question():
-    # test caset question list
-    question_list=[
-        [0,"what is your name?","A. hugo","B. ruofei","C.daniel","D.hendri"],
-        [1,"what is your favorite fruit?","A. apple","B. banana","C. rockmelon"],
-        [2,"what is your favorite color?","A. red","B. blue"]
-    ]
-    # print(question_list)
-    return question_list
 
-def list_number_of_answer(question_list):
-    answer_number_list=[]
-    for i in question_list:
-        answer_number_list.append(len(i)-2)
-    #print(answer_number_list)
-    return answer_number_list
+##THis function is being used when teacher click no question for their survey, and it could return a warning web page. 
+@app.route("/coursepage/warning", methods=["GET", "POST"])
+def warning():
+    return("hey, please go back and add your answer!")
 
-def storedquestion(qid=[],coursename=""):
-    print(qid)
-    with open('%s.csv' % coursename,'w+') as csv_out:
-        writer = csv.writer(csv_out)
-        all_question = question()
-        for j in range(len(qid)):
-            for i in range(len(all_question)):
-                if (i+1) == int(qid[j]):
-                    print(all_question[i])
-                    writer.writerow(all_question[i])
 
-@app.route("/coursepage/<string:coursename>/studentsurvey", methods=["GET", "POST"])
-def student_part(coursename=""):
-    with open('%s.csv' % coursename,'r') as csv_in:
-        reader = csv.reader(csv_in)
-        courselist=[]
-        for row in reader:
-            courselist.append(row)
-    return courselist
 
+
+##THis function is used read in the generated coursequestion.csv file, and make it a courselist.
+## after that, you could print out the coursequestionlist to show waht is your final survey 
 @app.route("/coursepage/<string:coursename>/finalsurvey", methods=["GET", "POST"])
 def finalsurvey(coursename):
     with open('%s.csv'% coursename,'r') as csv_in:
         reader = csv.reader(csv_in)
-        questionlist=[]
+        coursequestionlist=[]
         for row in reader:
-            questionlist.append(row)
-        print(questionlist)
-    return render_template("finalsurvey.html", course_name=coursename, questionfield=questionlist,length=len(questionlist), number_of_answer=list_number_of_answer(questionlist) )
+            coursequestionlist.append(row)
+        ##print(questionlist)
+    return render_template("finalsurvey.html", course_name=coursename, questionfield=coursequestionlist,length=len(coursequestionlist), number_of_answer=s.list_number_of_answer(coursequestionlist) )      
 
-@app.route("/coursepage/<string:coursename>", methods=["GET", "POST"])
-def coursepage(coursename):
+
+
+
+##first, it will show all the question have been created.
+##Then, teacher chooses his desired questions
+##All the questions being chosen will be used to create a csv file
+## if no question chosen, it won't create csv file.
+@app.route("/addquestions/<string:coursename>", methods=["GET", "POST"])
+def addquestions(coursename):
     if request.method == "POST":
-        selected_q = request.form.getlist("check_list[]")
-        storedquestion(selected_q,coursename) #create a csv file
-        return redirect(url_for('finalsurvey',coursename=coursename))
-    return render_template("surveycreate.html", course_name=coursename, questionfield=question(),length=len(question()), number_of_answer=list_number_of_answer(question()) )
+        selected_q = request.form.getlist("check_list[]") 
+        if selected_q != []:
+            s.choosequestion(selected_q,coursename) #create a csv file
+            return redirect(url_for('finalsurvey',coursename=coursename))
+        else:
+            return redirect(url_for('warning'))
+##The return statement of function question() is the list of all the questions         
+    return render_template("surveycreate.html", course_name=coursename, questionfield=s.question(),length=len(s.question()), number_of_answer=s.list_number_of_answer(s.question()) )
 
+
+
+
+
+##THis is the function to show all the course
+##The return statement of function course() is the list of all the function 
 @app.route("/selectcourse", methods=["GET", "POST"])
 def course_adding():
+   
     if request.method == "POST":
-        return redirect(url_for('coursepage', coursename=request.form["co"]))
-    return render_template("courselect.html", course=course(), length=len(course()) )
+        return redirect(url_for('addquestions', coursename=request.form["co"]))
+    with open('courses.csv','r') as csv_in:
+        reader = csv.reader(csv_in)
+        courselist=[]
+        newrow=""
+        for row in reader:
+            newrow=''.join(row)
+            courselist.append(newrow)
+    del courselist[0]
+    courselist.pop()
+    return render_template("courselect.html", course=courselist, length=len(courselist) )
 
 @app.route("/student/<string:coursename>", methods=["GET", "POST"])
 def student(coursename):
+    res = respondent(coursename)
     error = None
-    with open('%s.csv'% coursename,'r') as csv_in:
-        reader = csv.reader(csv_in)
-        questionlist=[]
-        for row in reader:
-            questionlist.append(row)
+    length = res.get_length()
+    questionlist = res.get_question()
+    
     if request.method == "POST":
         answerlist = []
-        for i in range(len(questionlist)):
+        for i in range(length):
             try:
                 answerlist.append(request.form[str(i)])
             except :
-                error="you must have to finish the survey"
+                error = "must finish the survey"
                 
-        with open('student_%s.csv'%coursename,'a') as csv_out:
-            writer = csv.writer(csv_out)
-            writer.writerow(answerlist)
-        return render_template("finish_survey.html")
-    return render_template("student.html", course_name=coursename,error = error, questionfield=questionlist,length=len(questionlist), number_of_answer=list_number_of_answer(questionlist))
+        if not error:
+            res.append_csv(answerlist)
+            return render_template("finish_survey.html")
+    
+    return render_template("student.html", course_name = coursename, error = error, questionfield = questionlist,length = length, number_of_answer = s.list_number_of_answer(questionlist))
