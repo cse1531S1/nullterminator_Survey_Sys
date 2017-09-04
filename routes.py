@@ -27,9 +27,18 @@ def add_question():
 
 @app.route("/delquest",methods= ["POST","GET"])
 def del_question():
+    # instance of quest_tree
+    qt = quest_tree()
     if request.method== "POST":
         # try to delete the question that uesr want
         # create the instance of del_question class
-        del_q = delQ(quest_tree())
-        
-    return render_template("del_q.html",request= url_for("del_question"))
+        # initial an instance of deleting question
+        del_q = delQ(qt)
+
+        del_q.doDel(request.form.getlist("qid"))
+        return render_template("success_del_q.html", request = url_for("del_question"))
+    # a instance for finding all the question
+    get_q = getQ(qt)
+    # a list for question
+    q_list = get_q.findQ()
+    return render_template("del_q.html",request= url_for("del_question"),q_list = q_list)

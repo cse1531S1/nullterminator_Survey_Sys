@@ -108,15 +108,15 @@ class quest_tree():
             print("Fail on delet question", question_id)
             return 0
 
-class deleteQ():
+class delQ():
     def __init__(self, qTree):
-        self._qTree = qTree 
+        self._qTree = qTree
     def doDel(self,qID=[]):
         if len(qID)!= 0:
             # if qid != None hence do the delete
             for qid in qID:
-                
-                self._qTree.delete_question(qid)
+
+                self._qTree.delete_question(int(qid))
             # write the change into the csv file
             csv_util.write_csv(self._qTree)
 
@@ -214,6 +214,6 @@ if __name__ == '__main__':
 
 
     #test function for delete_question
-    qDel = deleteQ(quests2)
+    qDel = delQ(quests2)
     # couldn't delete the question while flying
     #qDel.doDel([5])
