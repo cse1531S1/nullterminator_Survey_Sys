@@ -1,9 +1,7 @@
 import csv
 
-
 class survey:
-
-##This function is used to store the selected question to an coursequestion.csv file.
+    ##This function is used to store the selected question to an coursequestion.csv file.
     def choosequestion(self,q_list=[],coursename=""):
         with open('%s.csv' % coursename,'w+') as csv_out:
             writer = csv.writer(csv_out)
@@ -17,20 +15,21 @@ class survey:
                 # write the questions into csv files.
                 writer.writerow(question)
 
-## Given a course name, go get a related coursequestion csv file
-## read out all the questions
-## put it into a coursequestionlist
+    ## Given a course name, return all the questions store in the file
     def coursequestionlist(self,coursename=""):
         with open('%s.csv'% coursename,'r') as csv_in:
             reader = csv.reader(csv_in)
             coursequestionlist=[]
             for row in reader:
+                ## read out all the questions
                 coursequestionlist.append(row)
+        ## return all questions that read
         return coursequestionlist
 
-## read in a courselist csv file
-## put all the course names in to courselist
+    ## read in a courselist csv file
+    ## put all the course names in to courselist
     def courselist(self):
+        # list for storing all the course
         courselist=[]
         with open('courses.csv','r') as csv_in:
             reader = csv.reader(csv_in)
