@@ -13,7 +13,7 @@
         {%if questionfield != []%}
          
             {%for i in range(length):%}        
-                <p>{{questionfield[i][0]}}. {{questionfield[i][1]}}  </p>
+                <p>{{i+1}}. {{questionfield[i][1]}}  </p>
                 {%for j in range(number_of_answer[i]):%}
                     <p><input type="radio" name="{{i}}" value="{{j+1}}">{{questionfield[i][j+2]}}</p>
                 {%endfor%}

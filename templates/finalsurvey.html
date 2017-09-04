@@ -12,7 +12,7 @@
             {%for i in range(length):%}        
 
                 <Form method="POST">
-         <p> {{questionfield[i][0]}}.{{questionfield[i][1]}}  </p>
+         <p> {{i+1}}. {{questionfield[i][1]}}  </p>
        
                 {%for j in range(number_of_answer[i]):%}
                       <p>  {{questionfield[i][j+2]}}</p>
