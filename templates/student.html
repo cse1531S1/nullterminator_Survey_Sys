@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+    <head>
+        <title>{{course_name}} Survey</title>
+    </head>
+    <body>
+        <h1>This is your course: {{course_name}}</h1>
+        <h2>Please answer all questions.</h2>
+        {%if error%}
+            <p><font color = "red">You did not answer all questions!</font></p>
+        {%endif%}
+        {%if quest_list %}
+            <Form method="POST" >
+                {% for quest in quest_list%}
+                    <p>{{quest[0]}}. {{quest[1]}}  </p>
+
+                    {% set ans_count =0 %}
+                    {% for ans in quest[2:] %}
+                        <p><input type="radio" name="{{quest[0]}}" value="{{ans_count}}">{{ans}}</p>
+                        {% set ans_count= ans_count +1 %}
+                    {%endfor%}
+                {% endfor %}
+            <input type="submit" value="Submit">
+        {%else%}
+            <p>couldn't find the survey for this course</p>
+        {%endif%}
+
+        </Form>
+    </body>
+</html>

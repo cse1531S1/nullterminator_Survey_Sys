@@ -1,23 +1,13 @@
 from flask import Flask, redirect, render_template, request, url_for
 from server import app
-from question import quest_tree,addQ,delQ,getQ
 from survey import *
-import csv
-
+from respond import respondent
+from question import quest_tree,addQ,delQ,getQ
 
 
 @app.route("/")
 def index():
     return "hello world! - This is our website"
-
-
-##THis function is used read in the generated coursequestion.csv file, and make it a courselist.
-## after that, you could print out the coursequestionlist to show waht is your final survey
-@app.route("/survey/<string:coursename>", methods=["GET", "POST"])
-def finalsurvey(coursename):
-    s = survey()
-    return render_template("finalsurvey.html", course_name=coursename, quest_list=s.coursequestionlist(coursename) )
-
 
 # survey creation in this controller
 @app.route("/create_sur")
@@ -40,7 +30,8 @@ def course_adding(name=None):
         if selected_q != []:
             # the admin has selected some questions for this survey
             s.choosequestion(get_question.findQ(selected_q),name) #create a csv file
-            return redirect(url_for('finalsurvey',coursename=name))
+            # renturn a preview of final survey
+            return render_template("finalsurvey.html", course_name=coursename, quest_list=s.coursequestionlist(coursename) )
         else:
             error = "please add at least one question for this survey."
     # teacher have select a course but not have select a question yet
@@ -48,6 +39,32 @@ def course_adding(name=None):
     q_list = get_question.findQ()
     return render_template("surveycreate.html", course_name=name, quest_list=q_list, error = error)
 
+
+
+@app.route("/student/<string:name>", methods=["GET", "POST"])
+def student(name):
+    s = survey()
+    res = respondent(name)
+    error = None
+    length = res.get_length()
+    questionlist = res.get_question()
+
+    if request.method == "POST":
+        answerlist = []
+        for i in range(length):
+            try:
+                # get all the answer form student
+                # because the questoin_id in survey is start form 1
+                # so add 1 in i and find the answer
+                answerlist.append(request.form[str(i+1)])
+            except :
+                error = "must finish the survey"
+        print(answerlist)
+        if not error:
+            res.append_csv(answerlist)
+            return render_template("finish_survey.html")
+
+    return render_template("student.html", course_name = name, error = error, quest_list = questionlist,length = length)
 
 
 @app.route("/quest",methods = ["POST","GET"])
