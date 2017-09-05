@@ -11,9 +11,6 @@ def index():
     return "hello world! - This is our website"
 
 
-
-
-
 ##THis function is used read in the generated coursequestion.csv file, and make it a courselist.
 ## after that, you could print out the coursequestionlist to show waht is your final survey
 @app.route("/survey/<string:coursename>", methods=["GET", "POST"])
@@ -22,43 +19,35 @@ def finalsurvey(coursename):
     return render_template("finalsurvey.html", course_name=coursename, quest_list=s.coursequestionlist(coursename) )
 
 
-
-
-##first, it will show all the question have been created.
-##Then, teacher chooses his desired questions
-##All the questions being chosen will be used to create a csv file
-## if no question chosen, it won't create csv file.
-@app.route("/addquestions/<string:coursename>", methods=["GET", "POST"])
-def addquestions(coursename):
+# survey creation in this controller
+@app.route("/create_sur")
+@app.route("/create_sur/<string:name>",methods=["GET","POST"])
+def course_adding(name=None):
     s = survey()
+    if not name:
+        # name is none when teacher try to create a course
+        # render the course selection page
+        return render_template("courselect.html", course_list=s.courselist())
+    # else: teacher already have select a course
     # var for passing error message
     error = None
     # generated the list of questions
     get_question = getQ(quest_tree())
     if request.method == "POST":
+        # teacher is trying to create a survey by select questions
+        # getting all the teacher selected question
         selected_q = request.form.getlist("selected_q")
-        print(selected_q)
         if selected_q != []:
             # the admin has selected some questions for this survey
-
-            s.choosequestion(get_question.findQ(selected_q),coursename) #create a csv file
-            return redirect(url_for('finalsurvey',coursename=coursename))
+            s.choosequestion(get_question.findQ(selected_q),name) #create a csv file
+            return redirect(url_for('finalsurvey',coursename=name))
         else:
             error = "please add at least one question for this survey."
-
+    # teacher have select a course but not have select a question yet
     # getting all the question
     q_list = get_question.findQ()
-    return render_template("surveycreate.html", course_name=coursename, quest_list=q_list, error = error)
+    return render_template("surveycreate.html", course_name=name, quest_list=q_list, error = error)
 
-
-##THis is the function to show all the course
-##The return statement of function course() is the list of all the function
-@app.route("/selectcourse", methods=["GET", "POST"])
-def course_adding():
-    s = survey()
-    if request.method == "POST":
-        return redirect(url_for('addquestions', coursename=request.form["co"]))
-    return render_template("courselect.html", course_list=s.courselist() )
 
 
 @app.route("/quest",methods = ["POST","GET"])
