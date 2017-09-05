@@ -1,10 +1,53 @@
 from flask import Flask, redirect, render_template, request, url_for
 from server import app
 from question import quest_tree,addQ,delQ,getQ
+from survey import *
+import csv
+
+
 
 @app.route("/")
 def index():
     return "hello world! - This is our website"
+
+
+##THis function is used read in the generated coursequestion.csv file, and make it a courselist.
+## after that, you could print out the coursequestionlist to show waht is your final survey
+@app.route("/survey/<string:coursename>", methods=["GET", "POST"])
+def finalsurvey(coursename):
+    s = survey()
+    return render_template("finalsurvey.html", course_name=coursename, quest_list=s.coursequestionlist(coursename) )
+
+
+# survey creation in this controller
+@app.route("/create_sur")
+@app.route("/create_sur/<string:name>",methods=["GET","POST"])
+def course_adding(name=None):
+    s = survey()
+    if not name:
+        # name is none when teacher try to create a course
+        # render the course selection page
+        return render_template("courselect.html", course_list=s.courselist())
+    # else: teacher already have select a course
+    # var for passing error message
+    error = None
+    # generated the list of questions
+    get_question = getQ(quest_tree())
+    if request.method == "POST":
+        # teacher is trying to create a survey by select questions
+        # getting all the teacher selected question
+        selected_q = request.form.getlist("selected_q")
+        if selected_q != []:
+            # the admin has selected some questions for this survey
+            s.choosequestion(get_question.findQ(selected_q),name) #create a csv file
+            return redirect(url_for('finalsurvey',coursename=name))
+        else:
+            error = "please add at least one question for this survey."
+    # teacher have select a course but not have select a question yet
+    # getting all the question
+    q_list = get_question.findQ()
+    return render_template("surveycreate.html", course_name=name, quest_list=q_list, error = error)
+
 
 
 @app.route("/quest",methods = ["POST","GET"])

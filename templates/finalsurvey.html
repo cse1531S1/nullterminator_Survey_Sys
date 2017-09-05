@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+   <head>
+   <title>final survey </title>
+   </head>
+   <body>
+        {%if quest_list %}
+
+            <h1> This is your course: {{course_name}} </h1>
+            <h1> These are the questions chosen for survey!! </h1>
+            <!-- i is for the number behind each question -->
+            {%for quest in quest_list %}
+                <p> Q{{quest[0]}}. {{quest[1]}}</p>
+                answers:
+                <!-- print out all the answers -->
+                {%for ans in quest[2:] %}
+                     {{ans}}
+                {%endfor%}
+            {%endfor%}
+        {%else%}
+            <!-- very special error -->
+            <h1> Unknown Error:</h1>
+            <p><b>Reason:</b> No question added for a created survey</p>
+        {% endif %}
+   </body>
+</html>

@@ -70,8 +70,8 @@ class quest_tree():
             for i in ques_id:
                 # searching all the given values
                 try:
-
-                    return_list.append(cls._questDisct[i].getlist() )
+                    # try to search the for the valid question.
+                    return_list.append(cls._questDisct[int(i)].getlist() )
                 except KeyError:
                     print ("fail on find question", i)
             return return_list
@@ -124,13 +124,15 @@ class getQ():
     """docstring for getQuestion."""
     def __init__(self,qTree):
         super(getQ, self).__init__()
+        # keep an instance of the question_tree.
         self._qTree = qTree
-    # def fname(arg):
-    #     pass
     def findQ(self,qId = None):
-        return self._qTree.find_question(qId)
-
-
+        return_list = self._qTree.find_question(qId)
+        if len(return_list) ==0:
+            # return none obj, to better template use
+            return None
+        # else:
+        return return_list
 class addQ():
     """docstring for addQuestion."""
     def __init__(self, quest_tree):

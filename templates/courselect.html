@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Ongoing Courses</title>
+    </head>
+
+    <body>
+    <h1>Select an ongoing Course to Start a Survey</h1>
+        {% if course_list %}
+            {% for course in course_list %}
+                <a href="{{ url_for("course_adding",name= course)}}">{{course}}</a> <br>
+            {% endfor %}
+        {%else%}
+            <p>Currently all ongoing course have been created a survey, or currently there isn't an ongoing course.</p>
+        {%endif%}
+</body>
+</html>
