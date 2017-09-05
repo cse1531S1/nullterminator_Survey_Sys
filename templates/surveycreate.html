@@ -1,32 +1,31 @@
 <!doctype html>
 <html>
-   <head>
-   <title>survey~create </title>
-   </head>
-   <body>
-        <h1> This is your course: {{course_name}} </h1>
-      <h1> please click your desired question number for your survey </h1>
+    <head>
+    <title>Edit: {{course_name}} Survey</title>
+    </head>
+    <body>
+        <h1>Edit: {{course_name}} Survey</h1>
+        <h2> please click your desired question number for your survey </h2>
 
-        {%if questionfield != []%}
-         
-            {%for i in range(length):%}        
+        {%if quest_list != []%}
 
-                <Form method="POST">
-         <p> <input type="checkbox" name="check_list[]" value="{{questionfield[i][0]}}" >{{questionfield[i][0]}}.{{questionfield[i][1]}}  </p>
-                
-                {%for j in range(number_of_answer[i]):%}
-            
-                 
-                        <p>{{questionfield[i][j+2]}}</p>
-                               
+            {% if error %}
+                <p>{{error}}</p>
+            {% endif %}
+            <Form method="POST">
+                {% for quest in quest_list %}
+                    <input type="checkbox" name="selected_q" value="{{quest[0]}}" >
+                        {{quest[1]}} <br>
+                        {% for answer in quest[2:] %}
+                            {{answer}}
+                        {% endfor %}
+                        <br>
                 {%endfor%}
-            {%endfor%}
+                <input type="submit" value="Submit">
+            </From>
         {%else%}
-            </br></br>
+            <p>please add a question in the system</p>
         {%endif%}
-        <input type="submit" value="Submit">
-      </From>
-      </Form>
-   </body>
+
+    </body>
 </html>
-      

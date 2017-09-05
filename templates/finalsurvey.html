@@ -4,25 +4,23 @@
    <title>final survey </title>
    </head>
    <body>
-        <h1> This is your course: {{course_name}} </h1>
-        <h1> These are the questions chosen for survey!! </h1>
+        {%if quest_list %}
 
-        {%if questionfield != []%}
-         
-            {%for i in range(length):%}        
-
-                <Form method="POST">
-         <p> Q{{i+1}}. {{questionfield[i][1]}}  [Answer]  </p>
-          
-                {%for j in range(number_of_answer[i]):%}
-                      <p> {{questionfield[i][j+2]}}</p>
-     
+            <h1> This is your course: {{course_name}} </h1>
+            <h1> These are the questions chosen for survey!! </h1>
+            <!-- i is for the number behind each question -->
+            {%for quest in quest_list %}
+                <p> Q{{quest[0]}}. {{quest[1]}}</p>
+                answers:
+                <!-- print out all the answers -->
+                {%for ans in quest[2:] %}
+                     {{ans}}
                 {%endfor%}
             {%endfor%}
         {%else%}
-            </br></br>
-        {%endif%}
-        <p>URL for student: <a href ="http://localhost:8080/student/{{course_name}}">http://localhost:8080/student/{{course_name}}</a></p>
-      </Form>
+            <!-- very special error -->
+            <h1> Unknown Error:</h1>
+            <p><b>Reason:</b> No question added for a created survey</p>
+        {% endif %}
    </body>
 </html>

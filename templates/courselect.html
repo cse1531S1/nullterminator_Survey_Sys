@@ -1,22 +1,17 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>course~select</title>
+        <title>Ongoing Courses</title>
     </head>
 
     <body>
-    <h1>This is course selection page</h1>
-        {%if course != ""%}
-         
-            {%for i in range(length):%}        
-
-                <Form method="POST">
-                <p><input type="radio" name="co" value="{{course[i]}}" >{{course[i]}}</p>
-            {%endfor%}
+    <h1>Select an ongoing Course to Start a Survey</h1>
+        {% if course_list %}
+            {% for course in course_list %}
+                <a href="{{ url_for("course_adding",name= course)}}">{{course}}</a> <br>
+            {% endfor %}
         {%else%}
-            </br></br>
+            <p>Currently all ongoing course have been created a survey, or currently there isn't an ongoing course.</p>
         {%endif%}
-        <input type="submit" value="Submit">
-      </From>
 </body>
 </html>
