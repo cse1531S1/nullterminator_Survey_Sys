@@ -5,7 +5,6 @@ class survey:
     def choosequestion(self,q_list=[],coursename=""):
         with open('%s.csv' % coursename,'w+') as csv_out:
             writer = csv.writer(csv_out)
-            print(q_list)
             # i if the new order of each question
             i = 0
             for question in q_list:

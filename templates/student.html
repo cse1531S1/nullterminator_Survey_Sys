@@ -1,28 +1,30 @@
 <!doctype html>
 <html>
     <head>
-        <title>Student - {{course_name}}</title>
+        <title>{{course_name}} Survey</title>
     </head>
     <body>
         <h1>This is your course: {{course_name}}</h1>
         <h2>Please answer all questions.</h2>
-        <Form method="POST">
         {%if error%}
             <p><font color = "red">You did not answer all questions!</font></p>
         {%endif%}
-        {%if questionfield != []%}
-         
-            {%for i in range(length):%}        
-                <p>{{i+1}}. {{questionfield[i][1]}}  </p>
-                {%for j in range(number_of_answer[i]):%}
-                    <p><input type="radio" name="{{i}}" value="{{j+1}}">{{questionfield[i][j+2]}}</p>
-                {%endfor%}
-            {%endfor%}
+        {%if quest_list %}
+            <Form method="POST" >
+                {% for quest in quest_list%}
+                    <p>{{quest[0]}}. {{quest[1]}}  </p>
+
+                    {% set ans_count =0 %}
+                    {% for ans in quest[2:] %}
+                        <p><input type="radio" name="{{quest[0]}}" value="{{ans_count}}">{{ans}}</p>
+                        {% set ans_count= ans_count +1 %}
+                    {%endfor%}
+                {% endfor %}
+            <input type="submit" value="Submit">
         {%else%}
-            </br></br>
+            <p>couldn't find the survey for this course</p>
         {%endif%}
-        <input type="submit" value="Submit">
-        
+
         </Form>
     </body>
 </html>
