@@ -7,7 +7,8 @@ from question import quest_tree,addQ,delQ,getQ
 
 @app.route("/")
 def index():
-    return "hello world! - This is our website"
+	
+    return render_template("main.html")
 
 # survey creation in this controller
 @app.route("/create_sur")
