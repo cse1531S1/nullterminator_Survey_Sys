@@ -22,6 +22,9 @@
                         <br>
                 {%endfor%}
                 <input type="submit" value="Submit">
+                <form action="/results", method="GET">
+                   <p><input type="submit" value="Show Data"></p>
+                </form>
             </From>
         {%else%}
             <p>please add a question in the system</p>

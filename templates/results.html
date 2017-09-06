@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Show~Results</title>
+    </head>
+
+    <body>
+    <h1>Results</h1>
+        {%if results != ""%}         
+            {%for i in range(length):%}        
+
+                <Form method="POST">
+                <p>{{results[i]}}</p>
+            {%endfor%}
+        {%else%}
+            </br></br>
+        {%endif%}
+        <input type="submit" value="Exit">
+      </From>
+</body>
+</html>

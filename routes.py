@@ -6,10 +6,11 @@ from question import quest_tree,addQ,delQ,getQ
 
 
 @app.route("/", methods = ["GET", "POST"])
+#This isnt going to the login page first...
 def index():
     s = survey()
     if request.method == "GET":
-	    return render_template("courselect.html", course_list=s.courselist())
+        return render_template("courselect.html", course_list=s.courselist())
     return render_template("main.html")
 
 # survey creation in this controller
@@ -109,3 +110,24 @@ def del_question():
     # a list for question
     q_list = get_q.findQ()
     return render_template("del_q.html",request= url_for("del_question"),q_list = q_list)
+    
+    #Route to the results page displaying results of a survey.
+    #not sure how the data csv's are setup or how it should know which csv to read
+    @app.route("/results")
+    def show_results():
+        s = survey()
+        if request.method == "GET":
+            return render_template("results.html",res_list=get_results())
+        return render_template("surveycreate.html", course_list = s.course_list())
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
