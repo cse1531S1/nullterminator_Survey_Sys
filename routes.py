@@ -7,7 +7,7 @@ from question import quest_tree,addQ,delQ,getQ
 
 @app.route("/")
 def index():
-	
+
     return render_template("main.html")
 
 # survey creation in this controller
@@ -32,7 +32,7 @@ def course_adding(name=None):
             # the admin has selected some questions for this survey
             s.choosequestion(get_question.findQ(selected_q),name) #create a csv file
             # renturn a preview of final survey
-            return render_template("finalsurvey.html", course_name=coursename, quest_list=s.coursequestionlist(coursename) )
+            return render_template("finalsurvey.html", course_name=name, quest_list=s.coursequestionlist(name) )
         else:
             error = "please add at least one question for this survey."
     # teacher have select a course but not have select a question yet
