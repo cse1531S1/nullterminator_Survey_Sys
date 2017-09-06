@@ -39,6 +39,17 @@ class survey:
             # special usecase to return the None obj to template
             return None
         return courselist
+        	
+    def get_results():
+        results = []
+        def read():
+            with open('data.csv', 'r') as csv_in:
+                reader = csv.reader(csv_in)
+                for row in reader:
+                    results.append(row)
+        return results 
+    
+    
 
 
 if __name__ == '__main__':

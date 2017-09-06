@@ -5,9 +5,11 @@ from respond import respondent
 from question import quest_tree,addQ,delQ,getQ
 
 
-@app.route("/")
+@app.route("/", methods = ["GET", "POST"])
 def index():
-	
+    s = survey()
+    if request.method == "GET":
+	    return render_template("courselect.html", course_list=s.courselist())
     return render_template("main.html")
 
 # survey creation in this controller
@@ -39,6 +41,10 @@ def course_adding(name=None):
     # getting all the question
     q_list = get_question.findQ()
     return render_template("surveycreate.html", course_name=name, quest_list=q_list, error = error)
+
+
+
+
 
 
 
