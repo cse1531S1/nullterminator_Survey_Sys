@@ -1,9 +1,8 @@
-<!doctype html>
-<html>
-   <head>
-   <title>Completed survey</title>
-   </head>
-   <body>
-   <p>Thank you for finishing the survey.</p>
-   </body>
-</html>
+{%extends "base.html"%}
+{%block title%}Completed survey{%endblock%}
+{%block body%}
+    <div class="alert alert-success" role="alert">
+        <h4>Thank you!</h4>
+        <p>Your opinion is accepted</p>
+    </div>
+{endblock}

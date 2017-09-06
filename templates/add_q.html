@@ -1,17 +1,27 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title>Please add a question</title>
-    </head>
-    <body>
-        {% if error!=None %}
-            <p>{{error}}</p>
-        {% endif %}
-        <form class="" action="{{request}}" method="POST">
-            <input type="text" name="question" value="{{question}}" placeholder="Question">
-            <input type="text" name="answers" value="{{answers}}" placeholder="Answer1, Answer2, ..">
-            <button type="submit" name="">Add a Question</button>
-        </form>
-    </body>
-</html>
+{%extends "base.html"%}
+{% block title %}Please add a question{% endblock %}
+{%block body%}
+    <h2>Add a Question to Site</h2>
+    {% if error %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {{error}}
+    </div>
+    {% endif %}
+    <form class="" action="{{request}}" method="POST">
+        <div class="form-group">
+            <label>Question:</label>
+            <input type="text" name="question" value="{{question}}" class="form-control" placeholder="Question">
+        </div>
+        <div class="form-group">
+            <label>Answers:</label>
+            <input type="text" name="answers" value="{{answers}}" class="form-control" placeholder="Answer1, Answer2, ..">
+            <small class="form-text text-muted">
+                The answer can be infinate many, but at lease two. Syntax is: Answer1,Answer2,Answer3,..,AnswerN
+            </small>
+        </div>
+        <button type="submit" class="btn btn-primary" name="">Add a Question</button>
+    </form>
+{% endblock %}

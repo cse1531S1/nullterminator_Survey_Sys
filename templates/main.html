@@ -1,17 +1,15 @@
-<!doctype html>
-
-<html>
-	<head> 
-	<title>Welcome Page</title> 
-	   <h1> Hello Adminisrator, please log in </h1>
-	</head>
-	
-	<body>
-	 <form>
-       Username:<br>
-  	  <p><input type="text" name="username"><br></p>
-  	   Password:<br>
-  	  <p><input type="text" name="password"></p>
-  	  
-  	  <p><input type="submit" value="Submit"></p>
-	</form> 
+{%extends "base.html"%}
+{% block title%}Login{%endblock%}
+{% block body %}
+    <form>
+        <div class="container">
+            <div class="signin" >
+                <h1>Sign In</h1>
+                <input type="text" name="username" placeholder="username" class="form-control"/>
+                <input type="password" name="password" placeholder="password" class="form-control"/>
+                <br />
+                <button type="submit" class="btn btn-success btn-block" name="button">Login</button>
+            </div>
+        </div>
+    </form>
+{% endblock %}

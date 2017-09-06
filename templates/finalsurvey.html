@@ -1,31 +1,32 @@
-<!doctype html>
-<html>
-   <head>
-   <title>final survey </title>
-   </head>
-   <body>
-        {%if quest_list %}
+{%extends "base.html"%}
+{%block title%}{{course_name}} Survey Preview{%endblock%}
+{%block body %}
+    {%if quest_list %}
 
-            <h1> This is your course: {{course_name}} </h1>
-            <h1> These are the questions chosen for survey!! </h1>
-            <!-- i is for the number behind each question -->
-            {%for quest in quest_list %}
-                <p> Q{{quest[0]}}. {{quest[1]}}</p>
-                answers:
-                <!-- print out all the answers -->
-                {%for ans in quest[2:] %}
-                     {{ans}}
-                {%endfor%}
+        <h1>{{course_name}} Web Survey <span class="badge badge-success">preview</span></h1>
+
+        {%for quest in quest_list %}
+            <p>{{quest[0]}}. {{quest[1]}}  </p>
+
+            {% set ans_count =0 %}
+            {% for ans in quest[2:] %}
+            <div class="form-check">
+                <label class="form-check-label disabled">
+                    <input type="radio" name="{{quest[0]}}" class="form-check-input" value="{{ans_count}}" disabled/>{{ans}}
+                    {% set ans_count= ans_count +1 %}
+                </label>
+            </div>
             {%endfor%}
-            <br>
-            url for this Survey:
-            <a href="{{url_for("student",_external=True, name = course_name)}}">
-                {{url_for("student",_external=True, name = course_name)}}
-            </a>
-        {%else%}
-            <!-- very special error -->
+        {%endfor%}
+        url for this Survey:
+        <a href="{{url_for("student",_external=True, name = course_name)}}">
+            {{url_for("student",_external=True, name = course_name)}}
+        </a>
+    {%else%}
+        <!-- very special error -->
+        <div class="alert alert-danger " role="alert">
             <h1> Unknown Error:</h1>
             <p><b>Reason:</b> No question added for a created survey</p>
-        {% endif %}
-   </body>
-</html>
+        </div>
+    {% endif %}
+{%endblock%}
