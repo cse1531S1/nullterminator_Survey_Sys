@@ -61,14 +61,13 @@ def list_number_of_answer(question_list):
 ##This function is used to store the selected question to an coursequestion.csv file.
 def storedquestion(qid=[],coursename=""):
     print(qid)
-    with open('%s.csv' % coursename,'w+') as csv_out:
-        writer = csv.writer(csv_out)
-        all_question = question()
-        for j in range(len(qid)):
-            for i in range(len(all_question)):
-                if (i+1) == int(qid[j]):
-                    print(all_question[i])
-                    writer.writerow(all_question[i]) 
+    
+    all_question = question()
+    for j in range(len(qid)):
+        for i in range(len(all_question)):
+            if (i+1) == int(qid[j]):
+                print(all_question[i])
+                writer.writerow(all_question[i]) 
 
 
 
@@ -90,7 +89,8 @@ def finalsurvey(coursename):
             coursequestionlist.append(row)
         ##print(questionlist)
     return render_template("finalsurvey.html", course_name=coursename, questionfield=coursequestionlist,length=len(coursequestionlist), number_of_answer=list_number_of_answer(coursequestionlist) )      
-
+with open('%s.csv' % coursename,'w+') as csv_out:
+        writer = csv.writer(csv_out)
 
 
 ##first, it will show all the question have been created.
@@ -110,8 +110,6 @@ def coursepage(coursename):
     return render_template("surveycreate.html", course_name=coursename, questionfield=question(),length=len(question()), number_of_answer=list_number_of_answer(question()) )
 
 
-
-
 ##THis is the function to show all the course
 ##The return statement of function course() is the list of all the function 
 @app.route("/selectcourse", methods=["GET", "POST"])
@@ -121,7 +119,36 @@ def course_adding():
         return redirect(url_for('coursepage', coursename=request.form["co"]))
     return render_template("courselect.html", course=course(), length=len(course()) )
 
+
+
+
+
+
+
+
+#Display page of results for a particular course
+#unfinished -- 
+@app.route("/show_results", methods=["GET", "POST"])
+def show_results(coursename):
+    if request.method == "POST":
+        return redirect(url_for('resultspage', resultList=request.form["results"]))
+    return render_template("course_results.html", resultlist=get_results(), length=len(results()), course=coursename )
 	
+def get_results():
+    results = {}
+    def read():
+        with open('data.csv', 'r') as csv_in:
+            reader = csv.reader(csv_in)
+            for row in reader:
+                results.append(row)
+        return results	
+
+
+
+
+
+
+
 
 
 
