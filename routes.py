@@ -9,7 +9,10 @@ from question import quest_tree,addQ,delQ,getQ
 #This isnt going to the login page first...
 def index():
     s = survey()
-    if request.method == "GET":
+    
+    if request.method == "POST":
+        #username = request.form["Username"]
+        #password = request.form["Password"]
         return render_template("courselect.html", course_list=s.courselist())
     return render_template("main.html")
 
