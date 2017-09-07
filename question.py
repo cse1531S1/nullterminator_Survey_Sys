@@ -140,9 +140,9 @@ class addQ():
         self._qTree =quest_tree
     def is_valid_Q(self,question = "", answers = []):
         if len(question)<= 0:
-            return "question has not define"
+            return "Undifined question."
         if len(answers) <2:
-            return "answer is not enough"
+            return "This question at least have two answers."
         return 0
     def add_Q(self, question = "", answers = []):
         if self.is_valid_Q(question, answers)== 0:

@@ -4,12 +4,13 @@
     <h1>Select a Course to Create a Survey</h1>
     {% if course_list %}
         {% for course in course_list %}
-            <a href="{{ url_for("course_adding",name= course)}}">{{course}}</a> <br>
+            <a href="{{ url_for("show_results",name = course)}}">{{course}}</a> <br>
         {% endfor %}
     {%else%}
         <div class="alert alert-danger" role="alert">
-            <h2>WoW!</h2>
-            <p>Currently all ongoing course have been created a survey, or currently there isn't an ongoing course.</p>
+            <h2>Error:</h2>
+            <p>Couldn't find any survey that have recorded data.</p>
+            <p>Try to: <a href="{{url_for("course_adding")}}">Create a Survey</a></p>
         </div>
     {%endif%}
 {%endblock%}

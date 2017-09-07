@@ -16,14 +16,18 @@ class survey:
 
     ## Given a course name, return all the questions store in the file
     def coursequestionlist(self,coursename=""):
-        with open('%s.csv'% coursename,'r') as csv_in:
-            reader = csv.reader(csv_in)
-            coursequestionlist=[]
-            for row in reader:
-                ## read out all the questions
-                coursequestionlist.append(row)
-        ## return all questions that read
-        return coursequestionlist
+        try:
+            with open('%s.csv'% coursename,'r') as csv_in:
+                reader = csv.reader(csv_in)
+                coursequestionlist=[]
+                for row in reader:
+                    ## read out all the questions
+                    coursequestionlist.append(row)
+            ## return all questions that read
+            return coursequestionlist
+        except FileNotFoundError:
+            # couldn't open the file 
+            return []
 
     ## read in a courselist csv file
     ## put all the course names in to courselist

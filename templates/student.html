@@ -1,30 +1,37 @@
-<!doctype html>
-<html>
-    <head>
-        <title>{{course_name}} Survey</title>
-    </head>
-    <body>
-        <h1>This is your course: {{course_name}}</h1>
-        <h2>Please answer all questions.</h2>
-        {%if error%}
-            <p><font color = "red">You did not answer all questions!</font></p>
-        {%endif%}
-        {%if quest_list %}
-            <Form method="POST" >
-                {% for quest in quest_list%}
-                    <p>{{quest[0]}}. {{quest[1]}}  </p>
+{%extends "base.html"%}
+{%block title%}{{course_name}} Survey{%endblock%}
+{%block body%}
+    <h1>{{course_name}} Web Survey</h1>
+    {%if error%}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            {{error}}
+        </div>
+    {%endif%}
+    {%if quest_list %}
+        <Form method="POST" >
+            {%for quest in quest_list %}
+                <p>{{quest[0]}}. {{quest[1]}}  </p>
 
-                    {% set ans_count =0 %}
-                    {% for ans in quest[2:] %}
-                        <p><input type="radio" name="{{quest[0]}}" value="{{ans_count}}">{{ans}}</p>
+                {% set ans_count =0 %}
+                {% for ans in quest[2:] %}
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="radio" name="{{quest[0]}}" class="form-check-input" value="{{ans_count}}" />{{ans}}
                         {% set ans_count= ans_count +1 %}
-                    {%endfor%}
-                {% endfor %}
-            <input type="submit" value="Submit">
-        {%else%}
-            <p>couldn't find the survey for this course</p>
-        {%endif%}
-
+                    </label>
+                </div>
+                {%endfor%}
+            {%endfor%}
+            <br>
+            <button type="submit" class="btn btn-outline-success" name="button">I have finished this survey!</button>
         </Form>
-    </body>
-</html>
+    {%else%}
+        <div class="alert alert-danger " role="alert">
+            <p>couldn't find the survey for this course</p>
+        </div>
+    {%endif%}
+
+{%endblock%}
