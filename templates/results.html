@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Show~Results</title>
+    </head>
+
+    <body>
+        <h1>Results</h1>
+        {% set count = [1] %}              
+        {% for res in results %}  
+             <p>Q{{count}} - {{res}}</p>
+             {% if count.append(count.pop() + 1) %}{%endif%}
+         {% endfor %}              
+           <Form action="" method="POST">
+                 <input type="submit" value="Go Back">
+           </Form>
+     </body>
+</html>
