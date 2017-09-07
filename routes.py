@@ -8,7 +8,7 @@ from question import quest_tree,addQ,delQ,getQ
 @app.route("/")
 def index():
 
-    return render_template("main.html")
+    return render_template("index.html")
 
 # survey creation in this controller
 @app.route("/create_sur")
@@ -32,13 +32,15 @@ def course_adding(name=None):
             # the admin has selected some questions for this survey
             s.choosequestion(get_question.findQ(selected_q),name) #create a csv file
             # renturn a preview of final survey
-            return render_template("finalsurvey.html", course_name=name, quest_list=s.coursequestionlist(name) )
+            return render_template("finalsurvey.html", course_name=name,\
+                quest_list=s.coursequestionlist(name) )
         else:
-            error = "please add at least one question for this survey."
+            error = "Please add at least one question for this survey."
     # teacher have select a course but not have select a question yet
     # getting all the question
     q_list = get_question.findQ()
-    return render_template("surveycreate.html", course_name=name, quest_list=q_list, error = error)
+    return render_template("surveycreate.html", course_name=name,\
+        quest_list=q_list, error = error)
 
 
 
@@ -59,13 +61,14 @@ def student(name):
                 # so add 1 in i and find the answer
                 answerlist.append(request.form[str(i+1)])
             except :
-                error = "must finish the survey"
+                error = "You must finish all the questions."
         print(answerlist)
         if not error:
             res.append_csv(answerlist)
             return render_template("finish_survey.html")
 
-    return render_template("student.html", course_name = name, error = error, quest_list = questionlist,length = length)
+    return render_template("student.html", course_name = name, error = error,\
+        quest_list = questionlist,length = length)
 
 
 @app.route("/quest",methods = ["POST","GET"])
@@ -81,9 +84,12 @@ def add_question():
             # push the user input into system
             add_q.add_Q(question, answers)
             # get back the successful page to user
-            return render_template("success_add_q.html",add_more = url_for("add_question"))
+            return render_template("success_add_q.html",add_more = \
+                url_for("add_question"))
         # invalid input, push back what user has been input, and push the error message
-        return render_template("add_q.html",request = url_for("add_question"),error = add_q.is_valid_Q(question,answers),question = question, answers = request.form["answers"])
+        return render_template("add_q.html",request = url_for("add_question"),\
+            error = add_q.is_valid_Q(question,answers),question = question, \
+            answers = request.form["answers"])
     return render_template("add_q.html",request = url_for("add_question"))
 
 @app.route("/delquest",methods= ["POST","GET"])
@@ -97,9 +103,11 @@ def del_question():
         del_q = delQ(qt)
 
         del_q.doDel(request.form.getlist("qid"))
-        return render_template("success_del_q.html", request = url_for("del_question"))
+        return render_template("success_del_q.html", \
+            request = url_for("del_question"))
     # a instance for finding all the question
     get_q = getQ(qt)
     # a list for question
     q_list = get_q.findQ()
-    return render_template("del_q.html",request= url_for("del_question"),q_list = q_list)
+    return render_template("del_q.html",request= url_for("del_question"),\
+        q_list = q_list)
