@@ -5,17 +5,14 @@
     </head>
 
     <body>
-    <h1>Results</h1>
-        {%if results != ""%}         
-            {%for i in range(length):%}        
-
-                <Form method="POST">
-                <p>{{results[i]}}</p>
-            {%endfor%}
-        {%else%}
-            </br></br>
-        {%endif%}
-        <input type="submit" value="Exit">
-      </From>
-</body>
+        <h1>Results</h1>
+        {% set count = [1] %}              
+        {% for res in results %}  
+             <p>Q{{count}} - {{res}}</p>
+             {% if count.append(count.pop() + 1) %}{%endif%}
+         {% endfor %}              
+           <Form action="" method="POST">
+                 <input type="submit" value="Go Back">
+           </Form>
+     </body>
 </html>
