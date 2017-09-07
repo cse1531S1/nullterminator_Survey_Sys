@@ -23,3 +23,13 @@ class respondent():
 
     def get_question(self):
         return self._question
+        
+    def get_results(self):
+        results = []
+     
+        with open('student/%s.csv' % self.coursename, 'r') as csv_in:
+            reader = csv.reader(csv_in)
+            for row in reader:
+                results.append(row)
+               
+        return results 
