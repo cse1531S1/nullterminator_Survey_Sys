@@ -1,22 +1,38 @@
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, redirect, render_template, request, url_for,session
 from server import app
 from survey import *
 from respond import respondent
 from question import quest_tree,addQ,delQ,getQ
 
 
-@app.route("/", methods = ["GET", "POST"])
+@app.route("/login", methods = ["GET", "POST"])
 #This isnt going to the login page first...
-def index():
+def login():
     s = survey()
-    if request.method == "GET":
-        return render_template("courselect.html", course_list=s.courselist())
+    if request.method == "POST":
+        if request.form["username"]== app.config['USERNAME'] and \
+            request.form["password"] == app.config['PASSWORD']:
+            # valid usesr
+            session["logged_in"] = True
+            return redirect(url_for("course_adding"))
+
     return render_template("main.html")
+
+@app.route("/logout")
+def logout():
+    if session.get("logged_in"):
+        session.pop("logged_in",None)
+    return redirect(url_for("login"), code=302, Response=None)
 
 # survey creation in this controller
 @app.route("/create_sur")
 @app.route("/create_sur/<string:name>",methods=["GET","POST"])
 def course_adding(name=None):
+    # force login first
+    if not session.get("logged_in"):
+        return redirect(url_for("login"), code=302, Response=None)
+
+    # else: the admin has logged_in
     s = survey()
     if not name:
         # name is none when teacher try to create a course
@@ -77,6 +93,11 @@ def student(name):
 
 @app.route("/quest",methods = ["POST","GET"])
 def add_question():
+    # force login first
+    if not session.get("logged_in"):
+        return redirect("login", code=302, Response=None)
+
+    # else: the admin has logged_in
     if request.method == "POST":
         # get the question set
         add_q = addQ(quest_tree())
@@ -95,6 +116,11 @@ def add_question():
 
 @app.route("/delquest",methods= ["POST","GET"])
 def del_question():
+    # force login first
+    if not session.get("logged_in"):
+        return redirect("login", code=302, Response=None)
+
+    # else: the admin has logged_in
     # instance of quest_tree
     qt = quest_tree()
     if request.method== "POST":
@@ -110,24 +136,17 @@ def del_question():
     # a list for question
     q_list = get_q.findQ()
     return render_template("del_q.html",request= url_for("del_question"),q_list = q_list)
-    
-    #Route to the results page displaying results of a survey.
-    #not sure how the data csv's are setup or how it should know which csv to read
-    @app.route("/results")
-    def show_results():
-        s = survey()
-        if request.method == "GET":
-            return render_template("results.html",res_list=get_results())
-        return render_template("surveycreate.html", course_list = s.course_list())
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+#Route to the results page displaying results of a survey.
+#not sure how the data csv's are setup or how it should know which csv to read
+@app.route("/results")
+def show_results():
+    # force login first
+    if not session.get("logged_in"):
+        return redirect("login", code=302, Response=None)
+
+    # else: the admin has logged_in
+    s = survey()
+    if request.method == "GET":
+        return render_template("results.html",res_list=get_results())
+    return render_template("surveycreate.html", course_list = s.course_list())
