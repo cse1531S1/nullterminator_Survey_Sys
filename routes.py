@@ -9,7 +9,6 @@ from question import quest_tree,addQ,delQ,getQ
 #This isnt going to the login page first...
 def login():
     s = survey()
-<<<<<<< HEAD
     if request.method == "POST":
         if request.form["username"]== app.config['USERNAME'] and \
             request.form["password"] == app.config['PASSWORD']:
@@ -17,13 +16,7 @@ def login():
             session["logged_in"] = True
             return redirect(url_for("course_adding"))
 
-=======
 
-    if request.method == "POST":
-        #username = request.form["Username"]
-        #password = request.form["Password"]
-        return render_template("courselect.html", course_list=s.courselist())
->>>>>>> 7024994a46deecd4f6102570b669fef2e04cdaa3
     return render_template("main.html")
 
 @app.route("/logout")
@@ -59,7 +52,7 @@ def course_adding(name=None):
             # the admin has selected some questions for this survey
             s.choosequestion(get_question.findQ(selected_q),name) #create a csv file
             # renturn a preview of final survey
-            return render_template("finalsurvey.html", course_name=coursename, quest_list=s.coursequestionlist(coursename) )
+            return render_template("finalsurvey.html", course_name=name, quest_list=s.coursequestionlist(name) )
         else:
             error = "please add at least one question for this survey."
     # teacher have select a course but not have select a question yet
