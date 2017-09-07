@@ -13,7 +13,7 @@
     <body>
         <nav class="navbar navbar-expand-md navbar-light fixed-top bg-light ">
             <div class="container">
-                <a class="navbar-brand" href="{{url_for("index")}}">Servey Site</a>
+                <a class="navbar-brand" href="{{url_for("index")}}">Survey Site</a>
             </div>
         </nav>
         <div  class="nav-clear">
@@ -23,6 +23,7 @@
         <div class="container">
             {% block heading %}{% endblock%}
         </div>
+        <br>
         <div class="container">
             {% block body %}{% endblock %}
         </div>
