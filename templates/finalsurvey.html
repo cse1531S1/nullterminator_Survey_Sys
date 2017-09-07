@@ -18,6 +18,7 @@
             </div>
             {%endfor%}
         {%endfor%}
+        <br>
         url for this Survey:
         <a href="{{url_for("student",_external=True, name = course_name)}}">
             {{url_for("student",_external=True, name = course_name)}}
@@ -26,7 +27,7 @@
         <!-- very special error -->
         <div class="alert alert-danger " role="alert">
             <h1> Unknown Error:</h1>
-            <p><b>Reason:</b> No question added for a created survey</p>
+            <p><b>Reason:</b> No question added for a created survey.</p>
         </div>
     {% endif %}
 {%endblock%}

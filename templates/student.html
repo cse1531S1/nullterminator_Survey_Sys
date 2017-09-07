@@ -12,15 +12,20 @@
     {%endif%}
     {%if quest_list %}
         <Form method="POST" >
-            {% for quest in quest_list%}
+            {%for quest in quest_list %}
                 <p>{{quest[0]}}. {{quest[1]}}  </p>
 
                 {% set ans_count =0 %}
                 {% for ans in quest[2:] %}
-                    <input type="radio" name="{{quest[0]}}" value="{{ans_count}}">{{ans}}
-                    {% set ans_count= ans_count +1 %}
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="radio" name="{{quest[0]}}" class="form-check-input" value="{{ans_count}}" />{{ans}}
+                        {% set ans_count= ans_count +1 %}
+                    </label>
+                </div>
                 {%endfor%}
-            {% endfor %}
+            {%endfor%}
+            <br>
             <button type="submit" class="btn btn-outline-success" name="button">I have finished this survey!</button>
         </Form>
     {%else%}

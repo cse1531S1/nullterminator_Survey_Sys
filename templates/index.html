@@ -30,5 +30,18 @@
             <a href="{{url_for("course_adding")}}" class="btn btn-primary">Try me!</a>
         </div>
     </div>
-
+    <br>
+    <div class="row">
+        <div class="col-4">
+            <h2>Login Credential</h2>
+            <p>Just you can use this system as an admin user, No one can see the data and post unwanted survey to students.</p>
+            <a href="{{url_for("login")}}" class="btn btn-primary">Login</a>
+            <a href="{{url_for("logout")}}" class="btn btn-outline-danger">Logout</a>
+        </div>
+        <div class="col-4">
+            <h2>Show Statistic</h2>
+            <p>You can quickly checkout how does the survey going by just some simple clicks. Number and answers can let you quicker know the feedback from students.</p>
+            <a href="{{url_for("show_results")}}" class="btn btn-primary">Try me!</a>
+        </div>
+    </div>
 {%endblock%}

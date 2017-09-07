@@ -4,20 +4,24 @@ from survey import *
 from respond import respondent
 from question import quest_tree,addQ,delQ,getQ
 
+@app.route("/")
+def index():
+    return render_template("index.html")
 
 @app.route("/login", methods = ["GET", "POST"])
 #This isnt going to the login page first...
 def login():
-    s = survey()
+    if session.get("logged_in"):
+        return redirect(url_for("index"), code=302, Response=None)
     if request.method == "POST":
         if request.form["username"]== app.config['USERNAME'] and \
             request.form["password"] == app.config['PASSWORD']:
             # valid usesr
             session["logged_in"] = True
-            return redirect(url_for("course_adding"))
+            return redirect(url_for("index"))
 
 
-    return render_template("index.html")
+    return render_template("login.html")
 
 @app.route("/logout")
 def logout():
@@ -67,7 +71,7 @@ def course_adding(name=None):
 
 
 
-@app.route("/student")
+# @app.route("/student")
 @app.route("/student/<string:name>", methods=["GET", "POST"])
 def student(name):
     s = survey()
@@ -150,8 +154,20 @@ def del_question():
 #not sure how the data csv's are setup or how it should know which csv to read
 @app.route("/results")
 @app.route("/results/<string:name>",methods=["GET","POST"])
-def show_results(name):
+def show_results(name = None):
+    # force login first
+    if not session.get("logged_in"):
+        return redirect("login", code=302, Response=None)
+
+    # else: the admin has logged_in
     response = respondent(name)
+    if not name:
+        # find all classes
+
+        return render_template("select_result.html",course_list =response.get_open_course() )
+    # name is no none, try to find the results of that survey
+    # get all the survey question
+
     results=response.get_results()
 
-    return render_template("results.html", results=results)
+    return render_template("results.html",results=response.get_results())

@@ -1,8 +1,10 @@
 {%extends "base.html"%}
 {%block title %} Edit: {{course_name}} Survey{%endblock%}
-{%block body%}
+{%block header%}
     <h1>Edit:{{course_name}} Survey</h1>
-    <h2> Please click your desired question number for your survey </h2>
+    <h2> Please click your desired question for your survey </h2>
+{%endblock%}
+{%block body%}
 
     {%if quest_list %}
         {% if error %}
@@ -19,7 +21,9 @@
                     <tr>
                         <th scope="row" style="width:30px">#</th>
                         <th>Question</th>
-                        <th>Answers</th>
+                        <th>
+                            Answers
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -32,9 +36,13 @@
                                 {{quest[1]}}
                             </td>
                             <td>
-                                {% for answer in quest[2:] %}
-                                {{answer}}
-                                {% endfor %}
+                                <div class="row">
+                                    {% for answer in quest[2:] %}
+                                        <div class="col">
+                                            {{answer}}
+                                        </div>
+                                    {% endfor %}
+                                </div>
                             </td>
 
                     {%endfor%}

@@ -20,13 +20,15 @@
             <!-- float clear for the navbar -->
         </div>
         {% block jumbo %}{%endblock%}
-        <div class="container">
-            {% block heading %}{% endblock%}
-        </div>
         <br>
+        <div class="container">
+            {% block header %}{% endblock%}
+        </div>
+
         <div class="container">
             {% block body %}{% endblock %}
         </div>
+        <div  class="nav-clear">
         <footer class="footer bg-light">
             <div class="container text-muted">
                 ©2017 Null Terminator
