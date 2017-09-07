@@ -51,7 +51,7 @@ def course_adding(name=None):
 
 
 
-
+@app.route("/student")
 @app.route("/student/<string:name>", methods=["GET", "POST"])
 def student(name):
     s = survey()
@@ -114,14 +114,15 @@ def del_question():
     q_list = get_q.findQ()
     return render_template("del_q.html",request= url_for("del_question"),q_list = q_list)
     
-    #Route to the results page displaying results of a survey.
-    #not sure how the data csv's are setup or how it should know which csv to read
-    @app.route("/results")
-    def show_results():
-        s = survey()
-        if request.method == "GET":
-            return render_template("results.html",res_list=get_results())
-        return render_template("surveycreate.html", course_list = s.course_list())
+#Route to the results page displaying results of a survey.
+#not sure how the data csv's are setup or how it should know which csv to read
+@app.route("/results")
+@app.route("/results/<string:name>",methods=["GET","POST"])
+def show_results(name):
+    response = respondent(name)
+    results=response.get_results()
+   
+    return render_template("results.html", results=results)
     
     
     

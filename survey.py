@@ -40,15 +40,7 @@ class survey:
             return None
         return courselist
         	
-    def get_results():
-        results = []
-        def read():
-            with open('data.csv', 'r') as csv_in:
-                reader = csv.reader(csv_in)
-                for row in reader:
-                    results.append(row)
-        return results 
-    
+     
     
 
 
