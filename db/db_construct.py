@@ -1,37 +1,6 @@
 from sql_uti import sql_util,conn
 import csv
 
-conn.execute("""
-create table enrolments (
-    user_id int,
-    course_code char(8),
-    course_year char(4)
-);
-""")
-
-
-conn.execute("""
-create table users (
-    user_id int primary key,
-    user_name varchar(20),
-    password varchar(255)
-
-);
-""")
-
-conn.execute("""
-create table course(
-    course_code char(8),
-    course_year char(4)
-
-);
-
-""")
-
-
-
-
-
 enrol = sql_util("enrolments")
 user = sql_util("users")
 course = sql_util("course")
