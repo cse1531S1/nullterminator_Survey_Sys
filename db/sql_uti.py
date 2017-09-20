@@ -63,14 +63,13 @@ class sql_util(object):
         return ""
     def __sql(self):
         # generate the sql sentense
-        sql = self.__operator
+        sql = self.__operator+" "
         if self.__from:
             # has define some col
-            sql += " "
             sql += ",".join(self.__from)
             # add a space to split words
             sql +=  " "
-        elif self.__operator == "DELETE FROM":
+        elif self.__operator == "DELETE":
             # do nothing
             pass
         else:
@@ -139,10 +138,12 @@ class sql_util(object):
         return self
     def delete(self):
         #  delete somthing form the database
-        self.__operator = "DELETE FROM"
+        self.__operator = "DELETE"
         return_list =self.__conn.execute(self.__sql(),self.__data_pair.get_value()+self.__key_pair.get_value()).fetchone()
         #  clear all the list have been used
         self.clear()
+        # push the changes
+        self.__conn.commit()
         return self
 
     def one(self):
@@ -163,19 +164,22 @@ class sql_util(object):
     def save(self):
         # generate the sql by input things for C,U
         if not self.__operator in ["INSERT INTO","UPDATE"]:
-            raise TypeError
+            # save method for force commit
+            self.__conn.commit()
+            return self
         # it is CU operation
         sql = self.__operator + " "+ self.__table_name + " "
         if self.__operator == "INSERT INTO":
             # generate the column name
             sql += " (" +",".join(self.__data_pair.get_key())+") "
+            sql += "VALUES (" +",".join(["?" for item in self.__data_pair.get_value()]) +")"
         elif self.__operator == "UPDATE":
             # add a place holder into the sentence
-            sql += " SET "+", ".join([key+"?"for key in self.__data_pair.get_key()])
-            sql += self.__where()
+            sql += " SET "+", ".join([key+"=?"for key in self.__data_pair.get_key()])
+            sql += self.__where() +";"
 
         # execute the data operation
-        self.__conn.executemany(sql,self.__data_pair.get_value()+ self.__key_pair.get_value())
+        self.__conn.execute(sql,self.__data_pair.get_value()+ self.__key_pair.get_value())
 
         # clear all the temp data
         self.clear()
@@ -223,6 +227,24 @@ if __name__ == '__main__':
     course1511 = course.find("course_code", "COMP1511").find("course_year","17s2").all()
     print(course1511)
 
+
+    # Test for insert update and delete
+
+    print("\nTest whether user 1 have record:")
+    print(user.find("user_id",1).all())
+    user.insert(["user_id","user_name","password"],[1,"toby","test"]).save()
+
+    print("\nTest whether user 1 have recorded:")
+    print(user.find("user_id",1).one())
+
+    print("\nMoidfy the value to name of tecty")
+    user.find("user_id",1).update("user_name", "tecty").save()
+    print(user.find("user_id",1).one())
+
+    print("\nDelete the inserted item")
+    user.find("user_id",1).delete()
+    print("\nTest whether user 1 have been deleted:")
+    print(user.find("user_id",1).all())
 
     # # too long to print
     # print("\nTest find all the courses in 17s2")

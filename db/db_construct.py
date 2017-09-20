@@ -10,21 +10,21 @@ with open("enrolments.csv",'r') as csv_in:
     reader = csv.reader(csv_in)
     for row in reader:
         # print(row)
-        enrol.insert({"user_id":int(row[0]),"course_code":row[1],"course_year":row[2]})
-enrol.save()
+        enrol.insert(["user_id","course_code","course_year"],row[:]).save()
+
 # insert the users database
 with open("passwords.csv",'r') as csv_in:
     reader = csv.reader(csv_in)
     for row in reader:
         # print(row)
-        user.insert({"user_id":int(row[0]),"user_name":row[1],"password":row[2]})
-user.save()
+        user.insert(["user_id","user_name","password"],row[:]).save()
+
 
 # insert the course database
 with open("courses.csv",'r') as csv_in:
     reader = csv.reader(csv_in)
     for row in reader:
         # print(row)
-        course.insert({"course_code":row[0],"course_year":row[1]})
-course.save()
+        course.insert(["course_code","course_year"],row[:]).save()
+
 # print(query.all()) # too much to show, but this is valid
