@@ -64,7 +64,7 @@ def course_adding(name=None):
     # getting all the question
     q_list = get_question.findQ()
     return render_template("surveycreate.html", course_name=name,\
-        quest_list=q_list, error = error)
+        quest_list=q_list, msg_err = error)
 
 
 
@@ -95,7 +95,7 @@ def student(name):
             res.append_csv(answerlist)
             return render_template("finish_survey.html")
 
-    return render_template("student.html", course_name = name, error = error,\
+    return render_template("student.html", course_name = name, msg_err = error,\
         quest_list = questionlist,length = length)
 
 
@@ -121,7 +121,7 @@ def add_question():
                 url_for("add_question"))
         # invalid input, push back what user has been input, and push the error message
         return render_template("add_q.html",request = url_for("add_question"),\
-            error = add_q.is_valid_Q(question,answers),question = question, \
+            msg_err = add_q.is_valid_Q(question,answers),question = question, \
             answers = request.form["answers"])
     return render_template("add_q.html",request = url_for("add_question"))
 

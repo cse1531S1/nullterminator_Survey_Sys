@@ -39,6 +39,7 @@ All the user story are in [project](https://github.com/cse1531S1/survey-system-f
     ```
     - Super Long one line execution example:
     ```python
+    # A Unit Test of sql_util.py
     course1521 = enrol.find("course_code", "COMP1521")\
                         .find("course_year","17s2")\
                         .col_name(["user_id","course_code","course_year"])\
@@ -74,14 +75,27 @@ find() / insert() / update() / col_name() / with_table()```
     {%endblock%}
     ```
 
-## Message
+## Message Handle
 1. Error Success Normal Message:<br>
-    When use the render_template(), use these msg_err msg_suc msg_pri variable name to pass in your message.
+    When use the render_template(), use these msg_err msg_suc msg_std variable name to pass in your message.
     ```python
     # here is a quick example
     return render_template("student.html", course_name = name, msg_err = error,\
         quest_list = questionlist,length = length)```
 
+2. Another way to use error(This way would overwrite the handle of msg_*):<br>
+In view (in the file of templates/YOUR_FILE_NAME.html), you can use jinjia as follow:
+
+    ```html
+    <!-- File: templates/finalsurvey.html -->
+    {% block msg%}
+        <!-- very special error -->
+        <div class="alert alert-danger " role="alert">
+            <h1> Unknown Error:</h1>
+            <p><b>Reason:</b> No question added for a created survey.</p>
+        </div>
+    {%endblock%}
+    ```
 
 
 # Write at Last
