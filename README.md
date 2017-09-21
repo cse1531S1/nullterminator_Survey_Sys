@@ -43,7 +43,8 @@ All the user story are in [project](https://github.com/cse1531S1/survey-system-f
     course1521 = enrol.find("course_code", "COMP1521")\
                         .find("course_year","17s2")\
                         .col_name(["user_id","course_code","course_year"])\
-                        .col_name("user_name","users").all()```
+                        .col_name("user_name","users").all()
+    ```
     - Dynamic explaination
     ```python
     # delete the user_id = 50
@@ -54,7 +55,8 @@ All the user story are in [project](https://github.com/cse1531S1/survey-system-f
     ```
     - Test execution (for debug). Use test_exe() before the finialise functions, you can see the source SQL after explaination.<br> # this doesn't work for delete()
     ```python
-    user.test_exe().all()```
+    user.test_exe().all()
+    ```
 - There is difference between some function. Some function is act like execute the all your data, so these function must put at the end of line, and most of them would stop the online execution.
 ```python
 save() / one() / all() / delete()
