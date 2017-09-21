@@ -64,30 +64,43 @@ class sql_util(object):
     def __sql(self):
         # generate the sql sentense
         sql = self.__operator+" "
-        if self.__from:
-            # has define some col
-            sql += ",".join(self.__from)
-            # add a space to split words
-            sql +=  " "
-        elif self.__operator == "DELETE":
-            # do nothing
-            pass
-        else:
-            sql += " * "
-        # add the table_name
-        sql+= "FROM "+ self.__table_name
-        if self.__join:
-            # mutiple table search
-            sql+= ","+ ",".join(self.__join)
+        if self.__operator in ["SELECT","DELETE"]:
+            if self.__from:
+                # has define some col
+                sql += ",".join(self.__from)
+                # add a space to split words
+                sql +=  " "
+            elif self.__operator == "DELETE":
+                # do nothing
+                pass
+            else:
+                sql += " * "
+            # add the table_name
+            sql+= "FROM "+ self.__table_name
+            if self.__join:
+                # mutiple table search
+                sql+= ","+ ",".join(self.__join)
 
 
-        # try to append the search value
-        sql += self.__where()
-        # end of the sql sentense
+            # try to append the search value
+            sql += self.__where()
+            # end of the sql sentense
+
+        elif self.__operator == "INSERT INTO":
+            # directly append the table_name
+            sql += self.__table_name + " "
+
+            # generate the column name
+            sql += " (" +",".join(self.__data_pair.get_key())+") "
+            sql += "VALUES (" +",".join(["?" for item in self.__data_pair.get_value()]) +")"
+        elif self.__operator == "UPDATE":
+            # directly append the table_name
+            sql += self.__table_name + " "
+            # add a place holder into the sentence
+            sql += " SET "+", ".join([key+"=?"for key in self.__data_pair.get_key()])
+            sql += self.__where()
+
         sql +=";"
-
-
-
         return sql
 
 
@@ -96,12 +109,12 @@ class sql_util(object):
             # because default value would use self so use
             # this way to specify the table_name
             table_name = self.__table_name
-        if type(col) == str:
+        if type(col)==str:
             # only have one column to find
-            self.__from.append(table_name.col)
+            self.__from.append(table_name+"."+col)
         elif type(col) == list:
             # the input is for mutiple search
-            self.__form += [table_name+item for item in col]
+            self.__from += [table_name+"."+item for item in col]
         else:
             # couldn't handle this type
             raise TypeError
@@ -167,19 +180,10 @@ class sql_util(object):
             # save method for force commit
             self.__conn.commit()
             return self
-        # it is CU operation
-        sql = self.__operator + " "+ self.__table_name + " "
-        if self.__operator == "INSERT INTO":
-            # generate the column name
-            sql += " (" +",".join(self.__data_pair.get_key())+") "
-            sql += "VALUES (" +",".join(["?" for item in self.__data_pair.get_value()]) +")"
-        elif self.__operator == "UPDATE":
-            # add a place holder into the sentence
-            sql += " SET "+", ".join([key+"=?"for key in self.__data_pair.get_key()])
-            sql += self.__where() +";"
+
 
         # execute the data operation
-        self.__conn.execute(sql,self.__data_pair.get_value()+ self.__key_pair.get_value())
+        self.__conn.execute(self.__sql(),self.__data_pair.get_value()+ self.__key_pair.get_value())
 
         # clear all the temp data
         self.clear()
@@ -198,6 +202,11 @@ class sql_util(object):
         self.__operator = "SELECT"
         self.__key_pair.clear()
         self.__data_pair.clear()
+    def test_exe(self):
+        # debug function
+        print(self.__sql())
+        print(self.__data_pair.get_value()+self.__key_pair.get_value())
+        return self
 if __name__ == '__main__':
     __dbName = "../"+ __dbName
 
@@ -216,8 +225,13 @@ if __name__ == '__main__':
     enrol.with_table("users","user_id","user_id")
     # select one info about comp1521
     print("\ntest join search of users and enrolments table")
-    course1521 = enrol.find("course_code", "COMP1521").one()
-    print (course1521)
+    course1521 = enrol.find("course_code", "COMP1521")\
+                    .find("course_year","17s2")\
+                    .col_name(["user_id","course_code","course_year"])\
+                    .col_name("user_name","users").all()
+    for person in course1521:
+        print(person)
+    print("\nFind one record of year 18s1")
     # select one info about 18s1
     year18s1 = enrol.find("course_year", "18s1").one()
     print (year18s1)
@@ -243,10 +257,12 @@ if __name__ == '__main__':
     user.find("user_id",1).update("user_name", "tecty").save()
     print(user.find("user_id",1).one())
 
-    print("\nDelete the inserted item")
-    user.find("user_id",1).delete()
+    print("\nDelete the inserted item, this sql would execute:")
+    user.find("user_id",1).test_exe().delete()
     print("\nTest whether user 1 have been deleted:")
     print(user.find("user_id",1).all())
+
+
 
     # # too long to print
     # print("\nTest find all the courses in 17s2")
