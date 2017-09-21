@@ -199,6 +199,8 @@ class sql_util(object):
         self.__key_pair.clear()
         self.__data_pair.clear()
 if __name__ == '__main__':
+    __dbName = "../"+ __dbName
+
     enrol = sql_util("enrolments")
     user = sql_util("users")
     course = sql_util("course")
