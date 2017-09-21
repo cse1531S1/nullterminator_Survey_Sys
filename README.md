@@ -49,8 +49,10 @@ All the user story are in [project](https://github.com/cse1531S1/survey-system-f
     ```python
     # delete the user_id = 50
     user.find("user_id",50).delete()
-    # which is same as this line
+
+    # change the user who has user_id=50 to userid=49 and push to database 
     user.find("user_id",50).update("user_id",49).save()
+    # which is same as this line
     user.update("user_id",49).find("user_id",50).save()
     ```
     - Test execution (for debug). Use test_exe() before the finialise functions, you can see the source SQL after explaination.<br> # this doesn't work for delete()
