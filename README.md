@@ -57,10 +57,12 @@ All the user story are in [project](https://github.com/cse1531S1/survey-system-f
     user.test_exe().all()```
 - There is difference between some function. Some function is act like execute the all your data, so these function must put at the end of line, and most of them would stop the online execution.
 ```python
-save() / one() / all() / delete()```
+save() / one() / all() / delete()
+```
 - Some function won't sensetive to the order of how you put it around. These function just to put in neccessary infomation of that SQL execution.
 ```python
-find() / insert() / update() / col_name() / with_table()```
+find() / insert() / update() / col_name() / with_table()
+```
 - More example could be seen at user.py and the unit test in db/sql_uti.py
 
 # Layout
