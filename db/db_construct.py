@@ -1,9 +1,9 @@
-from sql_uti import sql_util,conn
+from sql_uti import SqlUtil,conn
 import csv
 
-enrol = sql_util("enrolments")
-user = sql_util("users")
-course = sql_util("course")
+enrol = SqlUtil("enrolments")
+user = SqlUtil("users")
+course = SqlUtil("course")
 """this script only could test once"""
 # insert the information into database
 with open("db/enrolments.csv",'r') as csv_in:
@@ -17,7 +17,7 @@ with open("db/passwords.csv",'r') as csv_in:
     reader = csv.reader(csv_in)
     for row in reader:
         # print(row)
-        user.insert(["user_id","user_name","password"],row[:]).save()
+        user.insert(["id","password","role"],row[:]).save()
 
 
 # insert the course database

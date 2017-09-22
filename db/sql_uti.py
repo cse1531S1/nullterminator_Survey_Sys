@@ -34,10 +34,10 @@ class val_pair(object):
         self.__key = []
         self.__value = []
 
-class sql_util(object):
+class SqlUtil(object):
     """docstring for sql_util."""
     def __init__(self, table_name):
-        super(sql_util, self).__init__()
+        super(SqlUtil, self).__init__()
         self.__conn = conn
         self.__table_name = table_name;
         # operation for this query defualt is select
@@ -55,24 +55,33 @@ class sql_util(object):
         # specify key for join
         self.__join_key = []
 
+        # sort column specify
+        self.__sort_by = []
+
+        # indicator of whether print the SQL information
+        self.__test = False
+
     def __where(self):
         # resolve the where sentense
         if self.__key_pair.get_key() or self.__join_key:
-            return " WHERE "+" and ".join(self.__join_key+[ key+"?" for key in self.__key_pair.get_key()])
+            return " WHERE "+" and "\
+                    .join(self.__join_key+\
+                    [ key+"?" for key in self.__key_pair.get_key()])
         # if nothing to search, return nothing
         return ""
     def __sql(self):
         # generate the sql sentense
         sql = self.__operator+" "
         if self.__operator in ["SELECT","DELETE"]:
-            if self.__from:
+
+            if self.__operator == "DELETE":
+                # do nothing
+                pass
+            elif self.__from:
                 # has define some col
                 sql += ",".join(self.__from)
                 # add a space to split words
                 sql +=  " "
-            elif self.__operator == "DELETE":
-                # do nothing
-                pass
             else:
                 sql += " * "
             # add the table_name
@@ -85,6 +94,10 @@ class sql_util(object):
             # try to append the search value
             sql += self.__where()
             # end of the sql sentense
+            if self.__operator == "SELECT" and self.__sort_by:
+                # sort only can be used by select
+                sql += " ORDER BY " + " ,"\
+                        .join(self.__sort_by)
 
         elif self.__operator == "INSERT INTO":
             # directly append the table_name
@@ -92,12 +105,14 @@ class sql_util(object):
 
             # generate the column name
             sql += " (" +",".join(self.__data_pair.get_key())+") "
-            sql += "VALUES (" +",".join(["?" for item in self.__data_pair.get_value()]) +")"
+            sql += "VALUES (" +",".join(["?" \
+                    for item in self.__data_pair.get_value()]) +")"
         elif self.__operator == "UPDATE":
             # directly append the table_name
             sql += self.__table_name + " "
             # add a place holder into the sentence
-            sql += " SET "+", ".join([key+"=?"for key in self.__data_pair.get_key()])
+            sql += " SET "+", ".join([key+"=?" \
+                                    for key in self.__data_pair.get_key()])
             sql += self.__where()
 
         sql +=";"
@@ -128,13 +143,21 @@ class sql_util(object):
 
         self.__join.append(table_name)
         # generate the join key_word connection
-        self.__join_key.append(self.__table_name + "."+ source_key+"="+ table_name+"."+dest_key)
+        self.__join_key.append(self.__table_name + "."+ source_key+"="\
+                                + table_name+"."+dest_key)
         return self
 
     def find(self, col, key_word, sign = "="):
         # set the this criteria into the variable
-        # for where xxx = xxx
-        self.__key_pair.push(col+sign, key_word)
+        if type(col)== list and type(key_word) == list\
+            and len(col)==len(key_word):
+            # Polymorphism support for this class
+            self.__key_pair.push([c+sign for c in col], key_word)
+        elif type(col)==str:
+            # for where xxx = xxx
+            self.__key_pair.push(col+sign, key_word)
+        else:
+            raise TypeError("Code Error: couldn't handle this type of column value.")
         return self
 
     # insert part (low level function)
@@ -152,7 +175,14 @@ class sql_util(object):
     def delete(self):
         #  delete somthing form the database
         self.__operator = "DELETE"
-        return_list =self.__conn.execute(self.__sql(),self.__data_pair.get_value()+self.__key_pair.get_value()).fetchone()
+
+        # for debug
+        self.__print_exe()
+
+        return_list =self.__conn.execute(self.__sql(),\
+                                        self.__data_pair.get_value()\
+                                        +self.__key_pair.get_value())\
+                                        .fetchone()
         #  clear all the list have been used
         self.clear()
         # push the changes
@@ -160,20 +190,48 @@ class sql_util(object):
         return self
 
     def one(self):
-        return_list =self.__conn.execute(self.__sql(),self.__data_pair.get_value()+self.__key_pair.get_value()).fetchone()
+
+        # for debug
+        self.__print_exe()
+
+        # only fetch one instance from database
+        return_list =self.__conn.execute(self.__sql(),\
+                        self.__data_pair.get_value()\
+                        +self.__key_pair.get_value()).fetchone()
         #  clear all the list have been used
         self.clear()
         # return the search result
-        return return_list
+        return list(return_list)
 
     def all(self):
         # convey the varable setted to a valid sql sentense and query the
         # database, collect the result and resent back the data
-        return_list = self.__conn.execute(self.__sql(),self.__data_pair.get_value()+self.__key_pair.get_value()).fetchall()
+
+        # for debug
+        self.__print_exe()
+
+        return_list = self.__conn.execute(self.__sql(),\
+                        self.__data_pair.get_value()\
+                        +self.__key_pair.get_value()).fetchall()
         #  clear all the list have been used
         self.clear()
         # return the buffer
-        return return_list
+        return [list(item) for item in return_list]
+    def sort_by(self, col, ascdending = True):
+        # sort by the col name provide, only use in select
+        if type(col) == list:
+            if ascdending:
+                col = [item + " ASC" for item in col ]
+            else:
+                col = [item + " DESC" for item in col ]
+            self.__sort_by += col
+        if type(col) == str:
+            if ascdending:
+                col += " ASC"
+            else:
+                col += " DESC"
+            self.__sort_by.append(col)
+        return self
     def save(self):
         # generate the sql by input things for C,U
         if not self.__operator in ["INSERT INTO","UPDATE"]:
@@ -181,9 +239,13 @@ class sql_util(object):
             self.__conn.commit()
             return self
 
+        # for debug
+        self.__print_exe()
 
         # execute the data operation
-        self.__conn.execute(self.__sql(),self.__data_pair.get_value()+ self.__key_pair.get_value())
+        self.__conn.execute(self.__sql(),\
+                            self.__data_pair.get_value()\
+                            + self.__key_pair.get_value())
 
         # clear all the temp data
         self.clear()
@@ -191,28 +253,38 @@ class sql_util(object):
         # save the changes
         self.__conn.commit()
         return self
-    def clear(self,join = False):
+    def clear(self,join = False,col= False):
         # clear the join info
         if join:
             self.__join= []
             self.__join_key =[]
-
+        if col:
+            self.__from = []
         # reset the values
-        self.__from = []
+        self.__sort_by = []
         self.__operator = "SELECT"
         self.__key_pair.clear()
         self.__data_pair.clear()
+
+        return self
+
+    def __print_exe(self):
+        if self.__test:
+            # print the essential information of exectuion for debug
+            print(self.__sql())
+            print(self.__data_pair.get_value()\
+                    +self.__key_pair.get_value()+self.__sort_by)
+            self.__test = False
     def test_exe(self):
         # debug function
-        print(self.__sql())
-        print(self.__data_pair.get_value()+self.__key_pair.get_value())
+        self.__test  = True
         return self
 if __name__ == '__main__':
     __dbName = "../"+ __dbName
 
-    enrol = sql_util("enrolments")
-    user = sql_util("users")
-    course = sql_util("course")
+    enrol = SqlUtil("enrolments")
+    user = SqlUtil("users")
+    course = SqlUtil("course")
     print("test find all courses that enroled by user_id = 332")
     user332 = enrol.find("user_id", 332, sign = "=").all()
     print(user332)
@@ -222,13 +294,14 @@ if __name__ == '__main__':
     print(user445)
 
     # try the function of join search
-    enrol.with_table("users","user_id","user_id")
+    enrol.with_table("users","user_id","id")
     # select one info about comp1521
     print("\ntest join search of users and enrolments table")
     course1521 = enrol.find("course_code", "COMP1521")\
                     .find("course_year","17s2")\
                     .col_name(["user_id","course_code","course_year"])\
-                    .col_name("user_name","users").all()
+                    .col_name("password","users").sort_by("user_id",False)\
+                    .test_exe().all()
     for person in course1521:
         print(person)
     print("\nFind one record of year 18s1")
@@ -237,7 +310,7 @@ if __name__ == '__main__':
     print (year18s1)
 
     print("\ntest whether the class works with users table")
-    user333 =user.find("user_id", 333).one()
+    user333 =user.find("id", 333).one()
     print(user333)
     print("\nTest find all the course_code is 1511 and course_year is 17s2 (mutiple criteria search)")
     course1511 = course.find("course_code", "COMP1511").find("course_year","17s2").all()
@@ -247,20 +320,20 @@ if __name__ == '__main__':
     # Test for insert update and delete
 
     print("\nTest whether user 1 have record:")
-    print(user.find("user_id",1).all())
-    user.insert(["user_id","user_name","password"],[1,"toby","test"]).save()
+    print(user.find("id",1).all())
+    user.insert(["id","password","role"],[1,"toby","test"]).save()
 
     print("\nTest whether user 1 have recorded:")
-    print(user.find("user_id",1).one())
+    print(user.find("id",1).one())
 
     print("\nMoidfy the value to name of tecty")
-    user.find("user_id",1).update("user_name", "tecty").save()
-    print(user.find("user_id",1).one())
+    user.find("id",1).update("password", "tecty").save()
+    print(user.find("id",1).one())
 
     print("\nDelete the inserted item, this sql would execute:")
-    user.find("user_id",1).test_exe().delete()
+    user.find("id",1).test_exe().delete()
     print("\nTest whether user 1 have been deleted:")
-    print(user.find("user_id",1).all())
+    print(user.find("id",1).all())
 
 
 

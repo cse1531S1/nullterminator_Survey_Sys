@@ -27,8 +27,12 @@ All the user story are in [project](https://github.com/cse1531S1/survey-system-f
 >sqlite3> .tables <br>
 >course enrolments users YOUR_NEW_TABLE_NAME
 
-## sql_util("TABLE_NAME")
-1. This is a runtime python3 to SQL explainer. Have a lots of great feature:
+## SqlUtil("TABLE_NAME")
+1. How to Use:
+    ```python
+    from db.sql_uti import SqlUtil
+    ```
+2. This is a runtime python3 to SQL explainer. Have a lots of great feature:
     - One line execution:
     ```python
     user = sql_util("users")
@@ -50,24 +54,30 @@ All the user story are in [project](https://github.com/cse1531S1/survey-system-f
     # delete the user_id = 50
     user.find("user_id",50).delete()
 
-    # change the user who has user_id=50 to userid=49 and push to database 
+    # change the user who has user_id=50 to userid=49 and push to database
     user.find("user_id",50).update("user_id",49).save()
     # which is same as this line
     user.update("user_id",49).find("user_id",50).save()
     ```
-    - Test execution (for debug). Use test_exe() before the finialise functions, you can see the source SQL after explaination.<br> # this doesn't work for delete()
+    - Test execution (for debug). Use test_exe() before the finialise functions, you can see the source SQL after explaination.<br>
     ```python
     user.test_exe().all()
     ```
-2. There is difference between some function. Some function is act like execute the all your data, so these function must put at the end of line, and most of them would stop the online execution.
+    The fucntion can use anywhere in the line. It would work if you put the function before the execution.
+    ```python
+    # both line are same
+    user.test_exe().find("user_id",50).update("user_id",49).save()
+    user.update("user_id",49).find("user_id",50).test_exe().save()
+    ```    
+3. There is difference between some function. Some function is act like execute the all your data, so these function must put at the end of line, and most of them would stop the online execution.
 ```python
 save() / one() / all() / delete()
 ```
-3. Some function won't sensetive to the order of how you put it around. These function just to put in neccessary infomation of that SQL execution.
+4. Some function won't sensetive to the order of how you put it around. These function just to put in neccessary infomation of that SQL execution.
 ```python
-find() / insert() / update() / col_name() / with_table()
+find() / insert() / update() / col_name() / with_table() / sort_by() / test_exe()
 ```
-4. More example could be seen at user.py and the unit test in db/sql_uti.py
+5. More example could be seen at user.py and the unit test in db/sql_uti.py
 
 # Layout
 ## How to use
