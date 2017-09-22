@@ -58,6 +58,9 @@ class SqlUtil(object):
         # sort column specify
         self.__sort_by = []
 
+        # indicator of whether print the SQL information
+        self.__test = False
+
     def __where(self):
         # resolve the where sentense
         if self.__key_pair.get_key() or self.__join_key:
@@ -70,14 +73,15 @@ class SqlUtil(object):
         # generate the sql sentense
         sql = self.__operator+" "
         if self.__operator in ["SELECT","DELETE"]:
-            if self.__from:
+
+            if self.__operator == "DELETE":
+                # do nothing
+                pass
+            elif self.__from:
                 # has define some col
                 sql += ",".join(self.__from)
                 # add a space to split words
                 sql +=  " "
-            elif self.__operator == "DELETE":
-                # do nothing
-                pass
             else:
                 sql += " * "
             # add the table_name
@@ -145,8 +149,15 @@ class SqlUtil(object):
 
     def find(self, col, key_word, sign = "="):
         # set the this criteria into the variable
-        # for where xxx = xxx
-        self.__key_pair.push(col+sign, key_word)
+        if type(col)== list and type(key_word) == list\
+            and len(col)==len(key_word):
+            # Polymorphism support for this class
+            self.__key_pair.push([c+sign for c in col], key_word)
+        elif type(col)==str:
+            # for where xxx = xxx
+            self.__key_pair.push(col+sign, key_word)
+        else:
+            raise TypeError("Code Error: couldn't handle this type of column value.")
         return self
 
     # insert part (low level function)
@@ -164,6 +175,10 @@ class SqlUtil(object):
     def delete(self):
         #  delete somthing form the database
         self.__operator = "DELETE"
+
+        # for debug
+        self.__print_exe()
+
         return_list =self.__conn.execute(self.__sql(),\
                                         self.__data_pair.get_value()\
                                         +self.__key_pair.get_value())\
@@ -175,24 +190,33 @@ class SqlUtil(object):
         return self
 
     def one(self):
+
+        # for debug
+        self.__print_exe()
+
+        # only fetch one instance from database
         return_list =self.__conn.execute(self.__sql(),\
                         self.__data_pair.get_value()\
                         +self.__key_pair.get_value()).fetchone()
         #  clear all the list have been used
         self.clear()
         # return the search result
-        return return_list
+        return list(return_list)
 
     def all(self):
         # convey the varable setted to a valid sql sentense and query the
         # database, collect the result and resent back the data
+
+        # for debug
+        self.__print_exe()
+
         return_list = self.__conn.execute(self.__sql(),\
                         self.__data_pair.get_value()\
                         +self.__key_pair.get_value()).fetchall()
         #  clear all the list have been used
         self.clear()
         # return the buffer
-        return return_list
+        return [list(item) for item in return_list]
     def sort_by(self, col, ascdending = True):
         # sort by the col name provide, only use in select
         if type(col) == list:
@@ -215,6 +239,8 @@ class SqlUtil(object):
             self.__conn.commit()
             return self
 
+        # for debug
+        self.__print_exe()
 
         # execute the data operation
         self.__conn.execute(self.__sql(),\
@@ -227,22 +253,31 @@ class SqlUtil(object):
         # save the changes
         self.__conn.commit()
         return self
-    def clear(self,join = False):
+    def clear(self,join = False,col= False):
         # clear the join info
         if join:
             self.__join= []
             self.__join_key =[]
-
+        if col:
+            self.__from = []
         # reset the values
         self.__sort_by = []
-        self.__from = []
         self.__operator = "SELECT"
         self.__key_pair.clear()
         self.__data_pair.clear()
+
+        return self
+
+    def __print_exe(self):
+        if self.__test:
+            # print the essential information of exectuion for debug
+            print(self.__sql())
+            print(self.__data_pair.get_value()\
+                    +self.__key_pair.get_value()+self.__sort_by)
+            self.__test = False
     def test_exe(self):
         # debug function
-        print(self.__sql())
-        print(self.__data_pair.get_value()+self.__key_pair.get_value())
+        self.__test  = True
         return self
 if __name__ == '__main__':
     __dbName = "../"+ __dbName
