@@ -6,13 +6,13 @@ create table enrolments (
 );
 
 create table users (
-    user_id int primary key,
-    user_name varchar(20) NOT NULL,
-    password varchar(255) NOT NULL,
+    id int primary key,
+    password varchar(93) NOT NULL,
+    role     varchar(15) NOT NULL,
     -- use the unique to let the update work
     -- because the update method must have unique constrain
     -- then the database won't throw an error
-    unique(user_id)
+    unique(id)
 );
 
 create table course(
