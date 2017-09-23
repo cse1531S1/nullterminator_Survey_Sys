@@ -3,6 +3,7 @@ from server import app
 from survey import *
 from respond import respondent
 from question import quest_tree,addQ,delQ,getQ
+from new_survey import *
 
 @app.route("/")
 def index():
@@ -31,40 +32,45 @@ def logout():
 
 # survey creation in this controller
 @app.route("/create_sur")
-@app.route("/create_sur/<string:name>",methods=["GET","POST"])
-def course_adding(name=None):
+@app.route("/create_sur/<string:course_name>/<string:course_year>",methods=["GET","POST"])
+def course_adding(course_name=None,course_year=None):
     # force login first
     if not session.get("logged_in"):
         return redirect(url_for("login"), code=302, Response=None)
 
     # else: the admin has logged_in
-    s = survey()
-    if not name:
+    s = Survey()
+    c = Course()
+    if not course_name and not course_year:
         # name is none when teacher try to create a course
         # render the course selection page
-        return render_template("courselect.html", course_list=s.courselist())
+        # return render_template("courselect.html",\
+                # course_list=c.get_course())
+
+        return render_template("courselect.html",\
+                    course_list = c.get_course())
     # else: teacher already have select a course
     # var for passing error message
     error = None
     # generated the list of questions
-    get_question = getQ(quest_tree())
-    if request.method == "POST":
+    ###get_question = getQ(quest_tree())
+    ###if request.method == "POST":
         # teacher is trying to create a survey by select questions
         # getting all the teacher selected question
-        selected_q = request.form.getlist("selected_q")
-        if selected_q != []:
+        ###selected_q = request.form.getlist("selected_q")
+        ###if selected_q != []:
             # the admin has selected some questions for this survey
-            s.choosequestion(get_question.findQ(selected_q),name) #create a csv file
+            ###s.choosequestion(get_question.findQ(selected_q),name) #create a csv file
             # renturn a preview of final survey
-            return render_template("finalsurvey.html", course_name=name,\
-                quest_list=s.coursequestionlist(name) )
-        else:
-            error = "Please add at least one question for this survey."
+            ###return render_template("finalsurvey.html", course_name=name,\
+                ###quest_list=s.coursequestionlist(name) )
+        ###else:
+            ###error = "Please add at least one question for this survey."
     # teacher have select a course but not have select a question yet
     # getting all the question
-    q_list = get_question.findQ()
-    return render_template("surveycreate.html", course_name=name,\
-        quest_list=q_list, msg_err = error)
+    ###q_list = get_question.findQ()
+    ###return render_template("surveycreate.html", course_name=name,\
+        ###quest_list=q_list, msg_err = error)
 
 
 

@@ -8,6 +8,12 @@ class Course(SqlUtil):
         this_course = self.find("course_code",course_code)\
                         .find("course_year",course_year).one()
         return int(this_course[0])
+    def get_course(self,course_code=None,course_year=None):
+        if course_code and course_year:
+            this_course = self.find("course_code",course_code)\
+                            .find("course_year",course_year).one()
+            return this_course()
+        return self.all()
 
 class Survey(SqlUtil):
     """docstring for survey."""
@@ -39,3 +45,5 @@ if __name__ == '__main__':
     print(survey.get_survey("COMP1521","17s2"))
     survey.delete_survey(this_id)
     print(survey.get_survey("COMP1521","17s2"))
+
+    # print(course.get_course())

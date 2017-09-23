@@ -4,8 +4,8 @@ import csv
 # config of the database name
 __dbName = "survey.db"
 
-# db connection
-conn = sqlite3.connect(__dbName)
+# # db connection
+# conn =
 
 class val_pair(object):
     """docstring for val_pair ."""
@@ -38,7 +38,7 @@ class SqlUtil(object):
     """docstring for sql_util."""
     def __init__(self, table_name):
         super(SqlUtil, self).__init__()
-        self.__conn = conn
+        self.__conn = sqlite3.connect("survey.db")
         self.__table_name = table_name;
         # operation for this query defualt is select
         self.__operator = "SELECT"
