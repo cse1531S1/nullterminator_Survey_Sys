@@ -1,14 +1,12 @@
-create table enrolments (
+create table enrolments(
     user_id int NOT NULL,
-    course_code char(8) NOT NULL,
-    course_year char(4) NOT NULL,
-    -- unique(user_id,course_code,course_year)
-
+    course_id int NOT NULL,
+    FOREIGN KEY (course_id) REFERENCES course(id),
     -- set up a foreign key
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-create table users (
+create table users(
     id int primary key,
     password varchar(93) NOT NULL,
     role     varchar(15) NOT NULL,
@@ -19,13 +17,14 @@ create table users (
 );
 
 create table course(
+    id INTEGER PRIMARY KEY,
     course_code char(8) NOT NULL,
     course_year char(4) NOT NULL,
     unique(course_code,course_year)
 );
 
 create table question(
-    -- INTEGER PRIMARY KEY is for auto increament in sqlite3 
+    -- INTEGER PRIMARY KEY is for auto increament in sqlite3
     id INTEGER PRIMARY KEY,
     question varchar(255) NOT NULL,
     -- record how many time the question have been linked
@@ -41,4 +40,14 @@ create table answer(
     q_id int NOT NULL,
     answer int NOT NULL,
     FOREIGN KEY (q_id) REFERENCES question(id)
+);
+
+create table survey(
+    id INTEGER PRIMARY KEY,
+    course_id int NOT NULL,
+    q_id varchar(1024) NOT NULL,
+    start_time DATETIME NOT NULL,
+    end_time DATETIME NOT NULL,
+    status INTEGER NOT NULL default 0,
+    FOREIGN KEY (course_id) REFERENCES course(id)
 );

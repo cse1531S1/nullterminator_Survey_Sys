@@ -1,16 +1,16 @@
-from db.sql_uti import sql_util
+from db.sql_uti import SqlUtil
 
 
-class User(sql_util):
+class User(SqlUtil):
     """docstring for user."""
     def __init__(self):
         super().__init__("users")
 
     def findById(self, id):
         if type(id)!=int:
-            raise TypeError("id for a user muset be a interger")
+            raise TypeError("id for a user muset be a integer")
         # simple case of mapping a function to dynamic execute SQL
-        return self.find("user_id",id).one()
+        return self.find("id",id).one()
 
     @property
     def name(self):
@@ -46,13 +46,13 @@ class User(sql_util):
         if not (self.name and self.id and self.password):
             raise TypeError("the user_name, user_id, password must be all setted")
         # store the information in the class
-        self.insert(["user_id","user_name","password"],[self.id,self.name,self.password]).save()
+        self.insert(["id","password","password"],[self.id,self.name,self.password]).save()
         # return self to have the property of one online execution
         return self
     def deleteById(self, id):
         if type(id)!= int:
             raise TypeError("input id must be int")
-        self.find("user_id",id).delete()
+        self.find("id",id).delete()
 
 
 

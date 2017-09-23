@@ -294,20 +294,23 @@ if __name__ == '__main__':
     print(user445)
 
     # try the function of join search
-    enrol.with_table("users","user_id","id")
+    enrol.with_table("users","user_id","id").with_table("course","course_id","id")
     # select one info about comp1521
     print("\ntest join search of users and enrolments table")
-    course1521 = enrol.find("course_code", "COMP1521")\
-                    .find("course_year","17s2")\
-                    .col_name(["user_id","course_code","course_year"])\
-                    .col_name("password","users").sort_by("user_id",False)\
+
+    course1521 = enrol.col_name(["user_id","course_id"])\
+                    .col_name("password","users")\
+                    .col_name(["course_code","course_year"],"course")\
+                    .sort_by("user_id",False)\
+                    .find("course.course_code", "COMP1521")\
+                    .find("course.course_year","17s2")\
                     .test_exe().all()
     for person in course1521:
         print(person)
-    print("\nFind one record of year 18s1")
-    # select one info about 18s1
-    year18s1 = enrol.find("course_year", "18s1").one()
-    print (year18s1)
+    # print("\nFind one record of year 18s1")
+    # # select one info about 18s1
+    # year18s1 = enrol.find("course_year", "18s1").one()
+    # print (year18s1)
 
     print("\ntest whether the class works with users table")
     user333 =user.find("id", 333).one()
