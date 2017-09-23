@@ -286,7 +286,7 @@ if __name__ == '__main__':
     user = SqlUtil("users")
     course = SqlUtil("course")
     print("test find all courses that enroled by user_id = 332")
-    user332 = enrol.find("user_id", 332, sign = "=").all()
+    user332 = enrol.find("user_id", 332).all()
     print(user332)
 
     print("\ntest find one course that enroled by user_id = 445")
@@ -299,12 +299,12 @@ if __name__ == '__main__':
     print("\ntest join search of users and enrolments table")
 
     course1521 = enrol.col_name(["user_id","course_id"])\
-                    .col_name("password","users")\
+                    .test_exe().col_name("password","users")\
                     .col_name(["course_code","course_year"],"course")\
                     .sort_by("user_id",False)\
                     .find("course.course_code", "COMP1521")\
                     .find("course.course_year","17s2")\
-                    .test_exe().all()
+                    .all()
     for person in course1521:
         print(person)
     # print("\nFind one record of year 18s1")
