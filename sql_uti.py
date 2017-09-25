@@ -1,11 +1,10 @@
 import sqlite3
 import csv
 
-# config of the database name
-__dbName = "survey.db"
+from server import app,get_db
 
-# db connection
-conn = sqlite3.connect(__dbName)
+
+
 
 class val_pair(object):
     """docstring for val_pair ."""
@@ -38,7 +37,7 @@ class SqlUtil(object):
     """docstring for sql_util."""
     def __init__(self, table_name):
         super(SqlUtil, self).__init__()
-        self.__conn = conn
+        self.__conn = get_db()
         self.__table_name = table_name;
         # operation for this query defualt is select
         self.__operator = "SELECT"
@@ -280,7 +279,7 @@ class SqlUtil(object):
         self.__test  = True
         return self
 if __name__ == '__main__':
-    __dbName = "../"+ __dbName
+
 
     enrol = SqlUtil("enrolments")
     user = SqlUtil("users")
