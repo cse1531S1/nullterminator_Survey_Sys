@@ -1,4 +1,4 @@
-from db.sql_uti import sql_util
+from sql_uti import sql_util
 
 
 class User(sql_util):

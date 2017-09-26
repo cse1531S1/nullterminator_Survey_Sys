@@ -1,4 +1,5 @@
-from db.sql_uti import SqlUtil
+from sql_uti import SqlUtil
+from server import app
 
 class Answer(SqlUtil):
     """docstring for Answer."""
@@ -48,10 +49,13 @@ class Question(SqlUtil):
         if not col:
             # reset the col value
             # in default only two column would show
-            self.col_name(["id","question"])
+            self.col_name(["id","question","type"])
 
 
     def find_by_id(self,q_id):
+        if not type(q_id) in [str,int]:
+            raise TypeError("q_id must be a int or str")
+
         # convent function in complement of sql_util
         self.find("id",int(q_id))
         return self
@@ -76,19 +80,21 @@ class Question(SqlUtil):
         elif type(q_id) == list:
             for q in q_id:
                 # collect all the return
-                return_list.append(self.find_q(q))
+                return_list+=self.find_q(q)
             return return_list
         elif type(q_id) in [str,int]:
-            return_list = self.find_by_id(q_id).one()
+            return_list = self.find_by_id(int(q_id)).all()
             # get all the answers append at the end of each question
             return [q+self.__ans.find_a(q[0]) for q in return_list]
         else:
             # couldn't hand this type
             raise TypeError("Question id must be a list or string or interger")
-    def add_q(self, answers, question,pool_id):
+
+    def add_q(self, answers, question,pool_id, q_type):
         # error handling
         if not (type(answers)== list and len(answers)>=2 and \
-            type(pool_id) in [str,int] and type(question) == str):
+            type(pool_id) in [str,int] and type(question) == str) and \
+            not q_type in ["MCQ","TEXT"]:
             if type(answers) != list:
                 raise TypeError("Answers must be a list.")
             if len(answers) < 2:
@@ -97,12 +103,14 @@ class Question(SqlUtil):
                 raise TypeError("Code Error: pool_id is not a str or int.")
             if type(question) != str:
                 raise TypeError("A question must be a string.")
+            if not q_type in ["MCQ","TEXT"]:
+                raise TypeError("unknown q_type: ", q_type)
 
         # valid question and answers
-        self.insert(["question","pool_id"],[question,int(pool_id)]).save()
+        self.insert(["question","pool_id","type"],[question,int(pool_id),q_type]).save()
         # get the q_id for the question just created
         # by getting the newest record that have same property
-        this_q = self.find(["question","pool_id"],[question,int(pool_id)])\
+        this_q = self.find(["question","pool_id","type"],[question,int(pool_id),q_type])\
                     .sort_by("id",False).one()
         q_id = this_q[0]
         # call the class Answer to append this question's answers
@@ -110,20 +118,76 @@ class Question(SqlUtil):
 
         # for convience return the q_id for just created question
         return q_id
+
+    def quote_q(self, q_ids):
+        # return all the question specify by q_ids and add a link count for each question
+        if type(q_ids) != list:
+            # error manage
+            raise TypeError("q_ids must be a list")
+
+
+        for q in q_ids:
+            # to select the linked time
+            self.clear(col= True)
+            self.col_name("link")
+
+            # all the linked time add one
+            linked = self.find_by_id(q).one()
+            self.update("link",linked[0]+1).find_by_id(q).save()
+        q_list = self.find_q(q_ids)
+
+
+        # return all the required question
+        return q_list
+
     def del_q(self, q_id):
-        self.find_by_id(q_id).delete()
-        self.__ans.del_a(q_id)
+        if not type(q_id) in [list, str, int]:
+            raise TypeError("Question should be deleted by Id of list of ids")
+
+        if type(q_id)  == list:
+            for q in q_id:
+                # recursively calling all the question's id
+                self.del_q(q)
+
+        else:
+            # the input type is a str or int
+            # delete the question by specify question id
+            self.find_by_id(int(q_id)).delete()
+            # delete the question's answer
+            self.__ans.del_a(q_id)
         return self
+
 if __name__ == '__main__':
-    quest = Question()
-    # add a test question into database
-    this_id=quest.add_q(["a1","a2"], "sample question?", "0")
 
-    # getting all the question in the database with pool_id = 0
-    print(quest.find_q(pool_id="0"))
+    with app.app_context():
+        quest = Question()
+        # add a test question into database
+        first_id=quest.add_q(["a1","a2"], "sample question?", "0", "MCQ")
+        second_id=quest.add_q(["a1","a2"], "sample question?", "0", "MCQ")
 
-    # delete the question we just create for test
-    quest.del_q(this_id)
+        print("try to find all the quesiton with question pool 0")
+        # getting all the question in the database with pool_id = 0
+        print(quest.find_q(pool_id="0"))
 
-    # check whether it's successfully deleted
-    print(quest.find_q(pool_id="0"))
+
+        list_q = [first_id,second_id]
+        # pretend these selected question has been added to a survey
+        print ("\nTry to queote added question into a survey")
+        print(quest.quote_q(list_q))
+
+
+        quest.col_name("link")
+        print("\nTry to check the linked time for each question.")
+        # check whether these question has been selected
+        print(quest.find_q(list_q))
+
+
+        print("\nDelete all the questions created for survey.")
+        # delete the question we just create for test
+        quest.del_q(list_q)
+
+        # delete all the question
+        # quest.del_q(list(range(1,18,1)))
+
+        # check whether it's successfully deleted
+        print(quest.find_q(pool_id="0"))

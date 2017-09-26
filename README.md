@@ -30,7 +30,8 @@ All the user story are in [project](https://github.com/cse1531S1/survey-system-f
 ## SqlUtil("TABLE_NAME")
 1. How to Use:
     ```python
-    from db.sql_uti import SqlUtil
+    from sql_uti import SqlUtil
+    from server import app
     ```
 2. This is a runtime python3 to SQL explainer. Have a lots of great feature:
     - One line execution:
@@ -77,7 +78,18 @@ save() / one() / all() / delete()
 ```python
 find() / insert() / update() / col_name() / with_table() / sort_by() / test_exe()
 ```
-5. More example could be seen at user.py and the unit test in db/sql_uti.py
+5. How to test.Use these line of code to test it.
+
+    ```python
+    if __name__ == '__main__':
+        # unit test
+        with app.app_context():
+            #  call the flask context
+            YOUR_TEST_CODE
+    ```
+    Also, you can use the .test_exe() to observe the execution.
+
+6. More example could be seen at user.py and the unit test in db/sql_uti.py
 
 # Layout
 ## How to use
