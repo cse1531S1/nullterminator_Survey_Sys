@@ -72,8 +72,8 @@ class Question(SqlUtil):
                 raise TypeError("Code Error: pool_id must be int or str")
             # q_id == None
             # return all the avaliable question (show = 1)
-            return_list = self.find("show", 1)\
-                            .find("pool_id",int(pool_id)).all()
+            return_list = self.find("show", 1).find("show",1)\
+                            .find("pool_id",pool_id).all()
             # return all the questions and with its' answers
             return [q+self.__ans.find_a(q[0]) for q in return_list]
 
@@ -99,11 +99,9 @@ class Question(SqlUtil):
 
     def add_q(self,question,pool_id, q_type,answers = None):
         # error handling
-        print('lenth of question',len(question))
         if not (type(pool_id) in [str,int] and len(question)>0 and type(question) == str and \
             q_type in ["MCQ","TEXT"]):
 
-            print("imhere")
             if not type(pool_id) in [str,int]:
                 raise TypeError("Code Error: pool_id is not a str or int.")
             elif len(question)==0:
@@ -156,8 +154,7 @@ class Question(SqlUtil):
         # return all the required question
         return q_list
 
-    def del_q(self, q_id):
-        print("question would be delecte is ", q_id)
+    def del_q(self, q_id,force=False):
         if not type(q_id) in [list, str, int]:
             raise TypeError("Question should be deleted by Id of list of ids")
 
@@ -167,14 +164,26 @@ class Question(SqlUtil):
         if type(q_id)  == list:
             for q in q_id:
                 # recursively calling all the question's id
-                self.del_q(q)
+                self.del_q(q,force)
 
         else:
             # the input type is a str or int
-            # delete the question by specify question id
-            self.find_by_id(int(q_id)).delete()
-            # delete the question's answer
-            self.__ans.del_a(q_id)
+            this_q = self.col_name("link").find_by_id(q_id).one()
+
+            if this_q == None:
+                # this_q has already deleted
+                raise TypeError("The specify question is not exist in database.")
+            if (this_q[0] ==0) or force:
+                # delete the question by specify question id
+                self.find_by_id(q_id).delete()
+                # delete the question's answer
+                self.__ans.del_a(q_id)
+            else:
+                # this question has been linked to some survey, couldn't delete
+                # but unshow it
+                self.find_by_id(q_id).update("show", 0).save()
+
+
         return self
 
 if __name__ == '__main__':
@@ -209,8 +218,11 @@ if __name__ == '__main__':
         # delete the question we just create for test
         quest.del_q(list_q)
 
-        # delete all the question
-        # quest.del_q(list(range(1,18,1)))
+        # delete all the question in database
+        # quest.del_q(list(range(1,81,1)),True)
 
         # check whether it's successfully deleted
         print(quest.find_q(pool_id="0"))
+
+        # force delete all the question for test
+        quest.del_q(list_q,True)
