@@ -3,6 +3,7 @@ from server import app
 from survey import *
 from respond import respondent
 from question import quest_tree,addQ,delQ,getQ
+from user import User
 
 @app.route("/")
 def index():
@@ -10,18 +11,30 @@ def index():
 
 @app.route("/login", methods = ["GET", "POST"])
 #This isnt going to the login page first...
+user = User()
 def login():
     if session.get("logged_in"):
         return redirect(url_for("index"), code=302, Response=None)
     if request.method == "POST":
-        if request.form["username"]== app.config['USERNAME'] and \
-            request.form["password"] == app.config['PASSWORD']:
+
+        user_id = request.form["id"]
+        password = request.form["Passsword"]
+        if check_password(user_id, password):
             # valid usesr
+            user.id = user_id
             session["logged_in"] = True
+
             return redirect(url_for("index"))
 
 
     return render_template("login.html")
+
+#Example, if user.role == "Admin"... load admin page
+#Routing Logic depending on the role of the user...
+
+
+
+
 
 @app.route("/logout")
 def logout():

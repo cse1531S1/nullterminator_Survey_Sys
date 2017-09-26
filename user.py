@@ -8,7 +8,7 @@ class User(sql_util):
 
     def findById(self, id):
         if type(id)!=int:
-            raise TypeError("id for a user muset be a interger")
+            raise TypeError("id for a user must be a interger")
         # simple case of mapping a function to dynamic execute SQL
         return self.find("user_id",id).one()
 
