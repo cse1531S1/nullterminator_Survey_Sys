@@ -3,6 +3,14 @@ from flask_login import LoginManager,login_user,current_user,login_required,logo
 from model import User
 from server import app,LoginManager
 import sqlite3
+
+#load data from passwords csv into the database
+def load_passwords(file):
+
+
+
+#ALready being done in db_construct ???? 
+
 def check_password(user_id, password):
     valid = find_password(password)
     if valid == True:
@@ -29,16 +37,18 @@ def load_user(user_id):
 
 
 
-def get_name(user_id):
-    connection = sqlite3.connect('survey.db')
-    c = conn.cursor()
-    
-    #Retrieve name from the database
-
-    return name
 
 def get_role(user_id):
 
+    connection = sqlite3.connect('survey.db')  #TABLE FOR USER ????
+    c = conn.cursor()
+    c.execute("SELECT role FROM survey.db WHERE id =?", (user_id))
+    con.commit()
+    row = cur.fetchone()
+    role = row[2]
+    #Retrieve name from the database
+
+    return role
     #retrieve role from the database
 
     return role
