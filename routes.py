@@ -3,6 +3,9 @@ from server import app
 from survey import *
 from respond import respondent
 from question import quest_tree,addQ,delQ,getQ
+# import the new question
+from new_question import Question
+
 
 @app.route("/")
 def index():

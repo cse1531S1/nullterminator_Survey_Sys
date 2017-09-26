@@ -83,22 +83,24 @@ class Question(SqlUtil):
                 return_list+=self.find_q(q)
             return return_list
         elif type(q_id) in [str,int]:
-            return_list = self.find_by_id(int(q_id)).all()
-            # get all the answers append at the end of each question
-            return [q+self.__ans.find_a(q[0]) for q in return_list]
+            this_q = self.find_by_id(int(q_id)).one()
+            if this_q[2] in ["MCQ"]:
+                # get all the answers append at the end of each question
+                return [this_q+self.__ans.find_a(this_q[0])]
+            elif this_q[2] in ["TEXT"]:
+                # Text base question don't have answers to specify
+                return [this_q]
+            else:
+                raise TypeError("Code Error: Counldn't handle this type of question:",this_q[2])
+
         else:
             # couldn't hand this type
             raise TypeError("Question id must be a list or string or interger")
 
-    def add_q(self, answers, question,pool_id, q_type):
+    def add_q(self,question,pool_id, q_type,answers = None):
         # error handling
-        if not (type(answers)== list and len(answers)>=2 and \
-            type(pool_id) in [str,int] and type(question) == str) and \
+        if not (type(pool_id) in [str,int] and type(question) == str) and \
             not q_type in ["MCQ","TEXT"]:
-            if type(answers) != list:
-                raise TypeError("Answers must be a list.")
-            if len(answers) < 2:
-                raise TypeError("A question must have at lease 2 answers.")
             if not type(pool_id) in [str,int]:
                 raise TypeError("Code Error: pool_id is not a str or int.")
             if type(question) != str:
@@ -106,6 +108,11 @@ class Question(SqlUtil):
             if not q_type in ["MCQ","TEXT"]:
                 raise TypeError("unknown q_type: ", q_type)
 
+        if q_type != "TEXT":
+            if type(answers) != list:
+                raise TypeError("Answers must be a list.")
+            if len(answers) < 2:
+                raise TypeError("A question must have at lease 2 answers.")
         # valid question and answers
         self.insert(["question","pool_id","type"],[question,int(pool_id),q_type]).save()
         # get the q_id for the question just created
@@ -113,8 +120,12 @@ class Question(SqlUtil):
         this_q = self.find(["question","pool_id","type"],[question,int(pool_id),q_type])\
                     .sort_by("id",False).one()
         q_id = this_q[0]
-        # call the class Answer to append this question's answers
-        self.__ans.add_a(answers,q_id)
+
+
+        if q_type in ["MCQ"]:
+            # only the MCQ base question would need some answer
+            # call the class Answer to append this question's answers
+            self.__ans.add_a(answers,q_id)
 
         # for convience return the q_id for just created question
         return q_id
@@ -162,15 +173,18 @@ if __name__ == '__main__':
     with app.app_context():
         quest = Question()
         # add a test question into database
-        first_id=quest.add_q(["a1","a2"], "sample question?", "0", "MCQ")
-        second_id=quest.add_q(["a1","a2"], "sample question?", "0", "MCQ")
+        first_id=quest.add_q("sample question?", "0", "MCQ",["a1","a2"])
+        second_id=quest.add_q( "sample question?", "0", "MCQ",["a1","a2"])
+        third_id=quest.add_q( "sample question?", "0", "TEXT")
+
+
 
         print("try to find all the quesiton with question pool 0")
         # getting all the question in the database with pool_id = 0
         print(quest.find_q(pool_id="0"))
 
 
-        list_q = [first_id,second_id]
+        list_q = [first_id,second_id,third_id]
         # pretend these selected question has been added to a survey
         print ("\nTry to queote added question into a survey")
         print(quest.quote_q(list_q))
