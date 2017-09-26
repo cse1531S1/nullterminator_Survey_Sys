@@ -1,10 +1,10 @@
 {%extends "base.html" %}
 {%block title%}Successfuly adding a question{%endblock%}
-{%block body%}
+{%block msg%}
     <div class="alert alert-success" role="alert">
         <h4>Well done!</h4>
         <p>You have added a question</p>
         <hr>
-        <a href="{{add_more}}" class="alert-link ">Add another question</a>
+        <a href="{{url_for("add_question")}}" class="alert-link ">Add another question</a>
     </div>
 {%endblock%}

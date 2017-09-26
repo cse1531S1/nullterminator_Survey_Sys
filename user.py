@@ -1,73 +1,56 @@
-from sql_uti import sql_util
+from sql_uti import SqlUtil
+from server import app
 
-
-class User(sql_util):
+class User(SqlUtil):
     """docstring for user."""
     def __init__(self):
         super().__init__("users")
 
-    def findById(self, id):
-        if type(id)!=int:
-            raise TypeError("id for a user muset be a interger")
+    def findById(self, uid):
+        if not type(uid) in [int,str]:
+            raise TypeError("ID for a user muset be a interger")
         # simple case of mapping a function to dynamic execute SQL
-        return self.find("user_id",id).one()
+        return self.find("id",int(uid)).one()
+    def check_pass(self,uid,password):
+        # get the users information by self function
+        this_user = self.findById(uid)
+        if password == this_user[1]:
+            # check it's password and they are same
+            return True
+        else:
+            return False
 
-    @property
-    def name(self):
-        return self.__name
 
-    @name.setter
-    def name(self,name):
-        if type(name)!= str:
-            raise TypeError("User's name must be a string")
-        self.__name = name
+    def new_user(self,uid, password,role):
+        if not (uid and password and role):
+            raise TypeError("The user_name, user_id, password must be all setted")
+        if not role in ["staff","student","admin"]:
+            raise TypeError("Undefined role for this user.")
 
-    @property
-    def password(self):
-        return self.__password
-
-    @password.setter
-    def password(self,password):
-        if type(password)!= str:
-            raise TypeError("User's password must be a string")
-        self.__password = password
-
-    @property
-    def id(self):
-        return self.__id
-
-    @id.setter
-    def id(self,id):
-        if type(id)!= int:
-            raise TypeError("User's id must be a string")
-        self.__id = id
-
-    def saveUser(self):
-        if not (self.name and self.id and self.password):
-            raise TypeError("the user_name, user_id, password must be all setted")
         # store the information in the class
-        self.insert(["user_id","user_name","password"],[self.id,self.name,self.password]).save()
+        self.insert(["id","password","role"],[uid,password,role]).save()
         # return self to have the property of one online execution
         return self
-    def deleteById(self, id):
-        if type(id)!= int:
-            raise TypeError("input id must be int")
-        self.find("user_id",id).delete()
+    def deleteById(self, uid):
+        if not type(uid) in [int,str]:
+            raise TypeError("User id must be int or string")
+        self.find("id",int(uid)).delete()
 
 
 
 if __name__ == '__main__':
-    user = User()
-    # use.print_table()
-    print(user.findById(50))
+    with app.app_context():
+        user = User()
+        # use.print_table()
+        print(user.findById(50))
 
-    user.name = "toby"
-    user.password = "secret"
-    user.id = 1
-    user.saveUser()
+        user.new_user(1,"pass","admin")
+        print(user.findById(1))
 
-    print(user.findById(1))
+        print("\nTry to login with the user that I just insert")
+        print(user.check_pass(1,"pass"))
 
-    # cleanup the added user
-    user.deleteById(1)
-    print(user.findById(1))
+
+        # cleanup the added user
+        user.deleteById(1)
+        print(user.findById(1))

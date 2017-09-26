@@ -99,13 +99,18 @@ class Question(SqlUtil):
 
     def add_q(self,question,pool_id, q_type,answers = None):
         # error handling
-        if not (type(pool_id) in [str,int] and type(question) == str) and \
-            not q_type in ["MCQ","TEXT"]:
+        print('lenth of question',len(question))
+        if not (type(pool_id) in [str,int] and len(question)>0 and type(question) == str and \
+            q_type in ["MCQ","TEXT"]):
+
+            print("imhere")
             if not type(pool_id) in [str,int]:
                 raise TypeError("Code Error: pool_id is not a str or int.")
-            if type(question) != str:
+            elif len(question)==0:
+                raise TypeError("Question must be specify.")
+            elif type(question) != str:
                 raise TypeError("A question must be a string.")
-            if not q_type in ["MCQ","TEXT"]:
+            elif not q_type in ["MCQ","TEXT"]:
                 raise TypeError("unknown q_type: ", q_type)
 
         if q_type != "TEXT":
@@ -152,8 +157,12 @@ class Question(SqlUtil):
         return q_list
 
     def del_q(self, q_id):
+        print("question would be delecte is ", q_id)
         if not type(q_id) in [list, str, int]:
             raise TypeError("Question should be deleted by Id of list of ids")
+
+        if not q_id:
+            raise TypeError("Delect question must be specify.")
 
         if type(q_id)  == list:
             for q in q_id:

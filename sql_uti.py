@@ -199,9 +199,13 @@ class SqlUtil(object):
                         +self.__key_pair.get_value()).fetchone()
         #  clear all the list have been used
         self.clear()
-        # return the search result
-        return list(return_list)
+        if return_list:
+            # return the search result
+            return list(return_list)
 
+        else:
+            # the return_list is None, to return None in this situation
+            return return_list
     def all(self):
         # convey the varable setted to a valid sql sentense and query the
         # database, collect the result and resent back the data
