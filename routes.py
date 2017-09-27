@@ -4,6 +4,7 @@ from survey import *
 from respond import respondent
 from question import quest_tree,addQ,delQ,getQ
 from user import User
+from authenticate import check_password
 
 @app.route("/")
 def index():
@@ -11,14 +12,14 @@ def index():
 
 @app.route("/login", methods = ["GET", "POST"])
 #This isnt going to the login page first...
-user = User()
+#new_user = User()
 def login():
     if session.get("logged_in"):
         return redirect(url_for("index"), code=302, Response=None)
     if request.method == "POST":
 
-        user_id = request.form["id"]
-        password = request.form["Passsword"]
+        user_id = request.form["username"]
+        password = request.form["password"]
         if check_password(user_id, password):
             # valid usesr
             user.id = user_id

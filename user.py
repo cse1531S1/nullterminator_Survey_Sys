@@ -1,14 +1,14 @@
-from db.sql_uti import sql_util
+from db.sql_uti import SqlUtil
 
 
-class User(sql_util):
+class User(SqlUtil):
     """docstring for user."""
     def __init__(self):
         super().__init__("users")
 
     def findById(self, id):
         if type(id)!=int:
-            raise TypeError("id for a user must be a interger")
+            raise TypeError("id for a user must be a integer")
         # simple case of mapping a function to dynamic execute SQL
         return self.find("user_id",id).one()
 

@@ -1,5 +1,6 @@
 from sql_uti import SqlUtil,conn
 import csv
+from werkzeug_security import generate_password_hash,check_password_hash
 
 enrol = SqlUtil("enrolments")
 user = SqlUtil("users")
@@ -13,11 +14,15 @@ with open("db/enrolments.csv",'r') as csv_in:
         enrol.insert(["user_id","course_code","course_year"],row[:]).save()
 
 # insert the users database
+#Uses Hash security to store passwords
 with open("db/passwords.csv",'r') as csv_in:
     reader = csv.reader(csv_in)
     for row in reader:
         # print(row)
-        user.insert(["id","password","role"],row[:]).save()
+        row = row.split(',')
+        #Generate hash for the password
+        row[1] = generate_password_hash(row[1])
+        user.insert(["id","password","role"],[row[0], row[1], row[2]]).save()
 
 
 # insert the course database
