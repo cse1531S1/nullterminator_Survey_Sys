@@ -49,11 +49,12 @@ def get_role(user_id):
 
     #Query Using sql_util ...
 
-    connection = sqlite3.connect('user')  #TABLE FOR USER ????
-    c = conn.cursor()
-    c.execute("SELECT * FROM user WHERE id =?", (user_id))
-    con.commit()
-    row = cur.fetchone()
+    #connection = sqlite3.connect('user')  #TABLE FOR USER ????
+    #c = conn.cursor()
+    #c.execute("SELECT * FROM user WHERE id =?", (user_id))
+    #con.commit()
+    #row = cur.fetchone()
+    row = user.findById(user_id)
     role = row[2]
     return role
 

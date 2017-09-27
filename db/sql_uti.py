@@ -1,5 +1,6 @@
 import sqlite3
 import csv
+from werkzeug.security import check_password_hash,generate_password_hash
 
 # config of the database name
 __dbName = "survey.db"
@@ -330,6 +331,13 @@ if __name__ == '__main__':
     user.find("id",1).update("password", "tecty").save()
     print(user.find("id",1).one())
 
+    #################################
+    print('Test Authentication')
+    hash_pass = generate_password_hash('tecty')
+    user.find("id",1).update("password", hash_pass).save()
+    isValid = compare_password(1, 'tecty')
+    print(isValid)
+    #################################
     print("\nDelete the inserted item, this sql would execute:")
     user.find("id",1).test_exe().delete()
     print("\nTest whether user 1 have been deleted:")
