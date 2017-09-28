@@ -20,10 +20,10 @@ All the user story are in [project](https://github.com/cse1531S1/survey-system-f
 # Database
 ## New table
 1. Add the initialisation script (in SQL) in file db/tables.sql
-2. Run the script by using this command:
+2. Run the script by using this command(in the root folder) :
 >sh init_db.sh
 3. Check whether your table have been initialised:
->sqlite3 survey.db <br>
+>sqlite3 db/survey.db <br>
 >sqlite3> .tables <br>
 >course enrolments users YOUR_NEW_TABLE_NAME
 
