@@ -1,10 +1,10 @@
 {%extends "base.html"%}
 {%block title%}Successfuly deleted a question{%endblock%}
-{% block body %}
+{% block msg %}
 <div class="alert alert-success" role="alert">
     <h4>Well done!</h4>
     <p>u are successfully deleted a question</p>
     <hr>
-    <a href="{{request}}"  class="alert-link">Delteing more question</a>
+    <a href="{{url_for("del_question")}}"  class="alert-link">Delteing more question</a>
 </div>
 {% endblock %}
