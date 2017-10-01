@@ -1,20 +1,24 @@
 {%extends "base.html"%}
 {%block title%}Manage Questions{%endblock%}
-{%block header%}<h2>Delete Question</h2>{%endblock%}
+{%block header%}<h1>Delete Question</h1>{%endblock%}
 {%block body%}
-    {% if q_list %}
-        <form class="" action="{{request}}" method="post">
-            <!-- the promt of the line, the idea is from bootstrap table-->
-            <table class="table table-hover">
-                <thead class="thead-default">
-                    <tr>
-                        <th scope="row" style="width:30px">#</th>
-                        <th>Question</th>
-                        <th>Answers</th>
-                    </tr>
-                </thead>
+    <br>
+    <h2>Mendatory Questions</h2>
+
+    <form class="" action="{{url_for("del_question")}}" method="post">
+        <!-- the promt of the line, the idea is from bootstrap table-->
+        <table class="table table-hover">
+            <thead class="thead-default">
+                <tr>
+                    <th scope="row" style="width:30px">#</th>
+                    <th>Question</th>
+                    <th>Type</th>
+                    <th>Answers</th>
+                </tr>
+            </thead>
+            {%if mendatory%}
                 <tbody>
-                    {% for q in q_list %}
+                    {% for q in mendatory %}
                     <!-- show up the information for each questoin -->
                         <tr>
                             <td scope="row">
@@ -24,8 +28,11 @@
                                 {{q[1]}}
                             </td>
                             <td>
+                                {{q[2]}}
+                            </td>
+                            <td>
                                 <!-- print all the answers -->
-                                {% for ans in q[2:] %}
+                                {% for ans in q[3:] %}
                                     {{ans}}
                                 {% endfor %}
                             </td>
@@ -33,13 +40,50 @@
                         </tr>
                     {% endfor %}
                 </tbody>
-            </table>
-            <button type="submit" class="btn btn-outline-success" name="button">Delete Questions</button>
-        </form>
-    {% else %}
-        <div class="alert alert-danger" role="alert">
-            <h2>Error:</h2>
-            <p>This system currently donesn't have any question. <a href="{{url_for("add_question")}}" class="alert-link">Go to add some question.</a></p>
-        </div>
-    {% endif %}
+            {% endif %}
+        </table>
+        <button type="submit" class="btn btn-outline-danger" name="button">Delete Questions</button>
+    </form>
+    <br>
+    <h2>Optional Questions</h2>
+    <form class="" action="{{url_for("del_question")}}" method="post">
+        <!-- the promt of the line, the idea is from bootstrap table-->
+        <table class="table table-hover">
+            <thead class="thead-default">
+                <tr>
+                    <th scope="row" style="width:30px">#</th>
+                    <th>Question</th>
+                    <th>Type</th>
+                    <th>Answers</th>
+                </tr>
+            </thead>
+            {% if optional %}
+                <tbody>
+                    {% for q in optional %}
+                    <!-- show up the information for each questoin -->
+                        <tr>
+                            <td scope="row">
+                                <input type="checkbox" name="qid" value="{{q[0]}}" class="float-left" >
+                            </td>
+                            <td>
+                                {{q[1]}}
+                            </td>
+                            <td>
+                                {{q[2]}}
+                            </td>
+                            <td>
+                                <!-- print all the answers -->
+                                {% for ans in q[3:] %}
+                                    {{ans}}
+                                {% endfor %}
+                            </td>
+
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            {%endif%}
+        </table>
+        <button type="submit" class="btn btn-outline-danger" name="button">Delete Questions</button>
+    </form>
+
 {%endblock%}

@@ -11,7 +11,8 @@ with open("db/enrolments.csv",'r') as csv_in:
     reader = csv.reader(csv_in)
     for row in reader:
         # print(row)
-        enrol.insert(["user_id","course_code","course_year"],row[:]).save()
+        row = row.split(',')
+        enrol.insert(["user_id","course_code","course_year"],[(int)row[0], row[1], row[2]]).save()
 
 # insert the users database
 #Uses Hash security to store passwords
@@ -22,7 +23,7 @@ with open("db/passwords.csv",'r') as csv_in:
         row = row.split(',')
         #Generate hash for the password
         row[1] = generate_password_hash(row[1])
-        user.insert(["id","password","role"],[row[0], row[1], row[2]]).save()
+        user.insert(["id","password","role"],[(int)row[0], row[1], row[2]]).save()
 
 
 # insert the course database

@@ -1,18 +1,32 @@
 {%extends "base.html"%}
-{% block title %}Please add a question{% endblock %}
-{% block header%}<h2>Add a Question to Site</h2>{%endblock%}
+{% block title %}Adding Question{% endblock %}
+{% block header%}<h2>Add a Question to System</h2>{%endblock%}
 {%block body%}
-    <form class="" action="{{request}}" method="POST">
+    <form class="" action="{{url_for("add_question")}}" method="POST">
         <div class="form-group">
             <label>Question:</label>
             <input type="text" name="question" value="{{question}}" class="form-control" placeholder="Question">
         </div>
         <div class="form-group">
             <label>Answers:</label>
-            <input type="text" name="answers" value="{{answers}}" class="form-control" placeholder="Answer1, Answer2, ..">
+            <input type="text" name="answers" value="{{answers}}" class="form-control" placeholder="Answer1/Answer2/ ..">
             <small class="form-text text-muted">
-                The answer can be infinate many, but at lease two. Syntax is: Answer1,Answer2,Answer3,..,AnswerN
+                The answer can be infinate many, but at lease two. Syntax is: Answer1/Answer2/Answer3/../AnswerN
             </small>
+        </div>
+        <div class="form-group">
+            <label>Pool:</label>
+            <select class="form-control" name="pool_id">
+                <option value="0">Mandatory</option>
+                <option value="1">Optional</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Type:</label>
+            <select class="form-control" name="type">
+                <option value="MCQ">Mulitple Choice Question</option>
+                <option value="TEXT">Text Base Question</option>
+            </select>
         </div>
         <button type="submit" class="btn btn-primary" name="">Add a Question</button>
     </form>

@@ -25,7 +25,7 @@ create table course(
 );
 
 create table question(
-    -- INTEGER PRIMARY KEY is for auto increament in sqlite3 
+    -- INTEGER PRIMARY KEY is for auto increament in sqlite3
     id INTEGER PRIMARY KEY,
     question varchar(255) NOT NULL,
     -- record how many time the question have been linked
@@ -33,6 +33,7 @@ create table question(
     -- decide whether this question showing to question manage system
     -- every linked question won't be actually deleted in database
     show int NOT NULL default 1,
+    type varchar(10) NOT NULL,
     pool_id int NOT NULL
 );
 

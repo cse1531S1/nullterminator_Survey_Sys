@@ -68,15 +68,7 @@ def get_role(user_id):
 
 #test authentication
 if __name__ == '__main__':
-    user = SqlUtil("users")
-
-    with open("db/passwords.csv",'r') as csv_in:
-        reader = csv.reader(csv_in)
-        for row in reader:
-            # print(row)
-            #Generate hash for the password
-            row[1] = generate_password_hash(row[1])
-            user.insert(["id","password","role"],[row[0], row[1], row[2]]).save()
+#    user = SqlUtil("users")
 
     print('=== Test Hashing comparison ===')
     password = 'secret_password'

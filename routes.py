@@ -3,8 +3,10 @@ from server import app
 from survey import *
 from respond import respondent
 from question import quest_tree,addQ,delQ,getQ
-from user import User
+# import the new question
+from new_question import Question
 from authenticate import check_password
+
 
 @app.route("/")
 def index():
@@ -119,25 +121,31 @@ def add_question():
     if not session.get("logged_in"):
         return redirect("login", code=302, Response=None)
 
+    error = ""
     # else: the admin has logged_in
     if request.method == "POST":
+        quest = Question()
         # get the question set
-        add_q = addQ(quest_tree())
+
         # grap the user input
         question = request.form["question"]
-        answers = request.form["answers"].split(",")
-        if add_q.is_valid_Q(question,answers) == 0:
-            # valid input
-            # push the user input into system
-            add_q.add_Q(question, answers)
-            # get back the successful page to user
-            return render_template("success_add_q.html",add_more = \
-                url_for("add_question"))
+        answers = request.form["answers"].split("/")
+        pool_id = request.form["pool_id"]
+        q_type = request.form["type"]
+
+        try:
+            quest.add_q(question, pool_id, q_type, answers = answers)
+        except TypeError as e:
+            error = format(e)
+        else:
+            return render_template("success_add_q.html")
+
+
         # invalid input, push back what user has been input, and push the error message
-        return render_template("add_q.html",request = url_for("add_question"),\
-            msg_err = add_q.is_valid_Q(question,answers),question = question, \
+        return render_template("add_q.html",\
+            msg_err = error,question = question, \
             answers = request.form["answers"])
-    return render_template("add_q.html",request = url_for("add_question"))
+    return render_template("add_q.html")
 
 @app.route("/delquest",methods= ["POST","GET"])
 def del_question():
@@ -147,22 +155,25 @@ def del_question():
 
     # else: the admin has logged_in
     # instance of quest_tree
-    qt = quest_tree()
+    quest = Question()
+    error = None
     if request.method== "POST":
         # try to delete the question that uesr want
         # create the instance of del_question class
         # initial an instance of deleting question
-        del_q = delQ(qt)
+        try:
 
-        del_q.doDel(request.form.getlist("qid"))
-        return render_template("success_del_q.html", \
-            request = url_for("del_question"))
-    # a instance for finding all the question
-    get_q = getQ(qt)
+            quest.del_q(request.form.getlist("qid"))
+        except Exception as e:
+            error = format(e)
+        else:
+            return render_template("success_del_q.html")
+
     # a list for question
-    q_list = get_q.findQ()
-    return render_template("del_q.html",request= url_for("del_question"),\
-    q_list = q_list)
+    mendatory = quest.find_q(pool_id="0")
+    optional = quest.find_q(pool_id=1)
+    return render_template("del_q.html",\
+    mendatory = mendatory,optional=optional,msg_err = error)
 
 #Route to the results page displaying results of a survey.
 #not sure how the data csv's are setup or how it should know which csv to read

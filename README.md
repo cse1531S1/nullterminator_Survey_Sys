@@ -20,22 +20,23 @@ All the user story are in [project](https://github.com/cse1531S1/survey-system-f
 # Database
 ## New table
 1. Add the initialisation script (in SQL) in file db/tables.sql
-2. Run the script by using this command:
+2. Run the script by using this command(in the root folder) :
 >sh init_db.sh
 3. Check whether your table have been initialised:
->sqlite3 survey.db <br>
+>sqlite3 db/survey.db <br>
 >sqlite3> .tables <br>
 >course enrolments users YOUR_NEW_TABLE_NAME
 
 ## SqlUtil("TABLE_NAME")
 1. How to Use:
     ```python
-    from db.sql_uti import SqlUtil
+    from sql_uti import SqlUtil
+    from server import app
     ```
 2. This is a runtime python3 to SQL explainer. Have a lots of great feature:
     - One line execution:
     ```python
-    user = sql_util("users")
+    user = SqlUtil("users")
     # this would select all the information in table users.
     user.all()
     # find one instance of user_id = 50
@@ -77,7 +78,19 @@ save() / one() / all() / delete()
 ```python
 find() / insert() / update() / col_name() / with_table() / sort_by() / test_exe()
 ```
-5. More example could be seen at user.py and the unit test in db/sql_uti.py
+5. How to test.Use these line of code to test it.
+
+    ```python
+    from server import app
+    if __name__ == '__main__':
+        # unit test
+        with app.app_context():
+            #  call the flask context
+            YOUR_TEST_CODE
+    ```
+    Also, you can use the .test_exe() to observe the execution.
+
+6. More example could be seen at user.py and the unit test in db/sql_uti.py
 
 # Layout
 ## How to use
