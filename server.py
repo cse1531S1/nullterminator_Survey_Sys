@@ -10,8 +10,6 @@ login_manager.init_app(app)
 
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'db/survey.db'),
-    USERNAME="admin",
-    PASSWORD="default"
 ))
 
 def get_db():
