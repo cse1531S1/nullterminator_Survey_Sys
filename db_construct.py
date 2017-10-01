@@ -1,6 +1,7 @@
 from sql_uti import SqlUtil
 from server import app
 import csv
+from werkzeug.security import generate_password_hash
 
 with app.app_context():
     enrol = SqlUtil("enrolments")
