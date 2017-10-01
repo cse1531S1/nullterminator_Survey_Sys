@@ -1,6 +1,7 @@
 from sql_uti import SqlUtil
 from server import app
 import csv
+from werkzeug.security import generate_password_hash
 
 with app.app_context():
     enrol = SqlUtil("enrolments")
@@ -19,7 +20,8 @@ with app.app_context():
         reader = csv.reader(csv_in)
         for row in reader:
             # print(row)
-            user.insert(["id","password","role"],row[:]).save()
+            hash_pass = generate_password_hash(row[1])
+            user.insert(["id","password","role"],[row[0], hash_pass, row[2]]).save()
 
 
     # insert the course database

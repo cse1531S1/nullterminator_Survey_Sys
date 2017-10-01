@@ -1,12 +1,15 @@
 import os
 from flask import Flask,g
 import sqlite3
+from flask_login import LoginManager
+
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "Highly secret key"
+login_manager = LoginManager()
+login_manager.init_app(app)
+
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'db/survey.db'),
-    USERNAME="admin",
-    PASSWORD="default"
 ))
 
 def get_db():
