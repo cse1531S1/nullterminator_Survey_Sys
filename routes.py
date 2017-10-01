@@ -1,7 +1,9 @@
 from flask import Flask, redirect, render_template, request, url_for,session
+from flask_login import LoginManager,login_user, current_user, login_required, logout_user
 from server import app
 from survey import *
 from respond import respondent
+from user import User
 from question import quest_tree,addQ,delQ,getQ
 # import the new question
 from new_question import Question
@@ -14,33 +16,51 @@ def index():
 @app.route("/login", methods = ["GET", "POST"])
 #This isnt going to the login page first...
 def login():
-    if session.get("logged_in"):
-        return redirect(url_for("index"), code=302, Response=None)
     if request.method == "POST":
-        if request.form["username"]== app.config['USERNAME'] and \
-            request.form["password"] == app.config['PASSWORD']:
+        this_user = User(request.form.get("username",None))
+
+        if this_user.check_pass(request.form["password"]):
             # valid usesr
-            session["logged_in"] = True
-            return redirect(url_for("index"))
+            login_user(User(2))
+            return redirect(url_for("dashboard"))
 
 
     return render_template("login.html")
 
 @app.route("/logout")
+@login_required
 def logout():
-    if session.get("logged_in"):
-        session.pop("logged_in",None)
+    logout_user()
     return redirect(url_for("login"), code=302, Response=None)
+
+
+@app.route("/dash")
+@login_required
+def dashboard():
+    # route by the current user type
+
+    """
+    !!!! These functions are not complete, plz complete it by the new survey parts!
+    When u complete it, delete this comment.
+    The _***.html in the dash is just give u a brief idea about how to do this.
+    Modify them by your data.
+      """
+    if current_user.is_student():
+        return render_template('dash/student.html',survey_l = survey().courselist())
+    if current_user.is_staff():
+        return render_template('dash/staff.html',survey_l = survey().courselist())
+    if current_user.is_admin():
+        return render_template('dash/admin.html',survey_l = survey().courselist())
+
+
+
 
 # survey creation in this controller
 @app.route("/create_sur")
 @app.route("/create_sur/<string:name>",methods=["GET","POST"])
+@login_required
 def course_adding(name=None):
-    # force login first
-    if not session.get("logged_in"):
-        return redirect(url_for("login"), code=302, Response=None)
 
-    # else: the admin has logged_in
     s = survey()
     if not name:
         # name is none when teacher try to create a course
@@ -76,6 +96,7 @@ def course_adding(name=None):
 
 # @app.route("/student")
 @app.route("/student/<string:name>", methods=["GET", "POST"])
+@login_required
 def student(name):
     s = survey()
     res = respondent(name)
@@ -103,10 +124,9 @@ def student(name):
 
 
 @app.route("/quest",methods = ["POST","GET"])
+@login_required
 def add_question():
-    # force login first
-    if not session.get("logged_in"):
-        return redirect("login", code=302, Response=None)
+
 
     error = ""
     # else: the admin has logged_in
@@ -135,12 +155,9 @@ def add_question():
     return render_template("add_q.html")
 
 @app.route("/delquest",methods= ["POST","GET"])
+@login_required
 def del_question():
-    # force login first
-    if not session.get("logged_in"):
-        return redirect("login", code=302, Response=None)
 
-    # else: the admin has logged_in
     # instance of quest_tree
     quest = Question()
     error = None
@@ -166,12 +183,9 @@ def del_question():
 #not sure how the data csv's are setup or how it should know which csv to read
 @app.route("/results")
 @app.route("/results/<string:name>",methods=["GET","POST"])
+@login_required
 def show_results(name = None):
-    # force login first
-    if not session.get("logged_in"):
-        return redirect("login", code=302, Response=None)
 
-    # else: the admin has logged_in
     response = respondent(name)
     if not name:
         # find all classes

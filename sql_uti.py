@@ -1,7 +1,7 @@
 import sqlite3
 import csv
 
-from server import app,get_db
+
 
 
 
@@ -37,7 +37,7 @@ class SqlUtil(object):
     """docstring for sql_util."""
     def __init__(self, table_name):
         super(SqlUtil, self).__init__()
-        self.__conn = get_db()
+        self.__conn = sqlite3.connect('db/survey.db')
         self.__table_name = table_name;
         # operation for this query defualt is select
         self.__operator = "SELECT"
@@ -184,8 +184,8 @@ class SqlUtil(object):
                                         .fetchone()
         #  clear all the list have been used
         self.clear()
-        # # push the changes
-        # self.__conn.commit()
+        # push the changes
+        self.__conn.commit()
         return self
 
     def one(self):
@@ -238,8 +238,8 @@ class SqlUtil(object):
     def save(self):
         # generate the sql by input things for C,U
         if not self.__operator in ["INSERT INTO","UPDATE"]:
-            # # save method for force commit
-            # self.__conn.commit()
+            # save method for force commit
+            self.__conn.commit()
             return self
 
         # for debug
@@ -253,8 +253,8 @@ class SqlUtil(object):
         # clear all the temp data
         self.clear()
 
-        # # save the changes
-        # self.__conn.commit()
+        # save the changes
+        self.__conn.commit()
         return self
     def clear(self,join = False,col= False):
         # clear the join info
@@ -284,63 +284,63 @@ class SqlUtil(object):
         return self
 if __name__ == '__main__':
 
-    with app.app_context():
-        enrol = SqlUtil("enrolments")
-        user = SqlUtil("users")
-        course = SqlUtil("course")
-        print("test find all courses that enroled by user_id = 332")
-        user332 = enrol.find("user_id", 332, sign = "=").all()
-        print(user332)
 
-        print("\ntest find one course that enroled by user_id = 445")
-        user445 = enrol.find("user_id", 445, sign = "=").one()
-        print(user445)
+    enrol = SqlUtil("enrolments")
+    user = SqlUtil("users")
+    course = SqlUtil("course")
+    print("test find all courses that enroled by user_id = 332")
+    user332 = enrol.find("user_id", 332, sign = "=").all()
+    print(user332)
 
-        # try the function of join search
-        enrol.with_table("users","user_id","id")
-        # select one info about comp1521
-        print("\ntest join search of users and enrolments table")
-        course1521 = enrol.find("course_code", "COMP1521")\
-                        .find("course_year","17s2")\
-                        .col_name(["user_id","course_code","course_year"])\
-                        .col_name("password","users").sort_by("user_id",False)\
-                        .test_exe().all()
-        for person in course1521:
-            print(person)
-        print("\nFind one record of year 18s1")
-        # select one info about 18s1
-        year18s1 = enrol.find("course_year", "18s1").one()
-        print (year18s1)
+    print("\ntest find one course that enroled by user_id = 445")
+    user445 = enrol.find("user_id", 445, sign = "=").one()
+    print(user445)
 
-        print("\ntest whether the class works with users table")
-        user333 =user.find("id", 333).one()
-        print(user333)
-        print("\nTest find all the course_code is 1511 and course_year is 17s2 (mutiple criteria search)")
-        course1511 = course.find("course_code", "COMP1511").find("course_year","17s2").all()
-        print(course1511)
+    # try the function of join search
+    enrol.with_table("users","user_id","id")
+    # select one info about comp1521
+    print("\ntest join search of users and enrolments table")
+    course1521 = enrol.find("course_code", "COMP1521")\
+                    .find("course_year","17s2")\
+                    .col_name(["user_id","course_code","course_year"])\
+                    .col_name("password","users").sort_by("user_id",False)\
+                    .test_exe().all()
+    for person in course1521:
+        print(person)
+    print("\nFind one record of year 18s1")
+    # select one info about 18s1
+    year18s1 = enrol.find("course_year", "18s1").one()
+    print (year18s1)
 
-
-        # Test for insert update and delete
-
-        print("\nTest whether user 1 have record:")
-        print(user.find("id",1).all())
-        user.insert(["id","password","role"],[1,"toby","test"]).save()
-
-        print("\nTest whether user 1 have recorded:")
-        print(user.find("id",1).one())
-
-        print("\nMoidfy the value to name of tecty")
-        user.find("id",1).update("password", "tecty").save()
-        print(user.find("id",1).one())
-
-        print("\nDelete the inserted item, this sql would execute:")
-        user.find("id",1).test_exe().delete()
-        print("\nTest whether user 1 have been deleted:")
-        print(user.find("id",1).all())
+    print("\ntest whether the class works with users table")
+    user333 =user.find("id", 333).one()
+    print(user333)
+    print("\nTest find all the course_code is 1511 and course_year is 17s2 (mutiple criteria search)")
+    course1511 = course.find("course_code", "COMP1511").find("course_year","17s2").all()
+    print(course1511)
 
 
+    # Test for insert update and delete
 
-        # # too long to print
-        # print("\nTest find all the courses in 17s2")
-        # year17s2 = course.find("course_year", "17s2").all()
-        # print(year17s2)
+    print("\nTest whether user 1 have record:")
+    print(user.find("id",1).all())
+    user.insert(["id","password","role"],[1,"toby","test"]).save()
+
+    print("\nTest whether user 1 have recorded:")
+    print(user.find("id",1).one())
+
+    print("\nMoidfy the value to name of tecty")
+    user.find("id",1).update("password", "tecty").save()
+    print(user.find("id",1).one())
+
+    print("\nDelete the inserted item, this sql would execute:")
+    user.find("id",1).test_exe().delete()
+    print("\nTest whether user 1 have been deleted:")
+    print(user.find("id",1).all())
+
+
+
+    # # too long to print
+    # print("\nTest find all the courses in 17s2")
+    # year17s2 = course.find("course_year", "17s2").all()
+    # print(year17s2)

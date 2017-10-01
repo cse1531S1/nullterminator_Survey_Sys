@@ -43,3 +43,6 @@ create table answer(
     answer int NOT NULL,
     FOREIGN KEY (q_id) REFERENCES question(id)
 );
+
+-- some test user
+INSERT INTO users  (id,password,role) VALUES (2,"tecty","admin");
