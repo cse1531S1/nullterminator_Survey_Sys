@@ -1,6 +1,10 @@
 import os
 from flask import Flask,g
 import sqlite3
+from flask_login import LoginManager
+from user import User
+
+
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "Highly secret key"
 app.config.update(dict(
@@ -9,23 +13,11 @@ app.config.update(dict(
     PASSWORD="default"
 ))
 
-def get_db():
 
-    if not hasattr(g,'sqlite_db'):
-        # initial a connection
-        g.sqlite_db =sqlite3.connect(app.config['DATABASE'])
-    return g.sqlite_db
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
 
-
-# # disconnect the database
-@app.teardown_appcontext
-def teardown_db(exception):
-    # with app.app_context():
-    if hasattr(g, 'sqlite_db'):
-        # commit all the changes for this thread
-        # (delay all the commit, so the website could act more reponsive)
-        g.sqlite_db.commit()
-
-        g.sqlite_db.close()
-    else:
-        print("the database has disconnected already")
+@login_manager.user_loader
+def load_user(userid):
+    return User(userid)

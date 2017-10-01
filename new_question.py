@@ -188,41 +188,41 @@ class Question(SqlUtil):
 
 if __name__ == '__main__':
 
-    with app.app_context():
-        quest = Question()
-        # add a test question into database
-        first_id=quest.add_q("sample question?", "0", "MCQ",["a1","a2"])
-        second_id=quest.add_q( "sample question?", "0", "MCQ",["a1","a2"])
-        third_id=quest.add_q( "sample question?", "0", "TEXT")
+
+    quest = Question()
+    # add a test question into database
+    first_id=quest.add_q("sample question?", "0", "MCQ",["a1","a2"])
+    second_id=quest.add_q( "sample question?", "0", "MCQ",["a1","a2"])
+    third_id=quest.add_q( "sample question?", "0", "TEXT")
 
 
 
-        print("try to find all the quesiton with question pool 0")
-        # getting all the question in the database with pool_id = 0
-        print(quest.find_q(pool_id="0"))
+    print("try to find all the quesiton with question pool 0")
+    # getting all the question in the database with pool_id = 0
+    print(quest.find_q(pool_id="0"))
 
 
-        list_q = [first_id,second_id,third_id]
-        # pretend these selected question has been added to a survey
-        print ("\nTry to queote added question into a survey")
-        print(quest.quote_q(list_q))
+    list_q = [first_id,second_id,third_id]
+    # pretend these selected question has been added to a survey
+    print ("\nTry to queote added question into a survey")
+    print(quest.quote_q(list_q))
 
 
-        quest.col_name("link")
-        print("\nTry to check the linked time for each question.")
-        # check whether these question has been selected
-        print(quest.find_q(list_q))
+    quest.col_name("link")
+    print("\nTry to check the linked time for each question.")
+    # check whether these question has been selected
+    print(quest.find_q(list_q))
 
 
-        print("\nDelete all the questions created for survey.")
-        # delete the question we just create for test
-        quest.del_q(list_q)
+    print("\nDelete all the questions created for survey.")
+    # delete the question we just create for test
+    quest.del_q(list_q)
 
-        # delete all the question in database
-        # quest.del_q(list(range(1,81,1)),True)
+    # delete all the question in database
+    # quest.del_q(list(range(1,81,1)),True)
 
-        # check whether it's successfully deleted
-        print(quest.find_q(pool_id="0"))
+    # check whether it's successfully deleted
+    print(quest.find_q(pool_id="0"))
 
-        # force delete all the question for test
-        quest.del_q(list_q,True)
+    # force delete all the question for test
+    quest.del_q(list_q,True)

@@ -1,7 +1,7 @@
 from sql_uti import SqlUtil
-from server import app
 
-class User(SqlUtil):
+
+class UserData(SqlUtil):
     """docstring for user."""
     def __init__(self):
         super().__init__("users")
@@ -37,20 +37,50 @@ class User(SqlUtil):
         self.find("id",int(uid)).delete()
 
 
+class User(object):
+    """docstring for User."""
+    def __init__(self, user_id):
+        super(User, self).__init__()
+        self.__usr = UserData()
+        this_user = self.__usr.findById(user_id)
+        if this_user:
+            self.uid = this_user[0]
+            self.__pw = this_user[1]
+            self.role = this_user[2]
+        else:
+            return None
+
+    def check_pass(self, pw):
+        return self.__pw == pw
+    def is_active(self):
+        return True
+    def get_id(self):
+        return self.uid
+    def is_authenticated(self):
+        return True
+    def is_anonymous(self):
+        return False
+
+    def is_admin(self):
+        return self.role == "admin"
+    def is_staff(self):
+        return self.role == "staff"
+    def is_student(self):
+        return self.role == "student"
 
 if __name__ == '__main__':
-    with app.app_context():
-        user = User()
-        # use.print_table()
-        print(user.findById(50))
 
-        user.new_user(1,"pass","admin")
-        print(user.findById(1))
+    user = UserData()
+    # use.print_table()
+    print(user.findById(50))
 
-        print("\nTry to login with the user that I just insert")
-        print(user.check_pass(1,"pass"))
+    user.test_exe().new_user(1,"pass","admin")
+    print(user.findById(1))
+
+    print("\nTry to login with the user that I just insert")
+    print(user.check_pass(1,"pass"))
 
 
-        # cleanup the added user
-        user.deleteById(1)
-        print(user.findById(1))
+    # cleanup the added user
+    user.deleteById(1)
+    print(user.findById(1))
