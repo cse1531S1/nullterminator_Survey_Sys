@@ -6,11 +6,10 @@
             <Form method="POST">
         {% for survey in survey_l %}
         
-            <br>{{survey[0]}}    {{course_name}} {{course_year}} {{survey[4]}} {{survey[5]}}</br>
+            <br><a href="{{ url_for("view_survey",survey_id = survey[0],course_name= course_name,course_year=course_year)}}">{{course_name}} {{course_year}} {{survey[4]}} {{survey[5]}}</a> <br>
         {% endfor %}
-         Survey_ID:<br>
-         <input type= "text" name = "id" > <br>
-         <br><input type = "submit" value = "Submit">
+         
+     
 
     {%else%}
         <div class="alert alert-danger" role="alert">

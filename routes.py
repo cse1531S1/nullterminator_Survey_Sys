@@ -85,14 +85,9 @@ def course_adding(course_name=None,course_year=None):
     if request.method == "POST":
 
         if s.get_survey(course_name,course_year) != []:
-            this_id = request.form.get("id")
-            survey_list = s.get_survey(course_name,course_year)
-            this_survey = s.get_survey_by_id(this_id,survey_list)   
-            selected_genQ = this_survey[2].split("&&")
-            selected_optQ = this_survey[3].split("&&")
-            # renturn a preview of final survey
-      
-
+            this_id = str(request.form.get("id"))
+     
+            return redirect(url_for('view_survey', survey_id = this_id, course_name = course_name, course_year = course_year))
         else:      
             # teacher is trying to create a survey by select questions
             # getting all the teacher selected question
@@ -100,20 +95,17 @@ def course_adding(course_name=None,course_year=None):
             selected_optQ = request.form.getlist("selected_optQ")
             if selected_genQ != [] and selected_optQ != []:
                # the admin has selected some questions for this survey
-               this_id = s.create_survey(course_name,course_year,selected_genQ,selected_optQ,"2017-09-23 00:00:00","2017-09-23 23:59:59")  
-        
-        # renturn a preview of final survey
-        return render_template("finalsurvey.html", course_name=course_name,\
-                course_year = course_year,\
-                genlist = q.find_q(q_id = selected_genQ,pool_id = "0"),\
-                optlist = q.find_q(q_id = selected_optQ,pool_id = "1"),\
-                Qnum1 = len(q.find_q(q_id = selected_genQ,pool_id = "0")),\
-                Qnum2 = len(q.find_q(q_id = selected_genQ,pool_id = "1")))        
-
+               this_id = s.create_survey(course_name,course_year,selected_genQ,selected_optQ,"2017-09-23 00:00:00","2017-09-23 23:59:59")
+               # renturn a preview of final survey
+               return redirect(url_for('view_survey', survey_id=this_id, course_name = course_name, course_year = course_year))
+    
+            else:
+               error = "Please add at least one general/optional question for this survey."      
+            
 
     # teacher have select a course but not have select a question yet
     # getting all the question
-
+ 
     if s.get_survey(course_name,course_year) == []:
       return render_template("surveycreate.html", course_name=course_name,\
          course_year=course_year,genQ_list=get_genQ,\
@@ -123,20 +115,28 @@ def course_adding(course_name=None,course_year=None):
       return render_template("select_sur.html", course_name = course_name, course_year = course_year,survey_l = s.get_survey(course_name,course_year))
 
 
-@app.route("/view_survey")
-@app.route("/view_sur/<string:course_name>/<string:course_year>",methods=["GET","POST"])
+
+@app.route("/view_sur/<int:survey_id>/<string:course_name>/<string:course_year>",methods=["GET","POST"])
 @login_required
-def view_survey(survey_id,course_name="",course_year=""):
- 
+def view_survey(survey_id="",course_name="",course_year=""):
    q = Question()
    get_genQ = q.find_q(pool_id = "0")
    get_optQ = q.find_q(pool_id = "1")
    s = Survey()
    survey_list = s.get_survey(course_name,course_year)
-   this_survey = s.get_survey_by_id(survey_id,survey_list)   
+   this_survey = s.get_survey_by_id(survey_id,survey_list)
+   
    selected_genQ = this_survey[2].split("&&")
    selected_optQ = this_survey[3].split("&&")
-   
+   print(selected_genQ)
+   print(selected_optQ)
+    
+   return render_template("finalsurvey.html", course_name=course_name,\
+                course_year = course_year,\
+                genlist = q.find_q(q_id = selected_genQ,pool_id = "0"),\
+                optlist = q.find_q(q_id = selected_optQ,pool_id = "1"),\
+                Qnum1 = len(q.find_q(q_id = selected_genQ,pool_id = "0")),\
+                Qnum2 = len(q.find_q(q_id = selected_optQ,pool_id = "1")))        
         
 
 
