@@ -1,36 +1,113 @@
 {%extends "base.html"%}
-{%block title%}{{course_name}} Survey Preview{%endblock%}
-{%block body %}
-    {%if quest_list %}
+{%block title %} Edit: {{course_name}} {{course_year}} Survey{%endblock%}
+{%block header%}
+    <h1>Edit:{{course_name}} Survey</h1>
+    <h2> Congrats for adding questions for your survey (preview) </h2>
+{%endblock%}
+{%block body%}
 
-        <h1>{{course_name}} Web Survey <span class="badge badge-success">preview</span></h1>
+    {%if genlist :%}
+        <Form method="POST">
+            <table class="table table-hover">
+                <thead class="thead-default">
+                    <tr>
+                        <th scope="row" style="width:30px">#</th>
+                        <th>General Question</th>
+                        <th>
+                            Answers
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                     
+                    {% for len in range(Qnum1) :%}
+                    
+                        <tr>
+                            <td scope="row">
+                                 {{len+1}}
+                            </td>
+                            <td>
+                                {{genlist[len][1]}}
+                            </td>
 
-        {%for quest in quest_list %}
-            <p>{{quest[0]}}. {{quest[1]}}  </p>
+                           {% if genlist[len][2] == "MCQ" : %}
+                            <td>
+                                <div class="row">
+                             
+                                    {% for answer in genlist[len][3:] :%}
+                                        <div class="col">
+                                            {{answer}}
+                                        </div>
+                                    {% endfor %}
+                                    <div>(MCQ)</div>
+                                </div>
+                            </td>
+                           {%endif%}
+                           {% if genlist[len][2] == "TEXT" : %}
 
-            {% set ans_count =0 %}
-            {% for ans in quest[2:] %}
-            <div class="form-check">
-                <label class="form-check-label disabled">
-                    <input type="radio" name="{{quest[0]}}" class="form-check-input" value="{{ans_count}}" disabled/>{{ans}}
-                    {% set ans_count= ans_count +1 %}
-                </label>
-            </div>
-            {%endfor%}
-        {%endfor%}
-        <br>
-        url for this Survey:
-        <a href="{{url_for("student",_external=True, name = course_name)}}">
-            {{url_for("student",_external=True, name = course_name)}}
-        </a>
-    {%else%}
-        {% block msg%}
+                              <td> (TEXT-BASED ANSWER) </td>   
+                           {%endif%}
+               
 
-            <!-- very special error -->
-            <div class="alert alert-danger " role="alert">
-                <h1> Unknown Error:</h1>
-                <p><b>Reason:</b> No question added for a created survey.</p>
-            </div>
-        {%endblock%}
-    {% endif %}
+                   
+                    {%endfor%}
+                </tbody>
+            
+
+      {%if optlist :%}
+            <table class="table table-hover">
+                <thead class="thead-default">
+                    <tr>
+                        <th scope="row" style="width:30px">#</th>
+                        <th>Optional Question</th>
+                        <th>
+                            Answers
+                        </th>
+                    
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for len in range(Qnum2) :%}
+                        <tr>
+                            <td scope="row">
+                             
+                                {{len+1}}
+                           
+                            </td>
+        
+                            <td>
+                                {{optlist[len][1]}}
+                            </td>
+
+                           {% if  optlist[len][2] == "MCQ" : %}
+                            <td>
+                                <div class="row">
+                                    {% for answer in optlist[len][3:] %}
+                                        <div class="col">
+                                            {{answer}}
+                                        </div>
+                                    {% endfor %}
+                                     <div>(MCQ)</div>
+                                </div>
+                          
+                            </td>
+                {%endif%}
+                           {% if optlist[len][2] == "TEXT" : %}
+
+                              <td> (TEXT-BASED ANSWER) </td>   
+                {%endif%}  
+
+
+                         
+                    {%endfor%}
+                </tbody>
+            </table>
+         {% else: %}
+            <div> There is no optional questions available</div>
+         {%endif%}
+            <p><h3>Next step</h3></p>
+            <a href="{{url_for("index")}}" class="alert-link"><h4> Go back to home page </h4></a>
+            <a href="{{url_for("course_adding")}}" class="alert-link"><h4>adding question for another course</h4></a>
+        </From>
+    {%endif%}
 {%endblock%}

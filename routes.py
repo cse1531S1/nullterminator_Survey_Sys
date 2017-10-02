@@ -1,7 +1,9 @@
 from flask import Flask, redirect, render_template, request, url_for,session
+from flask_login import LoginManager,login_user, current_user, login_required, logout_user
 from server import app
-from survey import *
+from new_survey import *
 from respond import respondent
+from user import User
 from question import quest_tree,addQ,delQ,getQ
 # import the new question
 from new_question import Question
@@ -14,61 +16,119 @@ def index():
 @app.route("/login", methods = ["GET", "POST"])
 #This isnt going to the login page first...
 def login():
-    if session.get("logged_in"):
-        return redirect(url_for("index"), code=302, Response=None)
     if request.method == "POST":
-        if request.form["username"]== app.config['USERNAME'] and \
-            request.form["password"] == app.config['PASSWORD']:
+        this_user = User(request.form.get("username",None))
+
+        if this_user.check_pass(request.form["password"]):
             # valid usesr
-            session["logged_in"] = True
-            return redirect(url_for("index"))
+    
+            login_user(User(request.form.get("username",None)))
+            return redirect(url_for("dashboard"))
 
 
     return render_template("login.html")
 
 @app.route("/logout")
+@login_required
 def logout():
-    if session.get("logged_in"):
-        session.pop("logged_in",None)
+    logout_user()
     return redirect(url_for("login"), code=302, Response=None)
+
+
+@app.route("/dash")
+@login_required
+def dashboard():
+    # route by the current user type
+
+    """
+    !!!! These functions are not complete, plz complete it by the new survey parts!
+    When u complete it, delete this comment.
+    The _***.html in the dash is just give u a brief idea about how to do this.
+    Modify them by your data.
+      """
+    c= Course()
+    #print(current_user.user.is_admin)
+    if current_user.is_student():
+        return render_template('dash/student.html',survey_l = c.get_course())
+    if current_user.is_staff():
+        return render_template('dash/staff.html',survey_l = c.get_course())
+    if current_user.is_admin():
+        return render_template('dash/admin.html',survey_l = c.get_course())
+
+
+
 
 # survey creation in this controller
 @app.route("/create_sur")
-@app.route("/create_sur/<string:name>",methods=["GET","POST"])
-def course_adding(name=None):
-    # force login first
-    if not session.get("logged_in"):
-        return redirect(url_for("login"), code=302, Response=None)
+@app.route("/create_sur/<string:course_name>/<string:course_year>",methods=["GET","POST"])
+@login_required
+def course_adding(course_name=None,course_year=None):
 
-    # else: the admin has logged_in
-    s = survey()
-    if not name:
+    s = Survey()
+    c = Course()
+    if not course_name and not course_year:
         # name is none when teacher try to create a course
         # render the course selection page
-        return render_template("courselect.html", course_list=s.courselist())
+        # return render_template("courselect.html",\
+                # course_list=c.get_course())
+     
+        return render_template("courselect.html",\
+                    course_list = c.get_course())
     # else: teacher already have select a course
     # var for passing error message
     error = None
     # generated the list of questions
-    get_question = getQ(quest_tree())
+    ###get_question = getQ(quest_tree())
+    q = Question()
+    get_genQ = q.find_q(pool_id = "0")
+    get_optQ = q.find_q(pool_id = "1") 
     if request.method == "POST":
+
+
         # teacher is trying to create a survey by select questions
         # getting all the teacher selected question
-        selected_q = request.form.getlist("selected_q")
-        if selected_q != []:
+        selected_genQ = request.form.getlist("selected_genQ")
+        selected_optQ = request.form.getlist("selected_optQ")
+        if selected_genQ != [] and selected_optQ != []:
             # the admin has selected some questions for this survey
-            s.choosequestion(get_question.findQ(selected_q),name) #create a csv file
+            this_id = s.create_survey(course_name,course_year,selected_genQ,selected_optQ,"2017-09-23 00:00:00","2017-09-23 23:59:59")          
             # renturn a preview of final survey
-            return render_template("finalsurvey.html", course_name=name,\
-                quest_list=s.coursequestionlist(name) )
-        else:
-            error = "Please add at least one question for this survey."
+            view_survey(this_id,course_name,course_year)
+
+
     # teacher have select a course but not have select a question yet
     # getting all the question
-    q_list = get_question.findQ()
-    return render_template("surveycreate.html", course_name=name,\
-        quest_list=q_list, msg_err = error)
 
+    if s.get_survey(course_name,course_year) == []:
+      return render_template("surveycreate.html", course_name=course_name,\
+         course_year=course_year,genQ_list=get_genQ,\
+         optQ_list=get_optQ, msg_err = error)
+
+    else :
+      return render_template("select_sur.html", course_name = course_name, course_year = course_year,survey_l = s.get_survey(course_name,course_year))
+
+
+@app.route("/view_survey")
+@app.route("/view_sur/<string:course_name>/<string:course_year>",methods=["GET","POST"])
+@login_required
+def view_survey(survey_id= 1,course_name="",course_year=""):
+   
+   q = Question()
+   get_genQ = q.find_q(pool_id = "0")
+   get_optQ = q.find_q(pool_id = "1")
+   s = Survey()
+   survey_list = s.get_survey(course_name,course_year)
+   this_survey = s.get_survey_by_id(survey_id,survey_list)
+   selected_genQ = this_survey[2].split("&&")
+   selected_optQ = this_survey[3].split("&&")
+   # renturn a preview of final survey
+   return render_template("finalsurvey.html", course_name=course_name,\
+                course_year = course_year,\
+                genlist = q.find_q(q_id = selected_genQ,pool_id = "0"),\
+                optlist = q.find_q(q_id = selected_optQ,pool_id = "1"),\
+                Qnum1 = len(q.find_q(q_id = selected_genQ,pool_id = "0")),\
+                Qnum2 = len(q.find_q(q_id = selected_genQ,pool_id = "1"))) 
+        
 
 
 
@@ -76,6 +136,7 @@ def course_adding(name=None):
 
 # @app.route("/student")
 @app.route("/student/<string:name>", methods=["GET", "POST"])
+@login_required
 def student(name):
     s = survey()
     res = respondent(name)
@@ -103,10 +164,9 @@ def student(name):
 
 
 @app.route("/quest",methods = ["POST","GET"])
+@login_required
 def add_question():
-    # force login first
-    if not session.get("logged_in"):
-        return redirect("login", code=302, Response=None)
+
 
     error = ""
     # else: the admin has logged_in
@@ -135,12 +195,9 @@ def add_question():
     return render_template("add_q.html")
 
 @app.route("/delquest",methods= ["POST","GET"])
+@login_required
 def del_question():
-    # force login first
-    if not session.get("logged_in"):
-        return redirect("login", code=302, Response=None)
 
-    # else: the admin has logged_in
     # instance of quest_tree
     quest = Question()
     error = None
@@ -166,12 +223,9 @@ def del_question():
 #not sure how the data csv's are setup or how it should know which csv to read
 @app.route("/results")
 @app.route("/results/<string:name>",methods=["GET","POST"])
+@login_required
 def show_results(name = None):
-    # force login first
-    if not session.get("logged_in"):
-        return redirect("login", code=302, Response=None)
 
-    # else: the admin has logged_in
     response = respondent(name)
     if not name:
         # find all classes

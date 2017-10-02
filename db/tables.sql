@@ -9,7 +9,7 @@ create table enrolments (
 );
 
 create table users (
-    id int primary key,
+    id INTEGER PRIMARY KEY,
     password varchar(93) NOT NULL,
     role     varchar(15) NOT NULL,
     -- use the unique to let the update work
@@ -19,6 +19,7 @@ create table users (
 );
 
 create table course(
+    id INTEGER PRIMARY KEY,
     course_code char(8) NOT NULL,
     course_year char(4) NOT NULL,
     unique(course_code,course_year)
@@ -42,4 +43,19 @@ create table answer(
     q_id int NOT NULL,
     answer int NOT NULL,
     FOREIGN KEY (q_id) REFERENCES question(id)
+);
+
+-- some test user
+INSERT INTO users  (id,password,role) VALUES (2,"tecty","admin");
+
+
+create table survey(
+    id INTEGER PRIMARY KEY,
+    course_id int NOT NULL,
+    genQ_id varchar(1024) NOT NULL,
+    optQ_id varchar(1024) NOT NULL,
+    start_time DATETIME NOT NULL,
+    end_time DATETIME NOT NULL,
+    status INTEGER NOT NULL default 0,
+    FOREIGN KEY (course_id) REFERENCES course(id)
 );
