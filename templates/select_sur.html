@@ -3,14 +3,20 @@
 {%block body %}
     <h1>Select a Survey to edit</h1>
     {% if survey_l %}
+            <Form method="POST">
         {% for survey in survey_l %}
         
-            <a href="{{ url_for("view_survey",survey_id = survey[0],course_name= course_name,course_year=course_year)}}">{{survey[0]}}    {{course_name}} {{course_year}} {{survey[4]}} {{survey[5]}}</a> <br>
+            <br>{{survey[0]}}    {{course_name}} {{course_year}} {{survey[4]}} {{survey[5]}}</br>
         {% endfor %}
+         Survey_ID:<br>
+         <input type= "text" name = "id" > <br>
+         <br><input type = "submit" value = "Submit">
+
     {%else%}
         <div class="alert alert-danger" role="alert">
             <h2>WoW!</h2>
             <p>Currently all ongoing course have been created a survey, or currently there isn't an ongoing course.</p>
         </div>
+</Form>
     {%endif%}
 {%endblock%}
