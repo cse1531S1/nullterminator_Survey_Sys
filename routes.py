@@ -71,51 +71,71 @@ def course_adding(course_name=None,course_year=None):
         # render the course selection page
         # return render_template("courselect.html",\
                 # course_list=c.get_course())
-     
+        
         return render_template("courselect.html",\
                     course_list = c.get_course())
     # else: teacher already have select a course
-    # var for passing error message
-    error = None
-    # generated the list of questions
-    ###get_question = getQ(quest_tree())
-    q = Question()
-    get_genQ = q.find_q(pool_id = "0")
-    get_optQ = q.find_q(pool_id = "1") 
+ 
     if request.method == "POST":
 
         if s.get_survey(course_name,course_year) != []:
-            this_id = str(request.form.get("id"))
-     
+            this_id = str(request.form.get("id"))     
             return redirect(url_for('view_survey', survey_id = this_id, course_name = course_name, course_year = course_year))
-        else:      
-            # teacher is trying to create a survey by select questions
-            # getting all the teacher selected question
-            selected_genQ = request.form.getlist("selected_genQ")
-            selected_optQ = request.form.getlist("selected_optQ")
-            if selected_genQ != [] and selected_optQ != []:
-               # the admin has selected some questions for this survey
-               this_id = s.create_survey(course_name,course_year,selected_genQ,selected_optQ,"2017-09-23 00:00:00","2017-09-23 23:59:59")
-               # renturn a preview of final survey
-               return redirect(url_for('view_survey', survey_id=this_id, course_name = course_name, course_year = course_year))
-    
-            else:
-               error = "Please add at least one general/optional question for this survey."      
+        else:
+            return redirct(url_for('survey_create',course_name = course_name, course_year = course_year))      
+        
             
 
-    # teacher have select a course but not have select a question yet
-    # getting all the question
- 
-    if s.get_survey(course_name,course_year) == []:
-      return render_template("surveycreate.html", course_name=course_name,\
+    # admin go to select specific survey from survey list
+    return render_template("select_sur.html", course_name = course_name, course_year = course_year,survey_l = s.get_survey(course_name,course_year))
+      
+
+
+# delect survey in this controller
+@app.route("/delete_sur/<int:survey_id>/<string:course_name>/<string:course_year>",methods=["GET","POST"])
+@login_required
+def delete_survey(survey_id="",course_name="",course_year=""):
+
+   s = Survey()
+   s.delete_survey(survey_id)
+   return redirect(url_for('course_adding',course_name = course_name, course_year = course_year))
+
+
+
+# create survey in the controller
+@app.route("/view_sur/<string:course_name>/<string:course_year>",methods=["GET","POST"])
+@login_required
+def survey_create(course_name="",course_year=""):
+   s = Survey()
+   q = Question()
+   get_genQ = q.find_q(pool_id = "0")
+   get_optQ = q.find_q(pool_id = "1")
+   error = None
+   if request.method == "POST":   
+      selected_genQ = request.form.getlist("selected_genQ")
+      selected_optQ = request.form.getlist("selected_optQ")
+      print(selected_genQ)
+      print(selected_optQ)
+    
+      if selected_genQ != [] and selected_optQ != []:
+            # the admin has selected some questions for this survey
+            this_id = s.create_survey(course_name,course_year,selected_genQ,selected_optQ,"2017-09-23 00:00:00","2017-09-23 23:59:59")
+            # renturn a preview of final survey
+            return redirect(url_for('view_survey', survey_id=this_id, course_name = course_name, course_year = course_year))
+    
+      else:
+            error = "Please add at least one general/optional question for this survey."      
+             
+   return render_template("surveycreate.html", course_name=course_name,\
          course_year=course_year,genQ_list=get_genQ,\
-         optQ_list=get_optQ, msg_err = error)
-
-    else :
-      return render_template("select_sur.html", course_name = course_name, course_year = course_year,survey_l = s.get_survey(course_name,course_year))
+         optQ_list=get_optQ,msg_err = error)
 
 
 
+
+
+
+# view survey in this controller
 @app.route("/view_sur/<int:survey_id>/<string:course_name>/<string:course_year>",methods=["GET","POST"])
 @login_required
 def view_survey(survey_id="",course_name="",course_year=""):

@@ -42,6 +42,7 @@ class Survey(SqlUtil):
             else:
                pass
 
+
     def delete_survey(self,id):
         if type(id)!= int:
             raise TypeError("input id must be int")

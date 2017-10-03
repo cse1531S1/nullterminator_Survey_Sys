@@ -1,21 +1,52 @@
 {%extends "base.html"%}
 {%block title%} Select Your survey{%endblock%}
 {%block body %}
-    <h1>Select a Survey to edit</h1>
+    <h1>{{course_name}} {{course_year}}</h1>
     {% if survey_l %}
+
+<table class="table table-hover">
+        <thead class="thead-default">
+            <tr>
+                <th scope="row" style="width:40px">#</th>
+                <th>Start time</th>
+                <th>End time</th>
+                <th> View</th>
+                <th>Action</th>
+            </tr>
+ </thead>
+
+
             <Form method="POST">
         {% for survey in survey_l %}
         
-            <br><a href="{{ url_for("view_survey",survey_id = survey[0],course_name= course_name,course_year=course_year)}}">{{course_name}} {{course_year}} {{survey[4]}} {{survey[5]}}</a> <br>
-        {% endfor %}
-         
-     
+          <tr>
+                <td>*</td>
+                <td>{{survey[4]}}</td>
+                <td>{{survey[5]}}</td>
+                <td>
+                 <a href="{{ url_for("view_survey",survey_id = survey[0],course_name= course_name,course_year=course_year)}}" class="btn btn-sm btn-primary" > View Survey </a>          
+                </td>
+               <td>
+                 <a href="{{ url_for("delete_survey",survey_id = survey[0],course_name= course_name,course_year=course_year)}}" class="btn btn-sm btn-primary" > Delete Survey </a>          
+                </td>
+            </tr>
 
+        {% endfor %}
+        </table> 
+
+
+        <br>Would you like to add another survey for {{course_name}} {{course_year}} ?
+            <br><a href="{{ url_for("survey_create",course_name= course_name,course_year=course_year)}}" class="btn btn-sm btn-primary">Yes </a> 
+            <a href="{{ url_for("index")}}" class="btn btn-sm btn-primary">No </a> <br>
     {%else%}
         <div class="alert alert-danger" role="alert">
-            <h2>WoW!</h2>
-            <p>Currently all ongoing course have been created a survey, or currently there isn't an ongoing course.</p>
+            <h2>Hey!</h2>
+            <p>You haven't created a survey for this course!</p>
+            <br><a href="{{ url_for("survey_create",course_name= course_name,course_year=course_year)}}" class="btn btn-sm btn-primary">Go to create one </a> 
         </div>
 </Form>
     {%endif%}
 {%endblock%}
+
+
+    
