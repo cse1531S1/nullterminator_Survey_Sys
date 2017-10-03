@@ -59,3 +59,10 @@ create table survey(
     status INTEGER NOT NULL default 0,
     FOREIGN KEY (course_id) REFERENCES course(id)
 );
+
+create table respond(
+    id INTEGER PRIMARY KEY,
+    survey_id INTEGER NOT NULL,
+    ans_list varchar(1024) NOT NULL,
+    FOREIGN KEY (survey_id) REFERENCES survey(id)
+);
