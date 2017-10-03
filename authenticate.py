@@ -14,18 +14,6 @@ def check_password(user_id, password):
         return True
     return False
 
-#Get information about the user from the database
-#def get_user(user_id):
-#    new_user = User()
-#    new_user.role = get_role(user_id)
-#    return new_user
-
-
-#@login_manager.user_loader
-#def load_user(user_id):
-#    user = get_user(user_id)
-#    return user
-
 
 def compare_password(user_id, password):
 
@@ -34,16 +22,7 @@ def compare_password(user_id, password):
     hash_pass = row[1]
     return check_password_hash(hash_pass, password)
 
-#def get_role(user_id):
 
-#    user = SqlUtil("users")
-#    row = user.find("id",user_id).one()
-#    role = row[2]
-
-#    return role
-
-
-#test authentication
 if __name__ == '__main__':
 #    user = SqlUtil("users")
     with app.app_context():

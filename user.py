@@ -1,5 +1,6 @@
 from sql_uti import SqlUtil
 from server import app
+from werkzeug.security import check_password_hash
 
 class User(SqlUtil):
     """docstring for user."""
@@ -14,7 +15,8 @@ class User(SqlUtil):
     def check_pass(self,uid,password):
         # get the users information by self function
         this_user = self.findById(uid)
-        if password == this_user[1]:
+        if check_password_hash(this_user[1],password) == True:
+
             # check it's password and they are same
             return True
         else:
@@ -42,15 +44,11 @@ if __name__ == '__main__':
     with app.app_context():
         user = User()
         # use.print_table()
+        #user in database - 50,staff670
         print(user.findById(50))
 
-        user.new_user(1,"pass","admin")
-        print(user.findById(1))
+        print("\nTry to login a known user")
+        print(user.check_pass(50,"staff670"))
 
-        print("\nTry to login with the user that I just insert")
-        print(user.check_pass(1,"pass"))
-
-
-        # cleanup the added user
-        user.deleteById(1)
-        print(user.findById(1))
+        print("Attempt a failed login")
+        print (user.check_pass(50,"asdasda"))
