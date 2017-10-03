@@ -11,12 +11,12 @@
         </thead>
         {%for s in survey_l%}
             <tr>
-                <td>0</td>
-                <td>{{s}}</td>
-                <td>{{s}}</td>
+                <td></td>
+                <td>{{s[1]}}</td>
+                <td>{{s[2]}}</td>
                 <td>
-                    <a href="{{url_for('index')}}" class="btn btn-sm btn-primary">Edit</a>
-                    <a href="{{url_for('index')}}" class="btn  btn-outline-danger btn-sm">Delete</a>
+                    <a href="{{url_for("course_adding",course_name= s[1],course_year=s[2])}}" class="btn btn-sm btn-primary">Edit</a>
+             
                 </td>
             </tr>
         {%endfor%}

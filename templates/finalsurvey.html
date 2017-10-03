@@ -16,6 +16,9 @@
                         <th>
                             Answers
                         </th>
+                        <th>
+                            Type
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -39,12 +42,13 @@
                                             {{answer}}
                                         </div>
                                     {% endfor %}
-                                    <div>(MCQ)</div>
+                
                                 </div>
                             </td>
+<td>(MCQ)</td>
                            {%endif%}
                            {% if genlist[len][2] == "TEXT" : %}
-
+<td>Student response</td>
                               <td> (TEXT-BASED ANSWER) </td>   
                            {%endif%}
                
@@ -63,7 +67,9 @@
                         <th>
                             Answers
                         </th>
-                    
+                        <th>
+                            Type
+                        </th>    
                     </tr>
                 </thead>
                 <tbody>
@@ -87,13 +93,14 @@
                                             {{answer}}
                                         </div>
                                     {% endfor %}
-                                     <div>(MCQ)</div>
+                              
                                 </div>
-                          
+                     
                             </td>
+<td>(MCQ)</td>
                 {%endif%}
                            {% if optlist[len][2] == "TEXT" : %}
-
+<td>Student response</td>
                               <td> (TEXT-BASED ANSWER) </td>   
                 {%endif%}  
 

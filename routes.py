@@ -7,7 +7,7 @@ from user import User
 from question import quest_tree,addQ,delQ,getQ
 # import the new question
 from new_question import Question
-
+from enrolment import enrol_Data
 
 @app.route("/")
 def index():
@@ -23,7 +23,7 @@ def login():
             # valid usesr
     
             login_user(User(request.form.get("username",None)))
-            return redirect(url_for("dashboard"))
+            return redirect(url_for("dashboard",user_id = this_user.uid ))
 
 
     return render_template("login.html")
@@ -35,23 +35,21 @@ def logout():
     return redirect(url_for("login"), code=302, Response=None)
 
 
-@app.route("/dash")
+@app.route("/dash/<string:user_id>")
 @login_required
-def dashboard():
+def dashboard(user_id):
     # route by the current user type
-
-    """
-    !!!! These functions are not complete, plz complete it by the new survey parts!
-    When u complete it, delete this comment.
-    The _***.html in the dash is just give u a brief idea about how to do this.
-    Modify them by your data.
-      """
     c= Course()
+    print(c.get_course())
+    # get enrolment data (student,staff)
+    e= enrol_Data()
+    user_course = e.findById(user_id)
+    print(user_course)
     #print(current_user.user.is_admin)
     if current_user.is_student():
-        return render_template('dash/student.html',survey_l = c.get_course())
+        return render_template('dash/student.html',survey_l = user_course)
     if current_user.is_staff():
-        return render_template('dash/staff.html',survey_l = c.get_course())
+        return render_template('dash/staff.html',survey_l = user_course)
     if current_user.is_admin():
         return render_template('dash/admin.html',survey_l = c.get_course())
 

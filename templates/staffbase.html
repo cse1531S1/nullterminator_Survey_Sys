@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>{% block title %}{% endblock %}</title>
+        <script src="{{ url_for("static", filename="jquery-3.2.1.js")}}" ></script>
+        <script src="{{ url_for("static", filename="popper.js")}}" ></script>
+        <script type="text/javascript" src="{{ url_for("static", filename="bootstrap.min.js")}}"></script>
+        <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="bootstrap.min.css")}}" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="style.css")}}" />
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-md navbar-light fixed-top bg-light ">
+            <div class="container">
+                <a class="navbar-brand">Survey Site</a>
+            </div>
+        </nav>
+        <div  class="nav-clear">
+            <!-- float clear for the navbar -->
+        </div>
+        {% block jumbo %}{%endblock%}
+        <br>
+        <div class="container">
+            {% block header %}{% endblock%}
+        </div>
+        <div class="container">
+            {% block msg%}
+                {% if msg_err %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{msg_err}}
+                    </div>
+                {% endif%}
+                {% if msg_suc %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{msg_suc}}
+                    </div>
+                {% endif%}
+                {% if msg_std %}
+                    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{msg_std}}
+                    </div>
+                {% endif%}
+            {%endblock%}
+        </div>
+
+        <div class="container">
+            {% block body %}{% endblock %}
+        </div>
+        <div  class="nav-clear">
+        <footer class="footer bg-light">
+            <div class="container text-muted">
+                ©2017 Null Terminator
+            </div>
+        </footer>
+
+    </body>
+</html>

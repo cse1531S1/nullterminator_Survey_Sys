@@ -16,6 +16,9 @@
                         <th>
                             Answers
                         </th>
+                        <th>
+                            Type
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -37,12 +40,16 @@
                                             {{answer}}
                                         </div>
                                     {% endfor %}
-                                    <div>(MCQ)</div>
+                                   
                                 </div>
                             </td>
+<td>(MCQ)</td>
                            {%endif%}
-                           {% if quest[2] == "TEXT" : %}
 
+
+
+                           {% if quest[2] == "TEXT" : %}
+<td>Student reponse</td>
                               <td> (TEXT-BASED ANSWER) </td>   
                            {%endif%}
 
@@ -61,7 +68,9 @@
                         <th>
                             Answers
                         </th>
-                    
+                    <th>
+                            Type
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -82,13 +91,14 @@
                                             {{answer}}
                                         </div>
                                     {% endfor %}
-                                     <div>(MCQ)</div>
+                                    
                                 </div>
                           
                             </td>
+ <td>(MCQ)</td>
                 {%endif%}
                            {% if quest[2] == "TEXT" : %}
-
+<td>Student response</td>
                               <td> (TEXT-BASED ANSWER) </td>   
                 {%endif%}  
 
