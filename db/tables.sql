@@ -63,6 +63,22 @@ create table survey(
 create table respond(
     id INTEGER PRIMARY KEY,
     survey_id INTEGER NOT NULL,
+    uid INTEGER NOT NULL,
+    FOREIGN KEY (survey_id) REFERENCES survey(id),
+    FOREIGN KEY (uid) REFERENCES users(id)
+);
+
+create table res_mcq(
+    id INTEGER PRIMARY KEY,
+    respond_id INTEGER NOT NULL,
     ans_list varchar(1024) NOT NULL,
-    FOREIGN KEY (survey_id) REFERENCES survey(id)
+    FOREIGN KEY (respond_id) REFERENCES respond(id)
+);
+
+create table res_text(
+    id INTEGER PRIMARY KEY,
+    respond_id INTEGER NOT NULL,
+    ques_id INTEGER NOT NULL,
+    answer varchar(255) NOT NULL,
+    FOREIGN KEY (respond_id) REFERENCES respond(id)
 );
