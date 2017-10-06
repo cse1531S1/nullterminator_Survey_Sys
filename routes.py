@@ -126,7 +126,7 @@ def student(name):
 @app.route("/quest",methods = ["POST","GET"])
 @login_required
 def add_question():
-    if not current_user.is_admin():
+    if current_user.is_student():
         return redirect(url_for("index"),\
                 msg_err = "You have not primission for"+url_for("del_question"))
 
