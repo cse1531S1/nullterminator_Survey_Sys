@@ -78,12 +78,20 @@ class Question(SqlUtil):
             return [q+self.__ans.find_a(q[0]) for q in return_list]
 
         elif type(q_id) == list:
+            return_list = []
             for q in q_id:
-                # collect all the return
-                return_list+=self.find_q(q)
+                this_q = self.find_q(q,pool_id)
+                if this_q:
+                    # collect all the valid
+                    return_list+= this_q
             return return_list
         elif type(q_id) in [str,int]:
-            this_q = self.find_by_id(int(q_id)).one()
+            if pool_id:
+                this_q = self.find_by_id(int(q_id)).find("pool_id",pool_id).one()
+                if not this_q:
+                    return None
+            else:
+                this_q = self.find_by_id(int(q_id)).one()
             if this_q[2] in ["MCQ"]:
                 # get all the answers append at the end of each question
                 return [this_q+self.__ans.find_a(this_q[0])]
@@ -192,7 +200,7 @@ if __name__ == '__main__':
     quest = Question()
     # add a test question into database
     first_id=quest.add_q("sample question?", "0", "MCQ",["a1","a2"])
-    second_id=quest.add_q( "sample question?", "0", "MCQ",["a1","a2"])
+    second_id=quest.add_q( "sample question?", "1", "MCQ",["a1","a2"])
     third_id=quest.add_q( "sample question?", "0", "TEXT")
 
 
@@ -200,6 +208,10 @@ if __name__ == '__main__':
     print("try to find all the quesiton with question pool 0")
     # getting all the question in the database with pool_id = 0
     print(quest.find_q(pool_id="0"))
+
+    print("try to find all the quesiton with question pool 0 and id = 1,2")
+    # getting all the question in the database with pool_id = 0
+    print(quest.find_q(q_id = [1,2],pool_id="0"))
 
 
     list_q = [first_id,second_id,third_id]

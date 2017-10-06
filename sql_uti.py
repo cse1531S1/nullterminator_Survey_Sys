@@ -2,10 +2,6 @@ import sqlite3
 import csv
 
 
-
-
-
-
 class val_pair(object):
     """docstring for val_pair ."""
     def __init__(self):
