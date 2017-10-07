@@ -68,3 +68,11 @@ create table respond(
     FOREIGN KEY (course_id) REFERENCES course(id),
     FOREIGN KEY (q_id) REFERENCES question(id)
 );
+
+create table user_respond(
+    id INTEGER PRIMARY KEY,
+    uid INTEGER NOT NULL,
+    courseid INTEGER NOT NULL,
+    FOREIGN KEY (uid) REFERENCES users(id),
+    FOREIGN KEY (courseid) REFERENCES course(id)
+);

@@ -21,6 +21,34 @@ class Respond(SqlUtil):
     def delete_all_response_by_course(self,course_id):
         self.find("course_id",course_id).delete()
 
+    def delete_all(self):
+        self.delete()
+
+    def get_all(self):
+        return self.all()
+
+class User_respond(SqlUtil):
+    def __init__(self):
+        super().__init__("user_respond")
+    
+    def record_user_complete_survey(self,uid,courseid):
+        return self.insert(["uid","courseid"],[uid,courseid]).save()
+    
+    def delete_user_record(self,uid):
+        self.find("uid",uid).delete()
+    
+    def show_completed_by_user(self,uid):
+        return self.find("uid",uid).all()
+
+    def show_all_completed(self):
+        return self.all()
+
+    def delete_by_user(self,uid):
+        self.find("uid",uid).delete()
+
+    def delete_all(self):
+        self.delete()
+
 if __name__ == '__main__':
     res = Respond()
     res.insert_response(1,1,"abc")
@@ -31,3 +59,14 @@ if __name__ == '__main__':
     print(res.get_all_response_by_course(1))
     res.delete_all_response_by_course(1)
     print(res.get_all_response_by_course(1))
+    user = User_respond()
+    user.record_user_complete_survey(50,1)
+    print(user.show_completed_by_user(50))
+    user.delete_all()
+    print(user.show_all_completed())
+    res.insert_response(1,1,"abc")
+    res.insert_response(1,1,"bcd")
+    res.insert_response(1,1,"cde")
+    print(res.get_all())
+    res.delete_all()
+    print(res.get_all())
