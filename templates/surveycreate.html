@@ -110,10 +110,19 @@
          {% else: %}
             <div> There is no optional questions available</div>
          {%endif%}
+<br>
+Start Time:
+<br>
+<input type="text"  name="s0" placeholder="YYYY-MM-DD">
+<input type="text"  name="s1" placeholder="HH:MM:SS">
 
-
-
-            <button type="submit" class="btn btn-outline-success" name="button">These questions are good to go!</button>
+<br>
+End Time:
+<br>
+<input type="text"  name="e0" placeholder="YYYY-MM-DD">
+<input type="text"  name="e1" placeholder="HH:MM:SS">
+<br>
+            <button type="submit" class="btn btn-outline-success" name="button" margin= 10px>These questions are good to go!</button>
         </From>
     {%else :%}
         <div class="alert alert-danger alert-dismissible fade show" role="alert">

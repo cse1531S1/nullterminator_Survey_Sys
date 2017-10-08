@@ -20,28 +20,26 @@ class Survey(SqlUtil):
     def __init__(self):
         super().__init__("survey")
         self.__course = Course()
-    def create_survey(self,course_code,course_year,genQ_id,optQ_id,start_time,end_time):
+    def create_survey(self,course_code,course_year,Q_id,start_time,end_time):
         this_course_id = self.__course.get_course_id(course_code,course_year)
-        self.insert("course_id",this_course_id).insert("genQ_id","&&".join(genQ_id))\
-                        .insert("optQ_id","&&".join(optQ_id))\
+        self.insert("course_id",this_course_id).insert("Q_id","&&".join(Q_id))\
                         .insert("start_time",start_time)\
                         .insert("end_time",end_time).save()
-        this_survey = self.find(["course_id","genQ_id","optQ_id","start_time","end_time"],\
-                        [this_course_id,"&&".join(genQ_id),"&&".join(optQ_id),start_time,end_time])\
+        this_survey = self.find(["course_id","Q_id","start_time","end_time"],\
+                        [this_course_id,"&&".join(Q_id),start_time,end_time])\
                         .sort_by("id",False).one()
         return this_survey[0]
     def get_survey(self,course_code,course_year):
         this_course_id = self.__course.get_course_id(course_code,course_year)
-        return self.find("course_id",this_course_id).all()
+        return self.find("course_id",this_course_id).one()
 
-    def get_survey_by_id(self,survey_id,survey_list):
-       
-        for this_survey in survey_list :
-            if int(survey_id) == int(this_survey[0]):
-               return this_survey
-            else:
-               pass
-
+               
+    def post_sur_to_staff(self,course_name,course_year):
+        this_course_id = self.__course.get_course_id(course_name,course_year)
+        # post survey to related staff, stage = review
+        this_survey = self.find("course_id",this_course_id).update("status",1).save()
+        this_survey = self.find("course_id",this_course_id).one()
+        return this_survey
 
     def delete_survey(self,id):
         if type(id)!= int:
@@ -53,7 +51,7 @@ if __name__ == '__main__':
       course = Course()
       print(course.get_course_id("COMP1521","17s2"))
       survey = Survey()
-      this_id = survey.create_survey("COMP1521","17s2",["1","2","3"],["1","2"],"2017-09-23 00:00:00","2017-09-23 23:59:59")
+      this_id = survey.create_survey("COMP1521","17s2",["1","2","3"],"2017-09-23 00:00:00","2017-09-23 23:59:59")
       print(survey.get_survey("COMP1521","17s2"))
       survey.delete_survey(this_id)
       print(survey.get_survey("COMP1521","17s2"))

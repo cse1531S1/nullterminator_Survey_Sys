@@ -23,7 +23,7 @@ def login():
             # valid usesr
     
             login_user(User(request.form.get("username",None)))
-            return redirect(url_for("dashboard",user_id = this_user.uid ))
+            return redirect(url_for("dashboard"))
 
 
     return render_template("login.html")
@@ -35,16 +35,14 @@ def logout():
     return redirect(url_for("login"), code=302, Response=None)
 
 
-@app.route("/dash/<string:user_id>")
+@app.route("/dash")
 @login_required
-def dashboard(user_id):
+def dashboard():
     # route by the current user type
     c= Course()
-    print(c.get_course())
     # get enrolment data (student,staff)
     e= enrol_Data()
-    user_course = e.findById(user_id)
-    print(user_course)
+    user_course = e.findById(current_user.uid)
     #print(current_user.user.is_admin)
     if current_user.is_student():
         return render_template('dash/student.html',survey_l = user_course)
@@ -77,54 +75,71 @@ def course_adding(course_name=None,course_year=None):
     if request.method == "POST":
 
         if s.get_survey(course_name,course_year) != []:
-            this_id = str(request.form.get("id"))     
+            this_id = request.form.get("id")     
             return redirect(url_for('view_survey', survey_id = this_id, course_name = course_name, course_year = course_year))
         else:
             return redirct(url_for('survey_create',course_name = course_name, course_year = course_year))      
         
             
 
-    # admin go to select specific survey from survey list
-    return render_template("select_sur.html", course_name = course_name, course_year = course_year,survey_l = s.get_survey(course_name,course_year))
+    # admin go to a specific survey of {course_name}{course_year}
+    this_survey = s.get_survey(course_name,course_year)
+    return render_template("select_sur.html", course_name = course_name, course_year = course_year,survey = this_survey)
       
 
 
 # delect survey in this controller
 @app.route("/delete_sur/<int:survey_id>/<string:course_name>/<string:course_year>",methods=["GET","POST"])
 @login_required
-def delete_survey(survey_id="",course_name="",course_year=""):
+def delete_survey(survey_id=None,course_name=None,course_year=None):
 
-   s = Survey()
-   s.delete_survey(survey_id)
-   return redirect(url_for('course_adding',course_name = course_name, course_year = course_year))
+      s = Survey()
+      s.delete_survey(survey_id)
+      return redirect(url_for('course_adding',course_name = course_name, course_year = course_year))
+
+
+# post survey in this controller
+@app.route("/sur_to_staff/<string:course_name>/<string:course_year>",methods=["GET"])
+@login_required
+def post_sur_to_staff(course_name=None,course_year=None):
+
+      s = Survey()
+      this_survey = s.post_sur_to_staff(course_name,course_year)
+      return render_template("post_staff.html", course_name = course_name, course_year = course_year,survey= this_survey)
+
 
 
 
 # create survey in the controller
 @app.route("/view_sur/<string:course_name>/<string:course_year>",methods=["GET","POST"])
 @login_required
-def survey_create(course_name="",course_year=""):
-   s = Survey()
-   q = Question()
-   get_genQ = q.find_q(pool_id = "0")
-   get_optQ = q.find_q(pool_id = "1")
-   error = None
-   if request.method == "POST":   
-      selected_genQ = request.form.getlist("selected_genQ")
-      selected_optQ = request.form.getlist("selected_optQ")
-      print(selected_genQ)
-      print(selected_optQ)
-    
-      if selected_genQ != [] and selected_optQ != []:
+def survey_create(course_name=None,course_year=None):
+
+   if course_name == None and course_year == None:
+      pass
+
+   else:
+      s = Survey()
+      q = Question()
+      get_genQ = q.find_q(pool_id = "0")
+      get_optQ = q.find_q(pool_id = "1")
+      error = None
+      if request.method == "POST":   
+         selected_genQ = request.form.getlist("selected_genQ")
+         selected_optQ = request.form.getlist("selected_optQ")
+         q_id = selected_genQ + selected_optQ
+         start_time = request.form.get("s0")+" "+request.form.get("s1")
+         end_time = request.form.get("e0")+" "+request.form.get("e1")
+         if selected_genQ != [] and selected_optQ != []:
             # the admin has selected some questions for this survey
-            this_id = s.create_survey(course_name,course_year,selected_genQ,selected_optQ,"2017-09-23 00:00:00","2017-09-23 23:59:59")
+            this_id = s.create_survey(course_name,course_year,q_id,start_time,end_time)
             # renturn a preview of final survey
             return redirect(url_for('view_survey', survey_id=this_id, course_name = course_name, course_year = course_year))
     
-      else:
+         else:
             error = "Please add at least one general/optional question for this survey."      
              
-   return render_template("surveycreate.html", course_name=course_name,\
+      return render_template("surveycreate.html", course_name=course_name,\
          course_year=course_year,genQ_list=get_genQ,\
          optQ_list=get_optQ,msg_err = error)
 
@@ -134,27 +149,21 @@ def survey_create(course_name="",course_year=""):
 
 
 # view survey in this controller
-@app.route("/view_sur/<int:survey_id>/<string:course_name>/<string:course_year>",methods=["GET","POST"])
+@app.route("/view_sur/<int:survey_id>/<string:course_name>/<string:course_year>",methods=["GET"])
 @login_required
-def view_survey(survey_id="",course_name="",course_year=""):
+def view_survey(survey_id=None,course_name=None,course_year=None):
    q = Question()
-   get_genQ = q.find_q(pool_id = "0")
-   get_optQ = q.find_q(pool_id = "1")
    s = Survey()
-   survey_list = s.get_survey(course_name,course_year)
-   this_survey = s.get_survey_by_id(survey_id,survey_list)
-   
-   selected_genQ = this_survey[2].split("&&")
-   selected_optQ = this_survey[3].split("&&")
-   print(selected_genQ)
-   print(selected_optQ)
-    
+   this_survey = s.get_survey(course_name,course_year)
+   selected_Qid = this_survey[2].split("&&")
+   q_force = q.find_q(q_id = selected_Qid,pool_id = "0")
+   q_opt = q.find_q(q_id = selected_Qid,pool_id = "1")
    return render_template("finalsurvey.html", course_name=course_name,\
                 course_year = course_year,\
-                genlist = q.find_q(q_id = selected_genQ,pool_id = "0"),\
-                optlist = q.find_q(q_id = selected_optQ,pool_id = "1"),\
-                Qnum1 = len(q.find_q(q_id = selected_genQ,pool_id = "0")),\
-                Qnum2 = len(q.find_q(q_id = selected_optQ,pool_id = "1")))        
+                genlist = q_force,\
+                 optlist = q_opt,\
+                 Qnum1=len(q_force),\
+                 Qnum2=len(q_opt))        
         
 
 

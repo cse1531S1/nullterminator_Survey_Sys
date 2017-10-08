@@ -52,8 +52,7 @@ INSERT INTO users  (id,password,role) VALUES (2,"tecty","admin");
 create table survey(
     id INTEGER PRIMARY KEY,
     course_id int NOT NULL,
-    genQ_id varchar(1024) NOT NULL,
-    optQ_id varchar(1024) NOT NULL,
+    Q_id varchar(1024) NOT NULL,
     start_time DATETIME NOT NULL,
     end_time DATETIME NOT NULL,
     status INTEGER NOT NULL default 0,

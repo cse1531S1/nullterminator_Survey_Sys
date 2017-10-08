@@ -1,0 +1,47 @@
+{%extends "base.html"%}
+{%block title%} Post survey to staff{%endblock%}
+{%block body %}
+    <h1>Survey of {{course_name}} {{course_year}} already in review stage</h1>
+    {% if survey %}
+
+<table class="table table-hover">
+        <thead class="thead-default">
+            <tr>
+                <th scope="row" style="width:40px">#</th>
+                <th>Start time</th>
+                <th>End time</th>
+                <th>Stage</th>
+               
+            </tr>
+ </thead>
+
+
+            <Form method="POST">
+        
+          <tr>
+                <td>*</td>
+                <td>{{survey[3]}}</td>
+                <td>{{survey[4]}}</td>
+                {%if survey[-1]== 0%}
+                    <td > Edit</td>
+                {%else%}
+                    <td > Review</td>
+                {%endif%}
+         
+            </tr>
+
+        </table> 
+
+       <a href="{{url_for("index")}}" class="btn btn-sm btn-primary" > Back to homepage </a>     
+    {%else%}
+        <div class="alert alert-danger" role="alert">
+            <h2>Hey!</h2>
+            <p>You haven't created a survey for this course!</p>
+            <br><a href="{{ url_for("survey_create",course_name= course_name,course_year=course_year)}}" class="btn btn-sm btn-primary">Go to create one </a> 
+        </div>
+</Form>
+    {%endif%}
+{%endblock%}
+
+
+    
