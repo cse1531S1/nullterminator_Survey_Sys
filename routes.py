@@ -42,12 +42,17 @@ def dashboard():
     c= Course()
     # get enrolment data (student,staff)
     e= enrol_Data()
-    user_course = e.findById(current_user.uid)
-    #print(current_user.user.is_admin)
+    s = Survey()
+    user_courses = e.findById(current_user.uid)
+    
+    survey_l = []
+    for course in user_courses:
+        survey_l.append(s.get_survey(course[1],course[2]))
+    
     if current_user.is_student():
-        return render_template('dash/student.html',survey_l = user_course)
+        return render_template('dash/student.html',survey_l = survey_l)
     if current_user.is_staff():
-        return render_template('dash/staff.html',survey_l = user_course)
+        return render_template('dash/staff.html',survey_l = survey_l)
     if current_user.is_admin():
         return render_template('dash/admin.html',survey_l = c.get_course())
 
@@ -70,21 +75,10 @@ def course_adding(course_name=None,course_year=None):
         
         return render_template("courselect.html",\
                     course_list = c.get_course())
-    # else: teacher already have select a course
- 
-    if request.method == "POST":
-
-        if s.get_survey(course_name,course_year) != []:
-            this_id = request.form.get("id")     
-            return redirect(url_for('view_survey', survey_id = this_id, course_name = course_name, course_year = course_year))
-        else:
-            return redirct(url_for('survey_create',course_name = course_name, course_year = course_year))      
-        
-            
-
+    # else: admin already have select a course                     
     # admin go to a specific survey of {course_name}{course_year}
     this_survey = s.get_survey(course_name,course_year)
-    return render_template("select_sur.html", course_name = course_name, course_year = course_year,survey = this_survey)
+    return render_template("select_sur.html", course_name = course_name,course_year = course_year,survey = this_survey)
       
 
 
@@ -105,7 +99,7 @@ def post_sur_to_staff(course_name=None,course_year=None):
 
       s = Survey()
       this_survey = s.post_sur_to_staff(course_name,course_year)
-      return render_template("post_staff.html", course_name = course_name, course_year = course_year,survey= this_survey)
+      return render_template("select_sur.html", course_name = course_name,course_year = course_year,survey = this_survey)
 
 
 
@@ -114,34 +108,31 @@ def post_sur_to_staff(course_name=None,course_year=None):
 @app.route("/view_sur/<string:course_name>/<string:course_year>",methods=["GET","POST"])
 @login_required
 def survey_create(course_name=None,course_year=None):
-
-   if course_name == None and course_year == None:
-      pass
-
-   else:
-      s = Survey()
-      q = Question()
-      get_genQ = q.find_q(pool_id = "0")
-      get_optQ = q.find_q(pool_id = "1")
-      error = None
-      if request.method == "POST":   
-         selected_genQ = request.form.getlist("selected_genQ")
-         selected_optQ = request.form.getlist("selected_optQ")
-         q_id = selected_genQ + selected_optQ
-         start_time = request.form.get("s0")+" "+request.form.get("s1")
-         end_time = request.form.get("e0")+" "+request.form.get("e1")
-         if selected_genQ != [] and selected_optQ != []:
+  
+    s = Survey()
+    q = Question()
+    get_genQ = q.find_q(pool_id = "0")
+    get_optQ = q.find_q(pool_id = "1")
+    error = None
+    
+    if request.method == "POST":   
+        selected_genQ = request.form.getlist("selected_genQ")
+        selected_optQ = request.form.getlist("selected_optQ")
+        q_id = selected_genQ + selected_optQ
+        start_time = request.form.get("s0")+" "+request.form.get("s1")
+        end_time = request.form.get("e0")+" "+request.form.get("e1")
+        if selected_genQ != []:
             # the admin has selected some questions for this survey
             this_id = s.create_survey(course_name,course_year,q_id,start_time,end_time)
             # renturn a preview of final survey
-            return redirect(url_for('view_survey', survey_id=this_id, course_name = course_name, course_year = course_year))
-    
-         else:
-            error = "Please add at least one general/optional question for this survey."      
-             
-      return render_template("surveycreate.html", course_name=course_name,\
-         course_year=course_year,genQ_list=get_genQ,\
-         optQ_list=get_optQ,msg_err = error)
+            return redirect(url_for('view_survey', survey_id = this_id,course_name = course_name, course_year = course_year))
+
+        else:
+            error = "Please add at least one general question for this survey."      
+
+    return render_template("surveycreate.html", course_name=course_name,\
+    course_year=course_year,genQ_list=get_genQ,\
+    optQ_list=get_optQ,msg_err = error)
 
 
 
@@ -149,13 +140,14 @@ def survey_create(course_name=None,course_year=None):
 
 
 # view survey in this controller
-@app.route("/view_sur/<int:survey_id>/<string:course_name>/<string:course_year>",methods=["GET"])
+@app.route("/view_sur/<int:survey_id>/<string:course_name>/<string:course_year>",methods=["GET","POST"])
 @login_required
 def view_survey(survey_id=None,course_name=None,course_year=None):
+   print("test")
    q = Question()
    s = Survey()
    this_survey = s.get_survey(course_name,course_year)
-   selected_Qid = this_survey[2].split("&&")
+   selected_Qid = this_survey[3].split("&&")
    q_force = q.find_q(q_id = selected_Qid,pool_id = "0")
    q_opt = q.find_q(q_id = selected_Qid,pool_id = "1")
    return render_template("finalsurvey.html", course_name=course_name,\

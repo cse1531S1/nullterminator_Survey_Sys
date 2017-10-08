@@ -1,0 +1,33 @@
+<h3>Running Survey</h3>
+{%if survey_l %}
+    <table class="table table-hover">
+        <thead class="thead-default">
+            <tr>
+                <th scope="row" style="width:30px">#</th>
+                <th>Course</th>
+                <th>Semester</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        {%for s in survey_l%}
+            <tr>
+                <td></td>
+                {%if s[-1]==1%}
+                <td>{{s[1]}}</td>
+                <td>{{s[2]}}</td>
+                <td>
+                    <a href="{{ url_for("view_survey",survey_id = s[0],course_name= s[1],course_year=s[2] )}}" class="btn btn-sm btn-primary" > Review  </a>    
+             
+                </td>
+                {%else%}
+               
+                <td>No survey right now!!</td>
+                {%endif%}
+            </tr>
+        {%endfor%}
+    </table>
+
+
+{%else%}
+    <p>Current have not running survey</p>
+{%endif%}

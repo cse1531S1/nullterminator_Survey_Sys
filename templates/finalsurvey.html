@@ -116,6 +116,7 @@
             
             <a href="{{url_for("index")}}" class="alert-link"><h4> Go back to home page </h4></a>
             <a href="{{url_for("course_adding")}}" class="alert-link"><h4>adding survey for another course</h4></a>
+            <a href="{{url_for("course_adding",course_name = course_name , course_year= course_year)}}"  class="alert-link"><h4>My surevy</h4></a>
         </From>
     {%endif%}
 {%endblock%}
