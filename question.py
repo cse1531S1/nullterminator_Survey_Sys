@@ -1,221 +1,228 @@
-from csv_uti import csv_util
+from sql_uti import SqlUtil
+from server import app
 
-class quest_tree():
-    """docstring for question."""
-    # allocate the location of the csv file
-
-    # a dict to store all the instance of this class's node
-    _questDisct = {}
-    max_id = 0
-    buffer_obj = []
-
-    def __str__(slef):
-        # print this class
-        string = ""
-        if slef.id:
-            string = str(self.id )+ str(self.question)+str(self.answers)
-            return string
-        return "this is a tree object"
-
-
-    def csv_name(cls):
-        return "question.csv";
-
-    def csv_readRow(cls,row):
-        # try to read each row in this function
-        # after reading a row add an instance of this class into the _questDisct
-        # data_struct is: id, question, [answers]..
-
-
-        this_id = int(row[0])
-        # try to refresh the max_id
-        if this_id> quest_tree.max_id:
-            quest_tree.max_id = this_id
-        # use the row info to start a new row
-        new_node = quest_node(this_id, row[1],row[2:])
-        # assing this question node into the dictionary to be search
-        quest_tree._questDisct[this_id] = new_node
-        return new_node
-
-    def csv_append(cls):
-        # append the content at the end of the csv
-        return_list = [item.getlist() for item in cls.buffer_obj]
-        # clear the buffer
-        buffer_obj = []
-        # return the info should be append
-        return return_list
-
-    def csv_content(cls):
-        # rewrite all the row in the csv file
-        return cls.find_question();
-
-    def push_buffer(cls,node):
-        cls.buffer_obj.append(node)
+class Answer(SqlUtil):
+    """docstring for Answer."""
     def __init__(self):
-        super(quest_tree, self).__init__()
-        if quest_tree.max_id ==0:
-            # initialize the class
-            csv_util.read_csv(self)
+        super().__init__("answer")
+
+    def find_by_qid(self, q_id):
+        self.find("q_id",int(q_id))
+        return self
+    def find_a(self, q_id):
+        if type(q_id) in [str,int]:
+            ans_list = self.find_by_qid(q_id).all()
+            return [ans[2] for ans in ans_list]
         else:
-            # class has been initialized
-            pass
+            raise TypeError("Question id must be int or str.")
+    def add_a(self, answers, q_id):
+        if type(answers)== list and len(answers) >=2 and type(q_id) in [str,int]:
+            # valid type for adding a question
+            for a in answers:
+                # append all the answers into database system
+                self.insert(["q_id","answer"],[q_id,a]).save()
+        else:
+            # try to handle the error by raise different error msg
+            if type(answers) != list:
+                raise TypeError("Answers must be a list.")
+            if len(answers) < 2:
+                raise TypeError("A question must have at lease 2 answers.")
+            if not type(q_id) in [str,int]:
+                raise TypeError("Code Error: q_id is not a str or int")
+    def del_a(self, q_id):
+        if not type(q_id) in [str, int]:
+            raise TypeError("Question id must be int or str.")
+        self.find_by_qid(q_id).delete()
 
-    def find_question(cls,ques_id = None):
-        if ques_id == None:
-            # no input values, return all the values back
-                return [item.getlist() for item in cls._questDisct.values()]
-        else :
-            # input some things
-            return_list = []
-            for i in ques_id:
-                # searching all the given values
-                try:
-                    # try to search the for the valid question.
-                    return_list.append(cls._questDisct[int(i)].getlist() )
-                except KeyError:
-                    print ("fail on find question", i)
+class Question(SqlUtil):
+    """docstring for Question."""
+    def __init__(self):
+        super().__init__("question")
+        # create an instance of answer to append answer table
+        self.__ans = Answer()
+        # set up the defualt search column
+        self.clear()
+
+    def clear(self, join = False, col = False):
+        # overwrite the father function to set up default in __from
+        super().clear(join,True)
+        if not col:
+            # reset the col value
+            # in default only two column would show
+            self.col_name(["id","question","type"])
+
+
+    def find_by_id(self,q_id):
+        if not type(q_id) in [str,int]:
+            raise TypeError("q_id must be a int or str")
+
+        # convent function in complement of sql_util
+        self.find("id",int(q_id))
+        return self
+
+
+    def find_q(self, q_id=None, pool_id = None):
+        # default situation would show up all the hidden question
+        return_list = []
+        if  not q_id:
+            if not pool_id:
+                raise TypeError("pool_id must specify while getting all avaliable question")
+            if not type(pool_id) in [str, int] :
+                # couldn't handle else of these two type
+                raise TypeError("Code Error: pool_id must be int or str")
+            # q_id == None
+            # return all the avaliable question (show = 1)
+            return_list = self.find("show", 1).find("show",1)\
+                            .find("pool_id",pool_id).all()
+            # return all the questions and with its' answers
+            return [q+self.__ans.find_a(q[0]) for q in return_list]
+
+        elif type(q_id) == list:
+            for q in q_id:
+                # collect all the return
+                return_list+=self.find_q(q)
             return return_list
+        elif type(q_id) in [str,int]:
+            this_q = self.find_by_id(int(q_id)).one()
+            if this_q[2] in ["MCQ"]:
+                # get all the answers append at the end of each question
+                return [this_q+self.__ans.find_a(this_q[0])]
+            elif this_q[2] in ["TEXT"]:
+                # Text base question don't have answers to specify
+                return [this_q]
+            else:
+                raise TypeError("Code Error: Counldn't handle this type of question:",this_q[2])
 
-    def get_new_id(cls):
-        # assign a new id to return
-        cls.max_id +=1
-        return cls.max_id
+        else:
+            # couldn't hand this type
+            raise TypeError("Question id must be a list or string or interger")
 
+    def add_q(self,question,pool_id, q_type,answers = None):
+        # error handling
+        if not (type(pool_id) in [str,int] and len(question)>0 and type(question) == str and \
+            q_type in ["MCQ","TEXT"]):
 
-    def add_question(cls,question = "", answers = []):
-        if len(answers)<2 or question == "":
-            # fail to create the question
-            return 0
-        # else:
-        # give the new question a new id, add quesitons and answers in the list
-        row = [cls.max_id+1,question]
-        for answer in answers:
-            row.append(answer)
+            if not type(pool_id) in [str,int]:
+                raise TypeError("Code Error: pool_id is not a str or int.")
+            elif len(question)==0:
+                raise TypeError("Question must be specify.")
+            elif type(question) != str:
+                raise TypeError("A question must be a string.")
+            elif not q_type in ["MCQ","TEXT"]:
+                raise TypeError("unknown q_type: ", q_type)
 
-        # add it into the dict
-        new_node = cls.csv_readRow(row)
-        # add it into buffer to be adding to csv
-        cls.buffer_obj.append(new_node)
-        return 1
-
-    def delete_question(cls, question_id):
-        try:
-            # delet the record in the in self dictionary
-            del cls._questDisct[int (question_id)]
-            # successfully delete question
-            return 1
-        except KeyError:
-            print("Fail on delet question", question_id)
-            return 0
-
-class delQ():
-    def __init__(self, qTree):
-        self._qTree = qTree
-    def doDel(self,qID=[]):
-        if len(qID)!= 0:
-            # if qid != None hence do the delete
-            for qid in qID:
-
-                self._qTree.delete_question(int(qid))
-            # write the change into the csv file
-            csv_util.write_csv(self._qTree)
-
-class getQ():
-    """docstring for getQuestion."""
-    def __init__(self,qTree):
-        super(getQ, self).__init__()
-        # keep an instance of the question_tree.
-        self._qTree = qTree
-    def findQ(self,qId = None):
-        return_list = self._qTree.find_question(qId)
-        if len(return_list) ==0:
-            # return none obj, to better template use
-            return None
-        # else:
-        return return_list
-class addQ():
-    """docstring for addQuestion."""
-    def __init__(self, quest_tree):
-        # super(addQuestion, self).__init__()
-        self._qTree =quest_tree
-    def is_valid_Q(self,question = "", answers = []):
-        if len(question)<= 0:
-            return "Undifined question."
-        if len(answers) <2:
-            return "This question at least have two answers."
-        return 0
-    def add_Q(self, question = "", answers = []):
-        if self.is_valid_Q(question, answers)== 0:
-            # valid question
-            # try to assign a new queston id for this question
-            this_id = self._qTree.get_new_id()
-            # put all the information into a list
-            row = [this_id,question]
-            for answer in answers:
-                row.append(answer)
-
-            # translate the list into node and assign this question into dictionary
-            q_node=self._qTree.csv_readRow(row)
-            # push this node to be write
-            self._qTree.push_buffer(q_node)
-            csv_util.append_csv(self._qTree)
+        if q_type != "TEXT":
+            if type(answers) != list:
+                raise TypeError("Answers must be a list.")
+            if len(answers) < 2:
+                raise TypeError("A question must have at lease 2 answers.")
+        # valid question and answers
+        self.insert(["question","pool_id","type"],[question,int(pool_id),q_type]).save()
+        # get the q_id for the question just created
+        # by getting the newest record that have same property
+        this_q = self.find(["question","pool_id","type"],[question,int(pool_id),q_type])\
+                    .sort_by("id",False).one()
+        q_id = this_q[0]
 
 
-class quest_node():
-    """docstring for quest_node."""
-    def __init__(self, id, question = "", answers = []):
-        super(quest_node, self).__init__()
-        if question == "" or answers ==[]:
-            # invalid initialise
-            return None
-        # else:
-        # id must be an integer
-        self.id = int(id);
-        self.quest = question;
-        self.answers = answers;
+        if q_type in ["MCQ"]:
+            # only the MCQ base question would need some answer
+            # call the class Answer to append this question's answers
+            self.__ans.add_a(answers,q_id)
 
-    def getlist(self):
-        return_list = [self.id, self.quest]
-        for i in self.answers:
-            # append all the question in the return_list
-            return_list.append(i)
-        return return_list
+        # for convience return the q_id for just created question
+        return q_id
 
-    def __str__(self):
-        # printing string generator
-        string = str(self.id)+" "+self.quest+" "
-        answers = ",".join(self.answers)
-        return string+answers
+    def quote_q(self, q_ids):
+        # return all the question specify by q_ids and add a link count for each question
+        if type(q_ids) != list:
+            # error manage
+            raise TypeError("q_ids must be a list")
+
+
+        for q in q_ids:
+            # to select the linked time
+            self.clear(col= True)
+            self.col_name("link")
+
+            # all the linked time add one
+            linked = self.find_by_id(q).one()
+            self.update("link",linked[0]+1).find_by_id(q).save()
+        q_list = self.find_q(q_ids)
+
+
+        # return all the required question
+        return q_list
+
+    def del_q(self, q_id,force=False):
+        if not type(q_id) in [list, str, int]:
+            raise TypeError("Question should be deleted by Id of list of ids")
+
+        if not q_id:
+            raise TypeError("Delect question must be specify.")
+
+        if type(q_id)  == list:
+            for q in q_id:
+                # recursively calling all the question's id
+                self.del_q(q,force)
+
+        else:
+            # the input type is a str or int
+            this_q = self.col_name("link").find_by_id(q_id).one()
+
+            if this_q == None:
+                # this_q has already deleted
+                raise TypeError("The specify question is not exist in database.")
+            if (this_q[0] ==0) or force:
+                # delete the question by specify question id
+                self.find_by_id(q_id).delete()
+                # delete the question's answer
+                self.__ans.del_a(q_id)
+            else:
+                # this question has been linked to some survey, couldn't delete
+                # but unshow it
+                self.find_by_id(q_id).update("show", 0).save()
+
+
+        return self
 
 if __name__ == '__main__':
-    # unittests
-    quests= quest_tree()
-    # test the searching method
-    this_quest_list = quests.find_question([1,0,3])
-    for this in this_quest_list:
-        print(this)
 
 
-    this_quest_list = quests.find_question()
-    for this in this_quest_list:
-        print(this)
+    quest = Question()
+    # add a test question into database
+    first_id=quest.add_q("sample question?", "0", "MCQ",["a1","a2"])
+    second_id=quest.add_q( "sample question?", "0", "MCQ",["a1","a2"])
+    third_id=quest.add_q( "sample question?", "0", "TEXT")
 
 
-    # print("try to add the question into the file")
-    # quests.add_question("q3",["q3a0","q3a1"])
-    # # write the new question into the csv
-    # csv_util.append_csv(quests)
 
-    quests2 = quest_tree()
-    print ("find the question with a new class")
-    quest_find  = getQ(quest_tree())
-    print(quest_find.findQ([1,0,3]))
-
-    question_add = addQ(quests2)
-    question_add.add_Q("q3",["q3a0","q3a1"])
+    print("try to find all the quesiton with question pool 0")
+    # getting all the question in the database with pool_id = 0
+    print(quest.find_q(pool_id="0"))
 
 
-    #test function for delete_question
-    qDel = delQ(quests2)
-    # couldn't delete the question while flying
-    #qDel.doDel([5])
+    list_q = [first_id,second_id,third_id]
+    # pretend these selected question has been added to a survey
+    print ("\nTry to queote added question into a survey")
+    print(quest.quote_q(list_q))
+
+
+    quest.col_name("link")
+    print("\nTry to check the linked time for each question.")
+    # check whether these question has been selected
+    print(quest.find_q(list_q))
+
+
+    print("\nDelete all the questions created for survey.")
+    # delete the question we just create for test
+    quest.del_q(list_q)
+
+    # delete all the question in database
+    # quest.del_q(list(range(1,81,1)),True)
+
+    # check whether it's successfully deleted
+    print(quest.find_q(pool_id="0"))
+
+    # force delete all the question for test
+    quest.del_q(list_q,True)
