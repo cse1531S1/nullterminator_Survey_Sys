@@ -11,17 +11,14 @@
         </thead>
         {%for s in survey_l%}
             <tr>
-                <td></td>
-                {%if s[-1]==1%}
-                <td>{{s[1]}}</td>
-                <td>{{s[2]}}</td>
+
+                <td>0</td>
+                <td>{{s}}</td>
+                <td>{{s}}</td>
                 <td>
-                    <a href="{{url_for("course_adding",course_name= s[1],course_year=s[2])}}" class="btn btn-sm btn-primary">Edit</a>
-             
+                    <a href="{{url_for('index')}}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{{url_for('index')}}" class="btn  btn-outline-danger btn-sm">Delete</a>
                 </td>
-                {%else%}
-                <td>No survey for {{s[1]}} {{s[2]}} right now!!</td>
-                {%endif%}
             </tr>
         {%endfor%}
     </table>

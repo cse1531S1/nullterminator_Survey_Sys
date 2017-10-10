@@ -42,7 +42,7 @@ def dashboard():
     c= Course()
     # get enrolment data (student,staff)
     e= enrol_Data()
-    
+
     s = Survey()
     user_courses = e.findById(current_user.uid)
 
@@ -197,7 +197,9 @@ def student(name):
 @app.route("/quest",methods = ["POST","GET"])
 @login_required
 def add_question():
-
+    if current_user.is_student():
+        return redirect(url_for("index"),\
+                msg_err = "You have not primission for"+url_for("del_question"))
 
     error = ""
     # else: the admin has logged_in
@@ -228,7 +230,9 @@ def add_question():
 @app.route("/delquest",methods= ["POST","GET"])
 @login_required
 def del_question():
-
+    if not current_user.is_admin():
+        return redirect(url_for("index"),\
+                msg_err = "You have not primission for"+url_for("del_question"))
     # instance of quest_tree
     quest = Question()
     error = None

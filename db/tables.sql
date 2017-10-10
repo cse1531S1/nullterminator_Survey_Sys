@@ -57,5 +57,5 @@ create table survey(
     start_time DATETIME NOT NULL,
     end_time DATETIME NOT NULL,
     status INTEGER NOT NULL default 0
-   
+
 );

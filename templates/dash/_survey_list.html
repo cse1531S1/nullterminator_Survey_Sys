@@ -3,11 +3,10 @@
     <table class="table table-hover">
         <thead class="thead-default">
             <tr>
-                <th scope="row" style="width:40px">#</th>
+                <th scope="row" style="width:30px">#</th>
                 <th>Course</th>
                 <th>Semester</th>
                 <th>Actions</th>
-      
             </tr>
         </thead>
         {%for s in survey_l%}
@@ -17,14 +16,14 @@
                 <td>{{s[2]}}</td>
                 <td>
                     <a href="{{url_for("course_adding",course_name= s[1],course_year=s[2])}}" class="btn btn-sm btn-primary">Edit</a>
-                   
+
                 </td>
-               
+
             </tr>
         {%endfor%}
     </table>
 
 
 {%else%}
-    <p>Current have not running course</p>
+    <p>Current have not running survey</p>
 {%endif%}
