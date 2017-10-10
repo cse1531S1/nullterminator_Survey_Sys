@@ -35,12 +35,14 @@ def logout():
 
 
 @app.route("/dash")
+@app.route("/dashboard")
 @login_required
 def dashboard():
     # route by the current user type
     c= Course()
     # get enrolment data (student,staff)
     e= enrol_Data()
+    
     s = Survey()
     user_courses = e.findById(current_user.uid)
 
@@ -82,13 +84,15 @@ def course_adding(course_name=None,course_year=None):
 
 
 # delect survey in this controller
-@app.route("/delete_sur/<int:survey_id>/<string:course_name>/<string:course_year>",methods=["GET","POST"])
+@app.route("/delete_sur")
+@app.route("/delete_sur/<int:survey_id>",methods=["GET","POST"])
 @login_required
-def delete_survey(survey_id=None,course_name=None,course_year=None):
+def delete_survey(survey_id=None):
+    # error handling
 
-      s = Survey()
-      s.delete_survey(survey_id)
-      return redirect(url_for('course_adding',course_name = course_name, course_year = course_year))
+    s = Survey()
+    s.delete_survey(survey_id)
+    return redirect(url_for('course_adding',course_name = course_name, course_year = course_year))
 
 
 # post survey in this controller

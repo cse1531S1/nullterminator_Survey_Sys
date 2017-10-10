@@ -8,7 +8,7 @@ class Course(SqlUtil):
     def get_course(self,course_code=None,course_year=None):
         if course_code and course_year:
             this_course = self.find("course_code",course_code)\
-                            .find("course_year",course_year).one()            
+                            .find("course_year",course_year).one()
             return this_course
         return self.all()
 
@@ -28,12 +28,12 @@ class Survey(SqlUtil):
                         .sort_by("id",False).one()
         return this_survey[0]
     def get_survey(self,course_name,course_year):
-        
+
         return self.find(["course_name","course_year"],[course_name,course_year]).one()
 
-               
+
     def post_sur_to_staff(self,course_name,course_year):
-   
+
         # post survey to related staff, stage = review
         this_survey = self.find(["course_name","course_year"],[course_name,course_year]).update("status",1).save()
         this_survey = self.find(["course_name","course_year"],[course_name,course_year]).one()
@@ -47,13 +47,12 @@ class Survey(SqlUtil):
 
 
 if __name__ == '__main__':
-    with app.app_context():
-      course = Course()
-      print(course.get_course("COMP1521","17s2"))
-      survey = Survey()
-      this_id = survey.create_survey("COMP1521","17s2",["1","2","3"],"2017-09-23 00:00:00","2017-09-23 23:59:59")
-      print(survey.get_survey("COMP1521","17s2"))
-      survey.delete_survey(this_id)
-      print(survey.get_survey("COMP1521","17s2"))
+    course = Course()
+    print(course.get_course("COMP1521","17s2"))
+    survey = Survey()
+    this_id = survey.create_survey("COMP1521","17s2",["1","2","3"],"2017-09-23 00:00:00","2017-09-23 23:59:59")
+    print(survey.get_survey("COMP1521","17s2"))
+    survey.delete_survey(this_id)
+    print(survey.get_survey("COMP1521","17s2"))
 
     # print(course.get_course())
