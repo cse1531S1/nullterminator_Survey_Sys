@@ -38,9 +38,6 @@ def logout():
 @app.route("/dashboard")
 @login_required
 def dashboard():
-    if current_user.is_student():
-        # premission deny
-        return redirect(url_for("premission_deny"))
 
     # route by the current user type
     c= Course()
@@ -142,7 +139,7 @@ def view_survey(survey_id=None,course_name=None,course_year=None):
     return render_template("final_survey.html", course_name=this_survey[1],\
                 course_year = this_survey[2],\
                 mendatory_q = q_force,\
-                optional_q = q_opt)
+                optional_q = q_opt,survey_id = survey_id)
 
 
 # delect survey in this controller
@@ -159,16 +156,25 @@ def delete_survey(survey_id=None):
 
 
 # post survey in this controller
-@app.route("/sur_to_staff/<int:survey_id>",methods=["GET"])
+@app.route("/post_survey/<int:survey_id>")
 @login_required
 def post_survey(survey_id ):
-    if not current_user.is_admin():
+    if current_user.is_student():
         return redirect(url_for("premission_deny"))
 
     s = Survey()
-    this_survey = s.post_sur_to_staff(course_name,course_year)
-    return render_template("select_sur.html", course_name = course_name,course_year = course_year,survey = this_survey)
-
+    if current_user.is_admin():
+        # admin want to post the survey to staff
+        s.post(survey_id)
+    elif current_user.is_staff():
+        # staff try to post this survey to student
+        if s.is_premitted(survey_id, current_user.id):
+            # the staff is in that course
+            s.review(survey_id)
+        else:
+            # the staff have no right to change the code
+            return redirect(url_for("premission_deny"))
+    return redirect(url_for("dashboard"))
 
 
 

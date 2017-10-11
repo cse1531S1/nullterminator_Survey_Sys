@@ -41,7 +41,7 @@ class Survey(SqlUtil):
                         .insert("end_time",end_time).save()
         this_survey = self.find(["course_id","Q_id","start_time","end_time"],\
                         [this_course[0],"&&".join(Q_id),start_time,end_time])\
-                        .sort_by("id",False).one()
+                        .sort_by("survey.id",False).one()
         return this_survey[0]
     def get_survey(self,course_name= None,course_year = None):
         if not course_name and not course_year:
@@ -54,7 +54,6 @@ class Survey(SqlUtil):
         # join search and select all all the information
         # order by id, course_code, course_year, qid, start_time,end_time,status
         this_sur = self.find(["course_id"],[this_course[0]]).all()
-        self.clear(join =True, col=True)
         return this_sur
 
     def get_survey_by_user(self, user_id):
@@ -69,20 +68,37 @@ class Survey(SqlUtil):
             if this_sur:
                 # if it has survey, apppend in survey_list
                 survey_list += this_sur
+
+        print(survey_list)
         return survey_list
 
+    def is_premitted(self, user_id, survey_id):
+        this_sur = self.id_filter(survey_id)
+        his_enrol = self.__enrol.find(["user_id","course_code","course_year"]\
+                        ,user_id,this_sur[1],this_sur[2]).one()
+        if his_enrol:
+            return True
+        return False
 
-    def post_sur_to_staff(self,course_name,course_year):
+    def post(self,sid):
 
         # post survey to related staff, stage = review
-        this_survey = self.find(["course_name","course_year"],[course_name,course_year]).update("status",1).save()
-        return this_survey
+        self.id_filter(sid).update("status",1).save()
+        return self
 
-    def delete_survey(self,id):
-        if type(id)!= int:
+    def review(self, sid):
+        # post survey to related student, stage = review
+        self.id_filter(sid).update("status",2).save()
+        return self
+
+
+    def delete_survey(self,sid):
+        if type(sid)!= int:
             raise TypeError("input id must be int")
-        self.find("id",id).delete()
+        self.id_filter(sid).delete()
 
+    def id_filter(self, sid):
+        return self.find("survey.id",sid)
 
 
 if __name__ == '__main__':
@@ -91,7 +107,7 @@ if __name__ == '__main__':
     survey = Survey()
     this_id = survey.create_survey("COMP1521","17s2",["1","2","3"],"2017-09-23 00:00:00","2017-09-23 23:59:59")
     print(survey.get_survey("COMP1521","17s2"))
-    survey.delete_survey(this_id)
+    survey.test_exe().delete_survey(this_id)
     print(survey.get_survey("COMP1521","17s2"))
 
     # print(course.get_course())

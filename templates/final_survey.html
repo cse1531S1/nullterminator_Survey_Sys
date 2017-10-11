@@ -4,9 +4,13 @@
     <h1>{{course_name}} {{course_year}} Survey <span class="badge badge-success">Preview</span></h1>
 {%endblock%}
 {%block body%}
-    {% set list_type = "num"%}
+    {% if not list_type %}
+        {% set list_type = ["num","num"]%}
+    {% endif %}
     {% include "comp/q_list.html"%}
-
+    {% if not current_user.is_student()%}
+        <a href="{{ url_for("post_survey",survey_id=survey_id)}}" class="btn btn-primary">Post Survey</a>
+    {%endif%}
     <!--  -->
 
 {%endblock%}

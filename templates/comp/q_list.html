@@ -23,7 +23,7 @@
                                 checked
                                 {%- endif -%}
                                 >
-                            {% elif list_type=="num" %}
+                            {% elif list_type[0]=="num" %}
                                 {{q[0]}}
                             {% endif %}
                         </td>
@@ -69,7 +69,7 @@
                                 checked
                                 {%- endif -%}
                                 >
-                            {% elif list_type=="num" %}
+                            {% elif list_type[1]=="num" %}
                                 {{q[0]}}
                             {% endif %}
                         </td>

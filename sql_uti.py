@@ -56,12 +56,17 @@ class SqlUtil(object):
         # indicator of whether print the SQL information
         self.__test = False
 
-    def __where(self):
+    def __where(self,join=True):
         # resolve the where sentense
-        if self.__key_pair.get_key() or self.__join_key:
+        if self.__key_pair.get_key() or (self.__join_key and join):
+            join_array = []
+            # prevent the update with the joined table
+            if self.__join_key and join:
+                join_array += self.__join_key
+            join_array +=[ key+"?" for key in self.__key_pair.get_key()]
+
             return " WHERE "+" and "\
-                    .join(self.__join_key+\
-                    [ key+"?" for key in self.__key_pair.get_key()])
+                    .join(join_array)+" "
         # if nothing to search, return nothing
         return ""
     def __sql(self):
@@ -87,7 +92,7 @@ class SqlUtil(object):
 
 
             # try to append the search value
-            sql += self.__where()
+            sql += self.__where(not self.__operator == "DELETE")
             # end of the sql sentense
             if self.__operator == "SELECT" and self.__sort_by:
                 # sort only can be used by select
@@ -108,7 +113,7 @@ class SqlUtil(object):
             # add a place holder into the sentence
             sql += " SET "+", ".join([key+"=?" \
                                     for key in self.__data_pair.get_key()])
-            sql += self.__where()
+            sql += self.__where(False)
 
         sql +=";"
         return sql
