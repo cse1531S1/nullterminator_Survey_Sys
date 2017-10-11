@@ -38,6 +38,10 @@ def logout():
 @app.route("/dashboard")
 @login_required
 def dashboard():
+    if current_user.is_student():
+        # premission deny
+        return redirect(url_for("premission_deny"))
+
     # route by the current user type
     c= Course()
     # get the survey instance
@@ -63,22 +67,83 @@ def dashboard():
 @app.route("/create_sur")
 @app.route("/create_sur/<string:course_name>/<string:course_year>",methods=["GET","POST"])
 @login_required
-def course_adding(course_name=None,course_year=None):
+def survey_create(course_name=None,course_year=None):
 
+    if not current_user.is_admin():
+        # premission deny
+        return redirect(url_for("premission_deny"))
+
+
+    # variable to store the error message
+    error = None
+
+    # initial the instance to reach database
     s = Survey()
     c = Course()
-    if not current_user.is_admin():
-        redirect(url_for("index"),msg_err = "You have not premission to create a survey")
+    q = Question()
+
+    # the user try to create a survey
+    if request.method == "POST":
+        # get all the selected question
+        q_id = request.form.getlist("qid")
+
+        if not q_id:
+            # no specify question error
+            error = "Please add at least one question for this survey."
+        if not  (request.form.get("s0") and request.form.get("s1")\
+            and request.form.get("e0") and request.form.get("e1")):
+            # no specify survey time error
+            error = "Please specify time for this survey"
+        else:
+            # not error
+            start_time =request.form.get("s0")+" "+request.form.get("s1")
+            end_time = request.form.get("e0")+" "+request.form.get("e1")
+            # the admin has selected some questions for this survey
+            this_id = s.create_survey(course_name,course_year,q_id,start_time,end_time)
+            # renturn a preview of final survey
+            return redirect(url_for('view_survey', survey_id = this_id,course_name = course_name, course_year = course_year))
+
+
 
     if not course_name and not course_year:
         # name is none when teacher try to create a course
-        return render_template("courselect.html",\
+        return render_template("select_course.html",\
                     course_l = c.get_course())
     # else: admin already have select a course
-    # admin go to a specific survey of {course_name}{course_year}
-    this_survey = s.get_survey(course_name,course_year)
-    return render_template("select_sur.html", course_name = course_name,course_year = course_year,survey = this_survey)
+    # the admin try to create a survey
 
+    # find the question with different pool
+    get_genQ = q.find_q(pool_id = "0")
+    get_optQ = q.find_q(pool_id = "1")
+
+    return render_template("survey_create.html", course_name=course_name,\
+    course_year=course_year,mendatory_q=get_genQ,\
+    optional_q=get_optQ,msg_err = error)
+
+
+# view survey in this controller
+@app.route("/survey_view/<int:survey_id>",methods=["GET","POST"])
+@login_required
+def view_survey(survey_id=None,course_name=None,course_year=None):
+    if current_user.is_student():
+        return redirect(url_for("premission_deny"))
+
+
+    q = Question()
+    s = Survey()
+
+    # find the specify survey by id
+    this_survey = s.find("id", survey_id).one()
+    # find the selected question
+    selected_Qid = this_survey[2].split("&&")
+    q_force = q.find_q(q_id = selected_Qid,pool_id = "0")
+    q_opt = q.find_q(q_id = selected_Qid,pool_id = "1")
+    return render_template("finalsurvey.html", course_name=course_name,\
+                course_year = course_year,\
+                genlist = q_force,\
+                optlist = q_opt,\
+                Qnum1=len(q_force),\
+                Qnum2=len(q_opt))
 
 
 # delect survey in this controller
@@ -87,7 +152,8 @@ def course_adding(course_name=None,course_year=None):
 @login_required
 def delete_survey(survey_id=None):
     # error handling
-
+    if not current_user.is_admin:
+        return redirect(url_for("premission_deny"))
     s = Survey()
     s.delete_survey(survey_id)
     return redirect(url_for('dashboard'))
@@ -97,66 +163,19 @@ def delete_survey(survey_id=None):
 @app.route("/sur_to_staff/<string:course_name>/<string:course_year>",methods=["GET"])
 @login_required
 def post_sur_to_staff(course_name=None,course_year=None):
-
-      s = Survey()
-      this_survey = s.post_sur_to_staff(course_name,course_year)
-      return render_template("select_sur.html", course_name = course_name,course_year = course_year,survey = this_survey)
-
-
-
-
-# create survey in the controller
-@app.route("/view_sur/<string:course_name>/<string:course_year>",methods=["GET","POST"])
-@login_required
-def survey_create(course_name=None,course_year=None):
+    if not current_user.is_admin():
+        return redirect(url_for("premission_deny"))
 
     s = Survey()
-    q = Question()
-    get_genQ = q.find_q(pool_id = "0")
-    get_optQ = q.find_q(pool_id = "1")
-    error = None
-
-    if request.method == "POST":
-        selected_genQ = request.form.getlist("selected_genQ")
-        selected_optQ = request.form.getlist("selected_optQ")
-        q_id = selected_genQ + selected_optQ
-        start_time = request.form.get("s0")+" "+request.form.get("s1")
-        end_time = request.form.get("e0")+" "+request.form.get("e1")
-        if selected_genQ != []:
-            # the admin has selected some questions for this survey
-            this_id = s.create_survey(course_name,course_year,q_id,start_time,end_time)
-            # renturn a preview of final survey
-            return redirect(url_for('view_survey', survey_id = this_id,course_name = course_name, course_year = course_year))
-
-        else:
-            error = "Please add at least one general question for this survey."
-
-    return render_template("surveycreate.html", course_name=course_name,\
-    course_year=course_year,genQ_list=get_genQ,\
-    optQ_list=get_optQ,msg_err = error)
+    this_survey = s.post_sur_to_staff(course_name,course_year)
+    return render_template("select_sur.html", course_name = course_name,course_year = course_year,survey = this_survey)
 
 
 
 
 
 
-# view survey in this controller
-@app.route("/view_sur/<int:survey_id>/<string:course_name>/<string:course_year>",methods=["GET","POST"])
-@login_required
-def view_survey(survey_id=None,course_name=None,course_year=None):
-   print("test")
-   q = Question()
-   s = Survey()
-   this_survey = s.get_survey(course_name,course_year)
-   selected_Qid = this_survey[3].split("&&")
-   q_force = q.find_q(q_id = selected_Qid,pool_id = "0")
-   q_opt = q.find_q(q_id = selected_Qid,pool_id = "1")
-   return render_template("finalsurvey.html", course_name=course_name,\
-                course_year = course_year,\
-                genlist = q_force,\
-                 optlist = q_opt,\
-                 Qnum1=len(q_force),\
-                 Qnum2=len(q_opt))
+
 
 
 
@@ -196,8 +215,7 @@ def student(name):
 @login_required
 def add_question():
     if current_user.is_student():
-        return redirect(url_for("index"),\
-                msg_err = "You have not primission for"+url_for("del_question"))
+        return redirect(url_for("premission_deny"))
 
     error = ""
     # else: the admin has logged_in
@@ -229,8 +247,7 @@ def add_question():
 @login_required
 def del_question():
     if not current_user.is_admin():
-        return redirect(url_for("index"),\
-                msg_err = "You have not primission for"+url_for("del_question"))
+        return redirect(url_for("premission_deny"))
     # instance of quest_tree
     quest = Question()
     error = None
@@ -250,7 +267,7 @@ def del_question():
     mendatory = quest.find_q(pool_id="0")
     optional = quest.find_q(pool_id=1)
     return render_template("del_q.html",\
-    mendatory = mendatory,optional=optional,msg_err = error)
+    mendatory_q = mendatory,optional_q=optional,msg_err = error)
 
 #Route to the results page displaying results of a survey.
 #not sure how the data csv's are setup or how it should know which csv to read
@@ -258,6 +275,7 @@ def del_question():
 @app.route("/results/<string:name>",methods=["GET","POST"])
 @login_required
 def show_results(name = None):
+
 
     response = respondent(name)
     if not name:
@@ -270,3 +288,9 @@ def show_results(name = None):
     results=response.get_results()
 
     return render_template("results.html",results=response.get_results())
+
+# page for not premission
+@app.route("/premission")
+def premission_deny():
+
+    return render_template("premission.html")

@@ -1,0 +1,87 @@
+
+<h2>Mendatory Questions</h2>
+
+    <!-- the promt of the line, the idea is from bootstrap table-->
+    <table class="table table-hover">
+        <thead class="thead-default">
+            <tr>
+                <th scope="row" style="width:30px">#</th>
+                <th>Question</th>
+                <th>Type</th>
+                <th>Answers</th>
+            </tr>
+        </thead>
+        {%if mendatory_q%}
+            <tbody>
+                {% for q in mendatory_q %}
+                <!-- show up the information for each questoin -->
+                    <tr>
+                        <td scope="row">
+                            {% if list_type=="check" %}
+                                <input type="checkbox" name="qid" value="{{q[0]}}" class="float-left" >
+                            {% elif list_type=="num" %}
+                                {{q[0]}}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{q[1]}}
+                        </td>
+                        <td>
+                            {{q[2]}}
+                        </td>
+                        <td>
+                            <!-- print all the answers -->
+                            {% for ans in q[3:] %}
+                                {{ans}}
+                            {% endfor %}
+                        </td>
+
+                    </tr>
+                {% endfor %}
+            </tbody>
+        {% endif %}
+    </table>
+    <h2>Optional Questions</h2>
+
+    <!-- the promt of the line, the idea is from bootstrap table-->
+    <table class="table table-hover">
+        <thead class="thead-default">
+            <tr>
+                <th scope="row" style="width:30px">#</th>
+                <th>Question</th>
+                <th>Type</th>
+                <th>Answers</th>
+            </tr>
+        </thead>
+        {% if optional_q %}
+            <tbody>
+                {% for q in optional_q %}
+                <!-- show up the information for each questoin -->
+                    <tr>
+                        <td scope="row">
+                            {% if list_type=="check" %}
+                                <input type="checkbox" name="qid" value="{{q[0]}}" class="float-left" >
+                            {% elif list_type=="num" %}
+                                {{q[0]}}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{q[1]}}
+                        </td>
+                        <td>
+                            {{q[2]}}
+                        </td>
+                        <td>
+                            <!-- print all the answers -->
+                            {% for ans in q[3:] %}
+                                {{ans}}
+                            {% endfor %}
+                        </td>
+
+                    </tr>
+                {% endfor %}
+            </tbody>
+        {%endif%}
+    </table>
+    {% if btn %}
+    {% endif %}
