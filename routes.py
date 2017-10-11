@@ -101,7 +101,7 @@ def survey_create(course_name=None,course_year=None):
             # the admin has selected some questions for this survey
             this_id = s.create_survey(course_name,course_year,q_id,start_time,end_time)
             # renturn a preview of final survey
-            return redirect(url_for('view_survey', survey_id = this_id,course_name = course_name, course_year = course_year))
+            return redirect(url_for('view_survey', survey_id = this_id))
 
 
 
@@ -131,19 +131,18 @@ def view_survey(survey_id=None,course_name=None,course_year=None):
 
     q = Question()
     s = Survey()
-
     # find the specify survey by id
-    this_survey = s.find("id", survey_id).one()
+    this_survey = s.find("survey.id", survey_id).one()
     # find the selected question
-    selected_Qid = this_survey[2].split("&&")
+    selected_Qid = this_survey[3].split("&&")
+    print(this_survey)
     q_force = q.find_q(q_id = selected_Qid,pool_id = "0")
     q_opt = q.find_q(q_id = selected_Qid,pool_id = "1")
-    return render_template("finalsurvey.html", course_name=course_name,\
-                course_year = course_year,\
-                genlist = q_force,\
-                optlist = q_opt,\
-                Qnum1=len(q_force),\
-                Qnum2=len(q_opt))
+    # find the course that has recorded in the survey
+    return render_template("final_survey.html", course_name=this_survey[1],\
+                course_year = this_survey[2],\
+                mendatory_q = q_force,\
+                optional_q = q_opt)
 
 
 # delect survey in this controller
@@ -160,9 +159,9 @@ def delete_survey(survey_id=None):
 
 
 # post survey in this controller
-@app.route("/sur_to_staff/<string:course_name>/<string:course_year>",methods=["GET"])
+@app.route("/sur_to_staff/<int:survey_id>",methods=["GET"])
 @login_required
-def post_sur_to_staff(course_name=None,course_year=None):
+def post_survey(survey_id ):
     if not current_user.is_admin():
         return redirect(url_for("premission_deny"))
 

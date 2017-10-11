@@ -1,11 +1,11 @@
 {%extends "base.html"%}
 {%block title %} Create: {{course_name}} {{course_year}} Survey{%endblock%}
 {%block header%}
-    <h1>Edit:{{course_name}} {{course_year}} Survey</h1>
+    <h1>Create: {{course_name}} {{course_year}} Survey</h1>
 {%endblock%}
 {%block body%}
     <form class="" action="{{url_for("survey_create",course_name= course_name, course_year = course_year)}}" method="POST">
-        {% set list_type = "check"%}
+        {% set list_type = ["check","check"]%}
         {% include "comp/q_list.html"%}
         <div class="form-group">
             <label>

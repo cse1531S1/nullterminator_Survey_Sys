@@ -5,7 +5,7 @@
     <form class="" action="url_for("del_question")" method="POST">
 
         <!-- calling the component of questionlist -->
-        {% set list_type = "check"%}
+        {% set list_type = ["check","check"]%}
         {% include "comp/q_list.html"%}
         <button type="submit" class="btn btn-outline-danger" name="button">Delete Question</button>
 

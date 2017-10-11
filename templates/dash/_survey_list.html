@@ -15,7 +15,20 @@
                 <td>{{s[1]}}</td>
                 <td>{{s[2]}}</td>
                 <td>
-                    <a href="{{url_for("course_adding",course_name= s[1],course_year=s[2])}}" class="btn btn-sm btn-primary">Edit</a>
+                    {% if s[7] == 0 and current_user.is_admin() %}
+                        <a href="{{url_for("view_survey",survey_id= s[0])}}" class="btn btn-sm btn-primary">Edit</a>
+                        <a href="{{url_for("post_survey",survey_id= s[0])}}" class="btn btn-sm btn-success">Post</a>
+                    {% if s[7] == 1 and current_user.is_staff() %}
+                        <a href="{{url_for("view_survey",survey_id= s[0])}}" class="btn btn-sm btn-primary">Review</a>
+                    {% if s[7] == 2 and current_user.is_student() %}
+                        <a href="{{url_for("view_survey",survey_id= s[0])}}" class="btn btn-sm btn-primary">Filling</a>
+                    {% if s[7] == 3 or (s[7] ==2 and current_user.is_admin())%}
+                        <a href="{{url_for("view_survey",survey_id= s[0])}}" class="btn btn-sm btn-success">Result</a>
+
+                    {% endif%}
+                    {% if current_user.is_admin() %}
+                        <a href="{{url_for("delete_survey",survey_id= s[0])}}" class="btn btn-sm btn-outline-danger">Delete</a>
+                    {%endif%}
 
                 </td>
 

@@ -1,0 +1,12 @@
+{%extends "base.html"%}
+{%block title %} {{course_name}} {{course_year}} Survey{%endblock%}
+{%block header%}
+    <h1>{{course_name}} {{course_year}} Survey <span class="badge badge-success">Preview</span></h1>
+{%endblock%}
+{%block body%}
+    {% set list_type = "num"%}
+    {% include "comp/q_list.html"%}
+
+    <!--  -->
+
+{%endblock%}

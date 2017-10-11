@@ -19,6 +19,18 @@ class Survey(SqlUtil):
         super().__init__("survey")
         self.__course = Course()
         self.__enrol = enrol_Data()
+        # set up the join search columns
+        self.clear()
+
+    def clear(self,join = False, col = False):
+        super().clear(join = True, col= True)
+        if not col and not join:
+            # set up the default join searching order
+            self.with_table("course","course_id","id")\
+                .col_name("id").col_name(["course_code","course_year"],"course")\
+                .col_name(["Q_id","start_time","end_time","status"])
+        return self
+
     def create_survey(self,course_code,course_year,Q_id,start_time,end_time):
         # getthing this course's id
         this_course = self.__course.get_course(course_code,course_year)
@@ -39,7 +51,11 @@ class Survey(SqlUtil):
         # provided course info
         this_course = self.__course.get_course(course_name, course_year)
         # search all the survey provided by this course
-        return self.find(["course_id"],[this_course[0]]).all()
+        # join search and select all all the information
+        # order by id, course_code, course_year, qid, start_time,end_time,status
+        this_sur = self.find(["course_id"],[this_course[0]]).all()
+        self.clear(join =True, col=True)
+        return this_sur
 
     def get_survey_by_user(self, user_id):
         this_courses =self.__enrol.findById(user_id)
@@ -60,7 +76,6 @@ class Survey(SqlUtil):
 
         # post survey to related staff, stage = review
         this_survey = self.find(["course_name","course_year"],[course_name,course_year]).update("status",1).save()
-        this_survey = self.find(["course_name","course_year"],[course_name,course_year]).one()
         return this_survey
 
     def delete_survey(self,id):

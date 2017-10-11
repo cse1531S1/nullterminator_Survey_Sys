@@ -15,10 +15,14 @@
             <tbody>
                 {% for q in mendatory_q %}
                 <!-- show up the information for each questoin -->
-                    <tr>
+                    <tr >
                         <td scope="row">
-                            {% if list_type=="check" %}
-                                <input type="checkbox" name="qid" value="{{q[0]}}" class="float-left" >
+                            {% if list_type[0]=="check" %}
+                                <input type="checkbox" name="qid" value="{{q[0]}}" class="float-left"
+                                {%- if select_q and q[0] in select_q -%}
+                                checked
+                                {%- endif -%}
+                                >
                             {% elif list_type=="num" %}
                                 {{q[0]}}
                             {% endif %}
@@ -59,8 +63,12 @@
                 <!-- show up the information for each questoin -->
                     <tr>
                         <td scope="row">
-                            {% if list_type=="check" %}
-                                <input type="checkbox" name="qid" value="{{q[0]}}" class="float-left" >
+                            {% if list_type[1]=="check" %}
+                                <input type="checkbox" name="qid" value="{{q[0]}}" class="float-left"
+                                {%- if select_q and q[0] in select_q -%}
+                                checked
+                                {%- endif -%}
+                                >
                             {% elif list_type=="num" %}
                                 {{q[0]}}
                             {% endif %}
