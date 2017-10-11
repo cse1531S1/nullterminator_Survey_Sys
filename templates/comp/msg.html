@@ -1,0 +1,30 @@
+{% if msg_err %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {{msg_err}}
+    </div>
+{% endif%}
+{% if msg_suc %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {{msg_suc}}
+    </div>
+{% endif%}
+{% if msg_std %}
+    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {{msg_std}}
+    </div>
+{% endif%}
+
+
+ <!-- reset all the vars used by msg passing -->
+{% set msg_err = None %}
+{% set msg_suc = None %}
+{% set msg_std = None %}

@@ -78,12 +78,20 @@ class Question(SqlUtil):
             return [q+self.__ans.find_a(q[0]) for q in return_list]
 
         elif type(q_id) == list:
+            return_list = []
             for q in q_id:
-                # collect all the return
-                return_list+=self.find_q(q)
+                this_q = self.find_q(q,pool_id)
+                if this_q:
+                    # collect all the valid
+                    return_list+= this_q
             return return_list
         elif type(q_id) in [str,int]:
-            this_q = self.find_by_id(int(q_id)).one()
+            if pool_id:
+                this_q = self.find_by_id(int(q_id)).find("pool_id",pool_id).one()
+                if not this_q:
+                    return None
+            else:
+                this_q = self.find_by_id(int(q_id)).one()
             if this_q[2] in ["MCQ"]:
                 # get all the answers append at the end of each question
                 return [this_q+self.__ans.find_a(this_q[0])]

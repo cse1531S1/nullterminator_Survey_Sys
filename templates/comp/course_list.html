@@ -1,0 +1,29 @@
+<h3>Running Courses</h3>
+{%if course_l %}
+    <table class="table table-hover">
+        <thead class="thead-default">
+            <tr>
+                <th scope="row" style="width:30px">#</th>
+                <th>Course</th>
+                <th>Semester</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        {%for c in course_l%}
+            <tr>
+                <td>{{c[0]}}</td>
+                <td>{{c[1]}}</td>
+                <td>{{c[2]}}</td>
+                <td>
+                    <a href="{{url_for("course_adding",course_name= c[1],course_year=c[2])}}" class="btn btn-sm btn-outline-success">Create Survey</a>
+
+                </td>
+
+            </tr>
+        {%endfor%}
+    </table>
+
+
+{%else%}
+    <p>Current have not running course</p>
+{%endif%}

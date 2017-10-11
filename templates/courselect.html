@@ -1,15 +1,5 @@
 {%extends "base.html"%}
 {%block title%}Ongoing Courses{%endblock%}
 {%block body %}
-    <h1>Select a Course to Create a Survey</h1>
-    {% if course_list %}
-        {% for course in course_list %}
-            <a href="{{ url_for("course_adding",course_name= course[1],course_year=course[2])}}">{{course[1]}} {{course[2]}}</a> <br>
-        {% endfor %}
-    {%else%}
-        <div class="alert alert-danger" role="alert">
-            <h2>WoW!</h2>
-            <p>Currently all ongoing course have been created a survey, or currently there isn't an ongoing course.</p>
-        </div>
-    {%endif%}
+    {% include 'comp/course_list.html' %}
 {%endblock%}

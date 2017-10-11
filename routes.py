@@ -40,22 +40,21 @@ def logout():
 def dashboard():
     # route by the current user type
     c= Course()
-    # get enrolment data (student,staff)
-    e= enrol_Data()
-
+    # get the survey instance
     s = Survey()
-    user_courses = e.findById(current_user.uid)
 
-    survey_l = []
-    for course in user_courses:
-        survey_l.append(s.get_survey(course[1],course[2]))
 
+    # muti type of user respond
     if current_user.is_student():
-        return render_template('dash/student.html',survey_l = survey_l)
+        return render_template('dash/student.html',\
+                survey_l = s.get_survey_by_user(current_user.uid))
     if current_user.is_staff():
-        return render_template('dash/staff.html',survey_l = survey_l)
+        return render_template('dash/staff.html',\
+                survey_l = s.get_survey_by_user(current_user.uid))
     if current_user.is_admin():
-        return render_template('dash/admin.html',survey_l = c.get_course())
+        # get all the ongoning survey and all the courses
+        return render_template('dash/admin.html',survey_l = s.get_survey(),\
+                course_l= c.get_course())
 
 
 
@@ -68,14 +67,13 @@ def course_adding(course_name=None,course_year=None):
 
     s = Survey()
     c = Course()
+    if not current_user.is_admin():
+        redirect(url_for("index"),msg_err = "You have not premission to create a survey")
+
     if not course_name and not course_year:
         # name is none when teacher try to create a course
-        # render the course selection page
-        # return render_template("courselect.html",\
-                # course_list=c.get_course())
-
         return render_template("courselect.html",\
-                    course_list = c.get_course())
+                    course_l = c.get_course())
     # else: admin already have select a course
     # admin go to a specific survey of {course_name}{course_year}
     this_survey = s.get_survey(course_name,course_year)
@@ -92,7 +90,7 @@ def delete_survey(survey_id=None):
 
     s = Survey()
     s.delete_survey(survey_id)
-    return redirect(url_for('course_adding',course_name = course_name, course_year = course_year))
+    return redirect(url_for('dashboard'))
 
 
 # post survey in this controller

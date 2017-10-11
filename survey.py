@@ -1,5 +1,6 @@
 from sql_uti import SqlUtil
 from server import app
+from enrolment import enrol_Data
 class Course(SqlUtil):
     """docstring for Course."""
     def __init__(self):
@@ -17,19 +18,41 @@ class Survey(SqlUtil):
     def __init__(self):
         super().__init__("survey")
         self.__course = Course()
+        self.__enrol = enrol_Data()
     def create_survey(self,course_name,course_year,Q_id,start_time,end_time):
-        #this_course_id = self.__course.get_course_id(course_code,course_year)
-        self.insert("course_name",course_name).insert("course_year",course_year)\
+        # getthing this course's id
+        this_course = self.__course.get_course(course_code,course_year)
+        self.insert("course_id",this_course[0])\
                         .insert("Q_id","&&".join(Q_id))\
                         .insert("start_time",start_time)\
                         .insert("end_time",end_time).save()
-        this_survey = self.find(["course_name","course_year","Q_id","start_time","end_time"],\
-                        [course_name,course_year,"&&".join(Q_id),start_time,end_time])\
+        this_survey = self.find(["course_id","Q_id","start_time","end_time"],\
+                        [this_course_id,"&&".join(Q_id),start_time,end_time])\
                         .sort_by("id",False).one()
         return this_survey[0]
-    def get_survey(self,course_name,course_year):
+    def get_survey(self,course_name= None,course_year = None):
+        if not course_name and not course_year:
+            # return all the ongoning survey
+            return self.all()
 
-        return self.find(["course_name","course_year"],[course_name,course_year]).one()
+        # provided course info
+        this_course = self.__course.get_course(course_name, course_year)
+        # search all the survey provided by this course
+        return self.find(["course_id"],[course_id]).all()
+
+    def get_survey_by_user(self, user_id):
+        this_courses =self.__enrol.findById(user_id)
+        if not this_courses:
+            # thie user dont enrolled to any courses
+            return []
+        survey_list =[]
+        for course in this_courses:
+            # get the ongoning survey by course
+            this_sur =self.get_survey(course[1],course[2])
+            if this_sur:
+                # if it has survey, apppend in survey_list
+                survey_list += this_sur
+        return survey_list
 
 
     def post_sur_to_staff(self,course_name,course_year):
