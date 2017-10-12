@@ -22,35 +22,39 @@ class RespondMcq(SqlUtil):
         # count grather all the respond to gether
 
         # get the information of this question
-        this_q = self.__q.find_by_id(question_id).one()
+        this_q = self.__q.find_q(question_id)
+        this_q = this_q[0]
+
+        # count id for possible answers
         a_count = 0
         # to record all the answers
-        ans_l = []
+        ans_l = [this_q[1]]
+        print("selected question is ")
+        print(this_q)
         for q in this_q[3:]:
             # serach for all possible answers
+            self.clear(join =True, col=True)
+
+            # get the information of this question
+            this_q = self.__q.find_by_id(question_id).one()
+
             # join table search
-            self.with_table("survey", "respond_id", "id")
+            self.with_table("respond","respond_id","id").col_name("answer")
+            # find the criteria
+            self.find("question_id",question_id).find("survey_id",survey_id)
+            # answer filter
+            self.find("answer",a_count)
 
-            # find the correspond survey
-            self.find("respond.survey_id",survey_id)
 
-            # serach for that id for that question
-            self.find("question_id", question_id)
-
-            # serach for that id for that question
-            self.find("answer", a_count)
-
-            self.col_name("answer")
-            self.all()
             a_count +=1
             # count the answer number for this answer
             return_list = self.all()
-            if return_list:
-                # have the return value
-                ans_l+= [q,len(return_list)]
-            else:
-                # no record for the answers
-                ans_l+= [q,0]
+
+            # count the results and append in to list
+            ans_l.append([q,len(return_list)])
+
+            # force clear all the join
+            self.clear(True, True)
 
         # return [question,[[ans, count],..]]
         return ans_l
@@ -81,18 +85,16 @@ class RespondText(SqlUtil):
         this_q = self.__q.find_by_id(question_id).one()
 
         # join table search
-        self.with_table("survey", "respond_id", "id")
+        self.with_table("respond","respond_id","id").col_name("answer")
+        # find the criteria
+        self.find("question_id",question_id).find("survey_id",survey_id)
 
-        # find the correspond survey
-        self.find("respond.survey_id",survey_id)
-
-        # serach for that id for that question
-        self.find("question_id", question_id)
-
-        self.col_name("answer")
-
+        # pop the first item in the list, and search that
+        return_list = [this_q[1],[res[0] for res in self.all()]]
+        # force clear all the join
+        self.clear(True, True)
         # return [question, [all the answers]]
-        return [this_q[1],self.all()]
+        return return_list
 
 
     def delete_by_respond_id(self, respond_id):
@@ -156,9 +158,9 @@ class Respond(SqlUtil):
             # get the question type then try to put into correct respond
             this_type = self.__question.get_type(this_q[index])
             if this_type == "MCQ":
-                result_l += self.__mcq.count_respond(survey_id,this_q[index])
+                result_l.append(self.__mcq.count_respond(survey_id,this_q[index]))
             elif this_type == "TEXT":
-                result_l += self.__text.count_respond(survey_id,this_q[index])
+                result_l.append( self.__text.count_respond(survey_id,this_q[index]))
 
         return result_l
 
@@ -173,7 +175,13 @@ if __name__ == '__main__':
     print(res.all())
 
     # test the get_results fucntion is working
-    res.get_results(1)
+    print ("all the result currently have is")
+    print(res.get_results(1))
+
+    print("\nFound the result")
+    s = RespondMcq()
+    print()
+
 
     for rid in this_id:
         # delte the respond just create

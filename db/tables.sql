@@ -78,7 +78,7 @@ create table respond_mcq(
     id INTEGER PRIMARY KEY,
     respond_id INTEGER NOT NULL,
     question_id INTEGER NOT NULL,
-    answer varchar(10) NOT NULL,
+    answer INTEGER NOT NULL,
     FOREIGN KEY (respond_id) REFERENCES respond(id),
     FOREIGN KEY (question_id) REFERENCES question(id)
 );
