@@ -2,6 +2,7 @@ from flask import Flask, redirect, render_template, request, url_for,session
 from flask_login import LoginManager,login_user, current_user, login_required, logout_user
 from server import app
 from survey import *
+from new_respond import Respond
 # from respond import respondent
 from user import User
 # import the new question
@@ -195,32 +196,42 @@ def post_survey(survey_id ):
 
 
 # @app.route("/student")
-@app.route("/student/<string:name>", methods=["GET", "POST"])
+@app.route("/student/<int:survey_id>", methods=["GET", "POST"])
 @login_required
-def student(name):
-    s = survey()
-    res = respondent(name)
+def student(survey_id):
+    # neccessary instance for survey creation
+    s = Survey()
+    res = Respond()
     error = None
-    length = res.get_length()
-    questionlist = res.get_question()
 
+    # get the basic information for this survey_id
+    this_survey = s.id_filter(survey_id).one()
+    qids = s.get_qids(survey_id)
     if request.method == "POST":
         answerlist = []
-        for i in range(length):
+        for qid in qids:
             try:
                 # get all the answer form student
                 # because the questoin_id in survey is start form 1
                 # so add 1 in i and find the answer
-                answerlist.append(request.form[str(i+1)])
+                answerlist.append(request.form[str(qid)])
             except :
                 error = "You must finish all the questions."
         print(answerlist)
         if not error:
-            res.append_csv(answerlist)
+            # push the recorded answers to database
+            res.new_res(survey_id, current_user.get_id(), answerlist)
             return render_template("finish_survey.html")
+    # get the question information form here
+    q = Question()
+    # all the question is here
+    q_list = q.find_q(qids)
 
-    return render_template("student.html", course_name = name, msg_err = error,\
-        quest_list = questionlist,length = length)
+
+    return render_template("student.html", \
+            course_name = this_survey[1]+" "+this_survey[2],\
+            msg_err = error,\
+            quest_list = q_list)
 
 
 @app.route("/quest",methods = ["POST","GET"])
@@ -284,22 +295,21 @@ def del_question():
 #Route to the results page displaying results of a survey.
 #not sure how the data csv's are setup or how it should know which csv to read
 @app.route("/results")
-@app.route("/results/<string:name>",methods=["GET","POST"])
+@app.route("/results/<int:survey_id>",methods=["GET","POST"])
 @login_required
-def show_results(name = None):
+def show_results(survey_id = None):
 
 
-    response = respondent(name)
-    if not name:
-        # find all classes
 
-        return render_template("select_result.html",course_list =response.get_open_course() )
+    if not survey_id:
+        # not seeing the results
+        return redirect("dash")
     # name is no none, try to find the results of that survey
-    # get all the survey question
+    # instance for getting results
+    res = Respond()
 
-    results=response.get_results()
 
-    return render_template("results.html",results=response.get_results())
+    return render_template("results.html",results=res.get_results(survey_id))
 
 # page for not premission
 @app.route("/premission")

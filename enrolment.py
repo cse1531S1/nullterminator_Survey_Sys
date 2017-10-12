@@ -4,17 +4,18 @@ class enrol_Data(SqlUtil):
     """docstring for enrolment."""
     def __init__(self):
         super().__init__("enrolments")
+        self.clear()
     def clear(self, join = False, col = False):
         # overwrite the father function to set up default in __from
         super().clear(True,True)
         if not col and not join:
             # reset the col value and join serach
-            self.with_table("course")
+            self.with_table("course","course_id","id")
 
             # in default only three column would show
             self.col_name("user_id")
             # show the column in the course table
-            self.col_name(["course_year","course_year"], table_name ="course")
+            self.col_name(["course_code","course_year"], table_name ="course")
 
     def findById(self, uid):
         if not type(uid) in [int,str]:

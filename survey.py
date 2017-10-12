@@ -56,7 +56,7 @@ class Survey(SqlUtil):
         # search all the survey provided by this course
         # join search and select all all the information
         # order by id, course_code, course_year, qid, start_time,end_time,status
-        this_sur = self.find(["course_id"],[this_course[0]]).all()
+        this_sur = self.find(["survey.course_id"],[this_course[0]]).test_exe().all()
         return this_sur
 
     def get_survey_by_user(self, user_id):
@@ -64,6 +64,7 @@ class Survey(SqlUtil):
         # getting the class of the user
         this_user = self.__user.findById(user_id)
 
+        print(this_courses)
 
         if not this_courses:
             # thie user dont enrolled to any courses
@@ -77,14 +78,13 @@ class Survey(SqlUtil):
             elif this_user[2]== "student":
                 # only can reach the status echo to 2 and 3
                 self.findIn("status", ["2","3"], sign = "=")
-
             # get the ongoning survey by course
             this_sur =self.get_survey(course[1],course[2])
             if this_sur:
                 # if it has survey, apppend in survey_list
                 survey_list += this_sur
-        for l in survey_list:
-            print(l)
+        # for l in survey_list:
+        #     print(l)
         return survey_list
 
     def is_premitted(self, survey_id, user_id):

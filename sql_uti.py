@@ -71,7 +71,7 @@ class SqlUtil(object):
             search_arr +=[ key+"?" for key in self.__key_pair.get_key()]
             for pair in self.__key_pair_or:
                 # special string for muti search
-                search_arr.append(" or ".join([key+"?" for key in pair.get_key()]))
+                search_arr.append(" ( "+" or ".join([key+"?" for key in pair.get_key()])+" ) ")
 
 
 
