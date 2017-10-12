@@ -86,8 +86,8 @@ class SqlUtil(object):
                 sql += " * "
             # add the table_name
             sql+= "FROM "+ self.__table_name
-            if self.__join:
-                # mutiple table search
+            if self.__join and self.__operator == "SELECT":
+                # mutiple table search, only if search
                 sql+= ","+ ",".join(self.__join)
 
 
