@@ -73,7 +73,7 @@ class Survey(SqlUtil):
             # status filter
             if this_user[2] == "staff":
                 # only can reach the status echo to 1
-                self.findIn("status", ["1","3"], sign = "=")
+                self.findIn("status", ["1","2","3"], sign = "=")
             elif this_user[2]== "student":
                 # only can reach the status echo to 2 and 3
                 self.findIn("status", ["2","3"], sign = "=")
@@ -119,6 +119,10 @@ class Survey(SqlUtil):
 
     def id_filter(self, sid):
         return self.find("survey.id",sid)
+
+    def get_qids(self, sid):
+        # getting back an array of question id
+        return self.id_filter(sid).one()[3].split("&&")
 
 
 if __name__ == '__main__':

@@ -24,7 +24,9 @@
         <div class="form-group">
             <label>Type:</label>
             <select class="form-control" name="type">
-                <option value="MCQ">Mulitple Choice Question</option>
+                {% if current_user.is_admin() %}
+                    <option value="MCQ">Mulitple Choice Question</option>
+                {% endif %}
                 <option value="TEXT">Text Base Question</option>
             </select>
         </div>

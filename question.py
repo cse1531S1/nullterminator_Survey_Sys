@@ -194,6 +194,10 @@ class Question(SqlUtil):
 
         return self
 
+    def get_type(self, qid):
+        # get the type of specify question
+        return self.find_by_id(qid).one()[2]
+
 if __name__ == '__main__':
 
 

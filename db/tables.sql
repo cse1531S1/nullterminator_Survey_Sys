@@ -39,6 +39,7 @@ create table question(
 );
 
 create table answer(
+    -- this table is for questions' answers
     id INTEGER PRIMARY KEY,
     q_id int NOT NULL,
     answer int NOT NULL,

@@ -2,6 +2,7 @@ from sql_uti import SqlUtil
 from survey import Course
 import csv
 
+# create an instance of course to find the course id 
 c = Course()
 
 

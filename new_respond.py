@@ -1,24 +1,183 @@
 from sql_uti import SqlUtil
 from user import UserData
+from question import Question
+from survey import Survey
+
+"""Two base class for the respond controller"""
+class RespondMcq(SqlUtil):
+    """Control table for respond_mcq."""
+    def __init__(self):
+        super().__init__("respond_mcq")
+        self.__q = Question()
+    def new_ans(self, respond_id,question_id, answer):
+        # insert the respond_id by respond class
+        self.insert("respond_id", respond_id)
+        # insert the question_id
+        self.insert("question_id", question_id)
+        # insert the answer
+        self.insert("answer", answer)
+        return self.save()
+
+    def count_respond(self, survey_id, question_id):
+        # count grather all the respond to gether
+
+        # get the information of this question
+        this_q = self.__q.find_by_id(question_id).one()
+        a_count = 0
+        # to record all the answers
+        ans_l = []
+        for q in this_q[3:]:
+            # serach for all possible answers
+            # join table search
+            self.with_table("survey", "respond_id", "id")
+
+            # find the correspond survey
+            self.find("respond.survey_id",survey_id)
+
+            # serach for that id for that question
+            self.find("question_id", question_id)
+
+            # serach for that id for that question
+            self.find("answer", a_count)
+
+            self.col_name("answer")
+            self.all()
+            a_count +=1
+            # count the answer number for this answer
+            return_list = self.all()
+            if return_list:
+                # have the return value
+                ans_l+= [q,len(return_list)]
+            else:
+                # no record for the answers
+                ans_l+= [q,0]
+
+        # return [question,[[ans, count],..]]
+        return ans_l
+
+    def delete_by_respond_id(self, respond_id):
+        self.find("respond_id", respond_id).delete()
+
+class RespondText(SqlUtil):
+    """Table control for respond_text"""
+    def __init__(self):
+        super().__init__("respond_text")
+        self.__q = Question()
+    def new_ans(self, respond_id,question_id, answer):
+        # insert the respond_id by respond class
+        self.insert("respond_id", respond_id)
+        # insert the question_id
+        self.insert("question_id", question_id)
+
+        # insert the answer
+        self.insert("answer", answer)
+        return self.save()
+
+
+    def count_respond(self, survey_id, question_id):
+        # count grather all the respond to gether
+
+        # get the information of this question
+        this_q = self.__q.find_by_id(question_id).one()
+
+        # join table search
+        self.with_table("survey", "respond_id", "id")
+
+        # find the correspond survey
+        self.find("respond.survey_id",survey_id)
+
+        # serach for that id for that question
+        self.find("question_id", question_id)
+
+        self.col_name("answer")
+
+        # return [question, [all the answers]]
+        return [this_q[1],self.all()]
+
+
+    def delete_by_respond_id(self, respond_id):
+        self.find("respond_id", respond_id).delete()
 
 
 class Respond(SqlUtil):
     """Controller for Respond, control the table for respond"""
-    def __init__(self, arg):
+    def __init__(self):
         super().__init__("respond")
+        # two for inserting new respond
+        self.__mcq = RespondMcq()
+        self.__text = RespondText()
+        # check the type of question
+        self.__survey = Survey()
+        self.__question = Question()
+    def new_res(self, survey_id, user_id, answers):
+        # getting of all the question id by order in the survey database
+        this_q = self.__survey.get_qids(survey_id)
+        if len(answers)!= len(this_q):
+            print(this_q)
+            print(len(answers),len(this_q))
+            raise TypeError("The answer is not enough or Too much.")
 
-class RespondMcq(SqlUtil):
-    """Control table for respond_mcq."""
-    def __init__(self, arg):
-        super().__init__("respond_mcq")
+        # create a new record for this respond
+        self.insert("survey_id", survey_id)
+        # store the student id who submit the survey
+        self.insert("user_id",user_id)
+        self.save()
 
-class RespondText(SqlUtil):
-    """Table control for respond_text"""
-    def __init__(self, arg):
-        super().__init__("respond_text")
-    
+        # getting back the respond_id that just inserted
+        self.find(["survey_id","user_id"], [survey_id,user_id], sign = "=")
+        respond_id = self.sort_by("id", ascdending = False).one()[0]
 
+        for index in range(len(this_q)):
+            # get the question type then try to put into correct respond
+            this_type = self.__question.get_type(this_q[index])
+            if this_type == "MCQ":
+                self.__mcq.new_ans(respond_id,this_q[index], answers[index])
+            elif this_type == "TEXT":
+                self.__text.new_ans(respond_id,this_q[index], answers[index])
+
+        return respond_id
+
+    def delete_by_respond_id(self, respond_id):
+        # find the respond that should delete
+        self.find("id", respond_id).delete()
+
+        # find the record of answer to delete
+        self.__mcq.delete_by_respond_id(respond_id)
+        self.__text.delete_by_respond_id(respond_id)
+
+    def get_results(self, survey_id):
+        # get all the results into an array to give back
+        # getting all the question
+        this_q = self.__survey.get_qids(survey_id)
+
+        result_l = []
+
+        for index in range(len(this_q)):
+            # get the question type then try to put into correct respond
+            this_type = self.__question.get_type(this_q[index])
+            if this_type == "MCQ":
+                result_l += self.__mcq.count_respond(survey_id,this_q[index])
+            elif this_type == "TEXT":
+                result_l += self.__text.count_respond(survey_id,this_q[index])
+
+        return result_l
 
 if __name__ == '__main__':
     # unitests
-    pass
+    res=Respond()
+    this_id = []
+    this_id .append( res.new_res(1, 2, ["1","I dont","15"]))
+    this_id.append( res.new_res(1, 2, ["1","No need to improve","21"]))
+    this_id .append(res.new_res(1, 2, ["1","I dont","18"]))
+
+    print(res.all())
+
+    # test the get_results fucntion is working
+    res.get_results(1)
+
+    for rid in this_id:
+        # delte the respond just create
+        res.delete_by_respond_id( rid)
+
+    # check whether the data have been stored
+    print(res.all())

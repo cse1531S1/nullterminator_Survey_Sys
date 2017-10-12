@@ -2,7 +2,7 @@
 {%block title%}Manage Questions{%endblock%}
 {%block header%}<h1>Delete Question</h1>{%endblock%}
 {%block body%}
-    <form class="" action="url_for("del_question")" method="POST">
+    <form class="" action="{{url_for("del_question")}}" method="POST">
 
         <!-- calling the component of questionlist -->
         {% set list_type = ["check","check"]%}
