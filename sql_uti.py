@@ -1,11 +1,11 @@
 import sqlite3
-import csv
 
 
-class val_pair(object):
+
+class ValPair(object):
     """docstring for val_pair ."""
     def __init__(self):
-        super(val_pair, self).__init__()
+        super(ValPair, self).__init__()
         self.__key = []
         self.__value = []
     def push(self, key,value):
@@ -41,11 +41,11 @@ class SqlUtil(object):
         # colomn that would selected by this query
         self.__from = []
         # pair for searching ( where operation)
-        self.__key_pair = val_pair()
+        self.__key_pair = ValPair()
         # multi pair for multi searching
         self.__key_pair_or = []
         # pair for insert or update
-        self.__data_pair = val_pair()
+        self.__data_pair = ValPair()
 
 
 
@@ -183,7 +183,7 @@ class SqlUtil(object):
     def findIn(self, col, key_words,sign = "="):
         if type(col)== str and type(key_words)== list and type(sign)== str:
             # for this join searching
-            this_in = val_pair()
+            this_in = ValPair()
             for key in key_words:
                 # push all the pair for this join
                 this_in.push(col+ sign,key)

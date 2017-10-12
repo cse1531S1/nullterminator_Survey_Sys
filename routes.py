@@ -152,12 +152,16 @@ def view_survey(survey_id=None):
         # record the mandertory question
         q_force = []
 
-        if selected_Qid:
+        if selected_Qid and current_user.is_staff():
+            # in the staff, they only can choose not mendatory_q
             # filter out all the mandertory question
             q_force = q.find_q(q_id=selected_Qid, pool_id = None)
+            # change the q_force to  normal type(ids) == str
+            q_force = [str(this_q[0]) for this_q in q_force]
         # get all the selected question
         q_id = request.form.getlist("qid")
         # save the changes, by reconstruct the question list
+        print(q_id, q_force)
         s.update_survey(survey_id, q_id + q_force)
         if not q_id:
             error = ["Survey Create Error: Not Sufficient Question",\
