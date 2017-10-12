@@ -161,8 +161,9 @@ def view_survey(survey_id=None):
         # get all the selected question
         q_id = request.form.getlist("qid")
         # save the changes, by reconstruct the question list
-        print(q_id, q_force)
-        s.update_survey(survey_id, q_id + q_force)
+        # merge two ids into one array
+        q_id+= q_force
+        s.update_survey(survey_id, q_id)
         if not q_id:
             error = ["Survey Create Error: Not Sufficient Question",\
                     "Please select at least one question.",\
@@ -190,7 +191,6 @@ def view_survey(survey_id=None):
         q_force = []
         q_opt = []
 
-    print(q_force)
 
     if current_user.is_admin():
         # have the right to edit all the added question
@@ -285,10 +285,12 @@ def student(survey_id):
                 # get all the answer form student
                 # because the questoin_id in survey is start form 1
                 # so add 1 in i and find the answer
-                answerlist.append(request.form[str(qid)])
+                this_q = request.form[str(qid)]
+                if not this_q:
+                    error = "You must finish all the questions."
+                answerlist.append(this_q)
             except :
                 error = "You must finish all the questions."
-        print(answerlist)
         if not error:
             # push the recorded answers to database
             res.new_res(survey_id, current_user.get_id(), answerlist)

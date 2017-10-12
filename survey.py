@@ -87,6 +87,9 @@ class Survey(SqlUtil):
             # thie user dont enrolled to any courses
             return []
         survey_list =[]
+
+        # id to filte the survey_list
+        filter_arr =[]
         # status filter
         if this_user[2] == "staff":
             # only can reach the status echo to 1
@@ -94,10 +97,24 @@ class Survey(SqlUtil):
         elif this_user[2]== "student":
             # only can reach the status echo to 2 and 3
             self.findIn("status", ["2","3"], sign = "=")
+
+            # find the which survey this user has submitted
+
+            filter_arr =SqlUtil("respond").find("user_id",this_user[0]).all()
+            # get filter_arr only has id of submitted survey
+            filter_arr = [this[1] for this in filter_arr]
+
         # get the ongoning survey by course
         survey_list =self.findIn("course_id", [this[1] for this in this_courses]).all()
 
-        return survey_list
+        # filter the survey_list by whether it have finish the survey
+        final_survey_list = []
+        for s in survey_list:
+            if not s[0] in filter_arr:
+                # filter out all the submitted survey
+                final_survey_list.append(s)
+
+        return final_survey_list
 
     def is_premitted(self, survey_id, user_id):
         this_sur = self.id_filter(survey_id).test_exe().one()
