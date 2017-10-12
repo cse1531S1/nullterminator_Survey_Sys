@@ -97,7 +97,6 @@ class RespondText(SqlUtil):
         # return [question, [all the answers]]
         return return_list
 
-
     def delete_by_respond_id(self, respond_id):
         self.find("respond_id", respond_id).delete()
 

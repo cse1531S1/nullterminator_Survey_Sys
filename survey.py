@@ -74,7 +74,7 @@ class Survey(SqlUtil):
             # status filter
             if this_user[2] == "staff":
                 # only can reach the status echo to 1
-                self.findIn("status", ["1","2","3"], sign = "=")
+                self.findIn("status", ["1","3"], sign = "=")
             elif this_user[2]== "student":
                 # only can reach the status echo to 2 and 3
                 self.findIn("status", ["2","3"], sign = "=")
@@ -95,21 +95,26 @@ class Survey(SqlUtil):
             return True
         return False
 
-    def post(self,sid):
 
+    # status : 0 = just created, 1 = ask for review
+    # status : 2 = student access, close = student can access the data
+    def __change_status(self,sid, status):
         # post survey to related staff, stage = review
-        self.id_filter(sid).update("status",1).save()
+        self.id_filter(sid).update("status",status).save()
         return self
+
+    def post(self,sid):
+        # set the status to 1
+        return self.__change_status(sid, 1)
+
 
     def review(self, sid):
         # post survey to related student, stage = review
-        self.id_filter(sid).update("status",2).save()
-        return self
+        return self.__change_status(sid, 2)
 
     def close(self, sid):
-        # post survey to finished, stage = review
-        self.id_filter(sid).update("status",3).save()
-        return self
+        # post survey to finished, stage = closed
+        return self.__change_status(sid, 3)
 
 
     def delete_survey(self,sid):

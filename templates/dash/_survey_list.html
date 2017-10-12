@@ -31,6 +31,7 @@
                     {% endif%}
                     {% if current_user.is_admin() %}
                         <a href="{{url_for("delete_survey",survey_id= s[0])}}" class="btn btn-sm btn-outline-danger">Delete</a>
+                        <a href="{{url_for("close_survey",survey_id= s[0])}}" class="btn btn-sm btn-outline-danger">Close</a>
                     {%endif%}
 
                 </td>

@@ -16,6 +16,8 @@ def index():
 @app.route("/login", methods = ["GET", "POST"])
 #This isnt going to the login page first...
 def login():
+    # to record the error message
+    error = None
     if request.method == "POST":
         this_user = User(request.form.get("username",None))
 
@@ -24,9 +26,11 @@ def login():
 
             login_user(User(request.form.get("username",None)))
             return redirect(url_for("dashboard"))
+        else:
+            # print the pront
+            error = "Wrong username/password, please try again"
 
-
-    return render_template("login.html")
+    return render_template("login.html",msg_err = error)
 
 @app.route("/logout")
 @login_required
@@ -80,8 +84,13 @@ def survey_create(course_name=None,course_year=None):
     c = Course()
     q = Question()
 
+    # check whether this course has been already created a survey
+    this_course = s.get_survey(course_name, course_year)
+
     # the user try to create a survey
     if request.method == "POST":
+
+
         # get all the selected question
         q_id = request.form.getlist("qid")
 
@@ -107,9 +116,15 @@ def survey_create(course_name=None,course_year=None):
         # name is none when teacher try to create a course
         return render_template("select_course.html",\
                     course_l = c.get_course())
+    if this_course:
+        # couldn't Create mutiple survey
+        # return the error message for already have a survey for this_courses
+        return render_template("msg.html",title= "Too Much Survey",\
+                    msg_suc_l=["Survey Creation Error: Too Much Survey",\
+                    "Too much survey for course "+course_name+" "+ course_year+".",\
+                    url_for("dashboard"),"Back to Dashboard."])
     # else: admin already have select a course
     # the admin try to create a survey
-
     # find the question with different pool
     get_genQ = q.find_q(pool_id = "0")
     get_optQ = q.find_q(pool_id = "1")
@@ -193,9 +208,22 @@ def post_survey(survey_id ):
                 "You were successfully posted survey "+str(survey_id)+".",\
                 url_for("dashboard"),"Review More"])
 
+@app.route("/close/<int:survey_id>")
+@login_required
+def close_survey(survey_id):
+    # this controller only for admin to close a survey
+    if not current_user.is_admin():
+        # premission restriction
+        return redirect(url_for("premission_deny"))
+
+    s = Survey().close(survey_id)
+    # give a pront to show the successful message
+    return render_template("msg.html",title= "Successful Close a Survey",\
+                msg_suc_l=["Successful Close a Survey",\
+                "You were successfully Close survey "+str(survey_id)+".",\
+                url_for("dashboard"),"Back to Dashboard"])
 
 
-# @app.route("/student")
 @app.route("/student/<int:survey_id>", methods=["GET", "POST"])
 @login_required
 def student(survey_id):
