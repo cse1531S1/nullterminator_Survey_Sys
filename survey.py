@@ -107,14 +107,14 @@ class Survey(SqlUtil):
         # get the ongoning survey by course
         survey_list =self.findIn("course_id", [this[1] for this in this_courses]).all()
 
-        # filter the survey_list by whether it have finish the survey
-        final_survey_list = []
-        for s in survey_list:
-            if not s[0] in filter_arr:
-                # filter out all the submitted survey
-                final_survey_list.append(s)
+        # # filter the survey_list by whether it have finish the survey
+        # final_survey_list = []
+        # for s in survey_list:
+        #     if not s[0] in filter_arr:
+        #         # filter out all the submitted survey
+        #         final_survey_list.append(s)
 
-        return final_survey_list
+        return survey_list
 
     def is_premitted(self, survey_id, user_id):
         this_sur = self.id_filter(survey_id).test_exe().one()

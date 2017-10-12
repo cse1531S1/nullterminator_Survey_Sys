@@ -26,7 +26,7 @@ class Answer(SqlUtil):
             if type(answers) != list:
                 raise TypeError("Answers must be a list.")
             if len(answers) < 2:
-                raise TypeError("A question must have at lease 2 answers.")
+                raise TypeError("A question must have at least 2 answers.")
             if not type(q_id) in [str,int]:
                 raise TypeError("Code Error: q_id is not a str or int")
     def del_a(self, q_id):
@@ -66,7 +66,7 @@ class Question(SqlUtil):
         return_list = []
         if  not q_id:
             if not pool_id:
-                raise TypeError("pool_id must specify while getting all avaliable question")
+                raise TypeError("pool_id must be specified while getting all available question")
             if not type(pool_id) in [str, int] :
                 # couldn't handle else of these two type
                 raise TypeError("Code Error: pool_id must be int or str")
@@ -103,7 +103,7 @@ class Question(SqlUtil):
 
         else:
             # couldn't hand this type
-            raise TypeError("Question id must be a list or string or interger")
+            raise TypeError("Question id must be a list or string or integer")
 
     def add_q(self,question,pool_id, q_type,answers = None):
         # error handling
@@ -113,7 +113,7 @@ class Question(SqlUtil):
             if not type(pool_id) in [str,int]:
                 raise TypeError("Code Error: pool_id is not a str or int.")
             elif len(question)==0:
-                raise TypeError("Question must be specify.")
+                raise TypeError("Question must be specified.")
             elif type(question) != str:
                 raise TypeError("A question must be a string.")
             elif not q_type in ["MCQ","TEXT"]:
@@ -123,7 +123,7 @@ class Question(SqlUtil):
             if type(answers) != list:
                 raise TypeError("Answers must be a list.")
             if len(answers) < 2:
-                raise TypeError("A question must have at lease 2 answers.")
+                raise TypeError("A question must have at least 2 answers.")
         # valid question and answers
         self.insert(["question","pool_id","type"],[question,int(pool_id),q_type]).save()
         # get the q_id for the question just created
@@ -164,10 +164,10 @@ class Question(SqlUtil):
 
     def del_q(self, q_id,force=False):
         if not type(q_id) in [list, str, int]:
-            raise TypeError("Question should be deleted by Id of list of ids")
+            raise TypeError("Question should be deleted by id or list of ids")
 
         if not q_id:
-            raise TypeError("Delect question must be specify.")
+            raise TypeError("Must specify which question(s) to delete.")
 
         if type(q_id)  == list:
             for q in q_id:
@@ -180,7 +180,7 @@ class Question(SqlUtil):
 
             if this_q == None:
                 # this_q has already deleted
-                raise TypeError("The specify question is not exist in database.")
+                raise TypeError("The specified question does not exist in the database.")
             if (this_q[0] ==0) or force:
                 # delete the question by specify question id
                 self.find_by_id(q_id).delete()
