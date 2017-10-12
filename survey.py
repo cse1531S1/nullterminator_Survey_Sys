@@ -1,6 +1,8 @@
 from sql_uti import SqlUtil
 from server import app
 from enrolment import enrol_Data
+from user import UserData
+
 class Course(SqlUtil):
     """docstring for Course."""
     def __init__(self):
@@ -19,6 +21,7 @@ class Survey(SqlUtil):
         super().__init__("survey")
         self.__course = Course()
         self.__enrol = enrol_Data()
+        self.__user = UserData()
         # set up the join search columns
         self.clear()
 
@@ -58,18 +61,31 @@ class Survey(SqlUtil):
 
     def get_survey_by_user(self, user_id):
         this_courses =self.__enrol.findById(user_id)
+        # getting the class of the user
+        this_user = self.__user.findById(user_id)
+
+
         if not this_courses:
             # thie user dont enrolled to any courses
             return []
         survey_list =[]
         for course in this_courses:
+            # status filter
+            if this_user[2] == "staff":
+                # only can reach the status echo to 1
+                self.findIn("status", ["1","3"], sign = "=")
+            elif this_user[2]== "student":
+                # only can reach the status echo to 2 and 3
+                self.findIn("status", ["2","3"], sign = "=")
+            self.test_exe()
+
             # get the ongoning survey by course
             this_sur =self.get_survey(course[1],course[2])
             if this_sur:
                 # if it has survey, apppend in survey_list
                 survey_list += this_sur
-
-        print(survey_list)
+        for l in survey_list:
+            print(l)
         return survey_list
 
     def is_premitted(self, user_id, survey_id):
@@ -89,6 +105,11 @@ class Survey(SqlUtil):
     def review(self, sid):
         # post survey to related student, stage = review
         self.id_filter(sid).update("status",2).save()
+        return self
+
+    def close(self, sid):
+        # post survey to finished, stage = review
+        self.id_filter(sid).update("status",3).save()
         return self
 
 

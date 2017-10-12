@@ -42,8 +42,12 @@ class SqlUtil(object):
         self.__from = []
         # pair for searching ( where operation)
         self.__key_pair = val_pair()
+        # multi pair for multi searching
+        self.__key_pair_or = []
         # pair for insert or update
         self.__data_pair = val_pair()
+
+
 
         # join search for another table
         self.__join = []
@@ -59,14 +63,19 @@ class SqlUtil(object):
     def __where(self,join=True):
         # resolve the where sentense
         if self.__key_pair.get_key() or (self.__join_key and join):
-            join_array = []
+            # store the column that comtain some filter
+            search_arr = []
             # prevent the update with the joined table
             if self.__join_key and join:
-                join_array += self.__join_key
-            join_array +=[ key+"?" for key in self.__key_pair.get_key()]
+                search_arr += self.__join_key
+            search_arr +=[ key+"?" for key in self.__key_pair.get_key()]
+            for pair in self.__key_pair_or:
+                # special string for muti search
+                search_arr.append(" or ".join([key+"?" for key in pair.get_key()]))
 
-            return " WHERE "+" and "\
-                    .join(join_array)+" "
+
+
+            return " WHERE "+" and ".join(search_arr)+" "
         # if nothing to search, return nothing
         return ""
     def __sql(self):
@@ -118,6 +127,18 @@ class SqlUtil(object):
         sql +=";"
         return sql
 
+    def __values(self):
+        # return all the value by order
+        values = []
+        values += self.__data_pair.get_value()+self.__key_pair.get_value()
+
+        if not self.__operator in ["UPDATE","INSERT"]:
+            # the mutiple search only for select
+            for pair in self.__key_pair_or:
+                values+=pair.get_value()
+
+        return values
+
 
     def col_name(self, col, table_name = None):
         if not table_name:
@@ -159,7 +180,19 @@ class SqlUtil(object):
         else:
             raise TypeError("Code Error: couldn't handle this type of column value.")
         return self
-
+    def findIn(self, col, key_words,sign = "="):
+        if type(col)== str and type(key_words)== list and type(sign)== str:
+            # for this join searching
+            this_in = val_pair()
+            for key in key_words:
+                # push all the pair for this join
+                this_in.push(col+ sign,key)
+            # append this val_pair into a self list
+            self.__key_pair_or.append(this_in)
+        else:
+            # couldn't handle this type
+            raise TypeError("Code Error:The col is a string while the key_words must be a list;")
+        return self
     # insert part (low level function)
     def insert(self, key, values ):
         #  push the thing should be insert into data_pair
@@ -179,10 +212,8 @@ class SqlUtil(object):
         # for debug
         self.__print_exe()
 
-        return_list =self.__conn.execute(self.__sql(),\
-                                        self.__data_pair.get_value()\
-                                        +self.__key_pair.get_value())\
-                                        .fetchone()
+
+        return_list =self.__conn.execute(self.__sql(),self.__values()).fetchone()
         #  clear all the list have been used
         self.clear()
         # push the changes
@@ -195,9 +226,8 @@ class SqlUtil(object):
         self.__print_exe()
 
         # only fetch one instance from database
-        return_list =self.__conn.execute(self.__sql(),\
-                        self.__data_pair.get_value()\
-                        +self.__key_pair.get_value()).fetchone()
+        return_list =self.__conn.execute(self.__sql(),self.__values())\
+                        .fetchone()
         #  clear all the list have been used
         self.clear()
         if return_list:
@@ -213,10 +243,8 @@ class SqlUtil(object):
 
         # for debug
         self.__print_exe()
-
-        return_list = self.__conn.execute(self.__sql(),\
-                        self.__data_pair.get_value()\
-                        +self.__key_pair.get_value()).fetchall()
+        return_list = self.__conn.execute(self.__sql(),self.__values())\
+                        .fetchall()
         #  clear all the list have been used
         self.clear()
         # return the buffer
@@ -247,9 +275,7 @@ class SqlUtil(object):
         self.__print_exe()
 
         # execute the data operation
-        self.__conn.execute(self.__sql(),\
-                            self.__data_pair.get_value()\
-                            + self.__key_pair.get_value())
+        self.__conn.execute(self.__sql(),self.__values())
 
         # clear all the temp data
         self.clear()
@@ -269,6 +295,8 @@ class SqlUtil(object):
         self.__operator = "SELECT"
         self.__key_pair.clear()
         self.__data_pair.clear()
+        # Reset the muti criteria search
+        self.__key_pair_or = []
 
         return self
 
@@ -276,8 +304,7 @@ class SqlUtil(object):
         if self.__test:
             # print the essential information of exectuion for debug
             print(self.__sql())
-            print(self.__data_pair.get_value()\
-                    +self.__key_pair.get_value()+self.__sort_by)
+            print(self.__values())
             self.__test = False
     def test_exe(self):
         # debug function
