@@ -194,15 +194,6 @@ def post_survey(survey_id ):
 
 
 
-
-
-
-
-
-
-
-
-
 # @app.route("/student")
 @app.route("/student/<string:name>", methods=["GET", "POST"])
 @login_required

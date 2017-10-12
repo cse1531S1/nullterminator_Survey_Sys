@@ -1,0 +1,60 @@
+{% if msg_err or msg_err_l%}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {% if msg_err %}
+            {{msg_err |safe}}
+        {%endif%}
+        {%if msg_err_l%}
+            <h2>
+                {{msg_err_l[0]}}
+            </h2>
+            <p>{{msg_err_l[1]}}</p>
+            <hr>
+            <a href="{{msg_err_l[2]}}" class="alert-link">{{msg_err_l[3]}}</a>
+        {% endif%}
+    </div>
+{% endif%}
+{% if msg_suc or msg_suc_l %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {% if msg_suc%}
+            {{msg_suc |safe}}
+        {% endif%}
+        {% if msg_suc_l%}
+            <h2>
+                {{msg_suc_l[0]}}
+            </h2>
+            <p>{{msg_suc_l[1]}}</p>
+            <hr>
+            <a href="{{msg_suc_l[2]}}" class="alert-link">{{msg_suc_l[3]}}</a>
+        {% endif%}
+    </div>
+{% endif%}
+{% if msg_std or msg_std_l %}
+    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        {% if msg_std%}
+            {{msg_std |safe}}
+        {% endif%}
+        {% if msg_std_l%}
+            <h2>
+                {{msg_std_l[0]}}
+            </h2>
+            <p>{{msg_std_l[1]}}</p>
+            <hr>
+            <a href="{{msg_std_l[2]}}" class="alert-link">{{msg_std_l[3]}}</a>
+        {% endif%}
+    </div>
+{% endif%}
+
+
+ <!-- reset all the vars used by msg passing -->
+{% set msg_err = None %}
+{% set msg_suc = None %}
+{% set msg_std = None %}

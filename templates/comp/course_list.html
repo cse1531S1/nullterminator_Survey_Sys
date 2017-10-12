@@ -1,5 +1,5 @@
-<h3>Running Survey</h3>
-{%if survey_l %}
+<h3>Running Courses</h3>
+{%if course_l %}
     <table class="table table-hover">
         <thead class="thead-default">
             <tr>
@@ -9,21 +9,21 @@
                 <th>Actions</th>
             </tr>
         </thead>
-        {%for s in survey_l%}
+        {%for c in course_l%}
             <tr>
-
-                <td>0</td>
-                <td>{{s}}</td>
-                <td>{{s}}</td>
+                <td>{{c[0]}}</td>
+                <td>{{c[1]}}</td>
+                <td>{{c[2]}}</td>
                 <td>
-                    <a href="{{url_for('index')}}" class="btn btn-sm btn-primary">Edit</a>
-                    <a href="{{url_for('index')}}" class="btn  btn-outline-danger btn-sm">Delete</a>
+                    <a href="{{url_for("survey_create",course_name= c[1],course_year=c[2])}}" class="btn btn-sm btn-outline-success">Create Survey</a>
+
                 </td>
+
             </tr>
         {%endfor%}
     </table>
 
 
 {%else%}
-    <p>Current have not running survey</p>
+    <p>Current have not running course</p>
 {%endif%}
