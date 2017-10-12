@@ -71,7 +71,6 @@ create table respond(
     user_id INTEGER NOT NULL,
     FOREIGN KEY (survey_id) REFERENCES survey(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
-
 );
 
 create table respond_mcq(

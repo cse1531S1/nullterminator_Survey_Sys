@@ -72,8 +72,8 @@ def dashboard():
 def survey_create(course_name=None,course_year=None):
 
     if not current_user.is_admin():
-        # premission deny
-        return redirect(url_for("premission_deny"))
+        # permission deny
+        return redirect(url_for("permission_deny"))
 
 
     # variable to store the error message
@@ -137,23 +137,43 @@ def survey_create(course_name=None,course_year=None):
 # view survey in this controller
 @app.route("/survey_view/<int:survey_id>",methods=["GET","POST"])
 @login_required
-def view_survey(survey_id=None,course_name=None,course_year=None):
+def view_survey(survey_id=None):
     if current_user.is_student():
-        return redirect(url_for("premission_deny"))
+        return redirect(url_for("permission_deny"))
 
 
     q = Question()
     s = Survey()
+
+
+    if request.method == "POST":
+        # request for changing
+        # get all the selected question
+        q_id = request.form.getlist("qid")
+        # save the changes
+        s.update_survey(survey_id, q_id)
+
+        if request.form["submit_type"] == "save":
+            #  do nothing
+            pass
+        elif request.form["submit_type"] == "post":
+            #  post to next stage
+            return redirect(url_for("post_survey",survey_id = survey_id))
     # find the specify survey by id
     this_survey = s.find("survey.id", survey_id).one()
-
     # find the selected question
     # change the type to match the filter
-    selected_Qid = [int(qid) for qid in this_survey[3].split("&&")]
+    selected_Qid = s.get_qids(survey_id)
 
-    # filter the selected question
-    q_force = q.find_q(q_id = selected_Qid,pool_id = "0")
-    q_opt = q.find_q(q_id = selected_Qid,pool_id = "1")
+    if not selected_Qid:
+        # filter the selected question
+        q_force = q.find_q(q_id = selected_Qid,pool_id = "0")
+        q_opt = q.find_q(q_id = selected_Qid,pool_id = "1")
+    else:
+        # overwrite the qfind muti reaction
+        q_force = []
+        q_opt = []
+
 
     if current_user.is_admin():
         # have the right to edit all the added question
@@ -177,7 +197,7 @@ def view_survey(survey_id=None,course_name=None,course_year=None):
 def delete_survey(survey_id=None):
     # error handling
     if not current_user.is_admin:
-        return redirect(url_for("premission_deny"))
+        return redirect(url_for("permission_deny"))
     s = Survey()
     s.delete_survey(survey_id)
     return redirect(url_for('dashboard'))
@@ -188,7 +208,7 @@ def delete_survey(survey_id=None):
 @login_required
 def post_survey(survey_id ):
     if current_user.is_student():
-        return redirect(url_for("premission_deny"))
+        return redirect(url_for("permission_deny"))
 
     s = Survey()
     if current_user.is_admin():
@@ -201,7 +221,7 @@ def post_survey(survey_id ):
             s.review(survey_id)
         else:
             # the staff have no right to change the code
-            return redirect(url_for("premission_deny"))
+            return redirect(url_for("permission_deny"))
     # give a pront to show the successful message
     return render_template("msg.html",title= "Successful Post a Survey",\
                 msg_suc_l=["Successful Post a Survey",\
@@ -213,8 +233,8 @@ def post_survey(survey_id ):
 def close_survey(survey_id):
     # this controller only for admin to close a survey
     if not current_user.is_admin():
-        # premission restriction
-        return redirect(url_for("premission_deny"))
+        # permission restriction
+        return redirect(url_for("permission_deny"))
 
     s = Survey().close(survey_id)
     # give a pront to show the successful message
@@ -266,7 +286,7 @@ def student(survey_id):
 @login_required
 def add_question():
     if current_user.is_student():
-        return redirect(url_for("premission_deny"))
+        return redirect(url_for("permission_deny"))
 
     error = ""
     # else: the admin has logged_in
@@ -298,7 +318,7 @@ def add_question():
 @login_required
 def del_question():
     if not current_user.is_admin():
-        return redirect(url_for("premission_deny"))
+        return redirect(url_for("permission_deny"))
     # instance of quest_tree
     quest = Question()
     error = None
@@ -339,8 +359,8 @@ def show_results(survey_id = None):
 
     return render_template("results.html",results=res.get_results(survey_id))
 
-# page for not premission
-@app.route("/premission")
-def premission_deny():
+# page for not permission
+@app.route("/permission")
+def permission_deny():
 
-    return render_template("premission.html")
+    return render_template("permission.html")

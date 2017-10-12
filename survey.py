@@ -59,6 +59,23 @@ class Survey(SqlUtil):
         this_sur = self.find(["survey.course_id"],[this_course[0]]).test_exe().all()
         return this_sur
 
+    # for update the information of a survey
+    def update_survey(self, survey_id, Q_id, start_time = None, end_time = None):
+        # get the survey by id
+        self.id_filter(survey_id)
+
+        # generate a new list of question id, and update that
+        self.update("Q_id","&&".join(Q_id))
+
+        # if it has satrt time, and end_time update that
+        if start_time:
+            self.update("start_time", start_time)
+        if end_time:
+            self.update("end_time", end_time)
+
+        # push the changes to database
+        return self.save()
+
     def get_survey_by_user(self, user_id):
         this_courses =self.__enrol.findById(user_id)
         # getting the class of the user
@@ -127,8 +144,14 @@ class Survey(SqlUtil):
 
     def get_qids(self, sid):
         # getting back an array of question id
-        return self.id_filter(sid).one()[3].split("&&")
-
+        qids = self.id_filter(sid).one()[3]
+        if qids:
+            # prevent the error caused by qids is empty string
+            qids = qids.split("&&")
+            qids = [int(this_id) for this_id in qids]
+        else:
+            qids  =[]
+        return qids
 
 if __name__ == '__main__':
     course = Course()
