@@ -1,11 +1,11 @@
 create table enrolments (
     user_id int NOT NULL,
-    course_code char(8) NOT NULL,
-    course_year char(4) NOT NULL,
+    course_id int NOT NULL,
     -- unique(user_id,course_code,course_year)
 
     -- set up a foreign key
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (course_id) REFERENCES course(id)
 );
 
 create table users (
@@ -60,5 +60,34 @@ create table survey(
     end_time DATETIME NOT NULL,
     status INTEGER NOT NULL default 0,
     FOREIGN KEY (course_id) REFERENCES course(id)
+
+);
+
+
+create table respond(
+    id INTEGER PRIMARY KEY,
+    survey_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    FOREIGN KEY (survey_id) REFERENCES survey(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+
+);
+
+create table respond_mcq(
+    id INTEGER PRIMARY KEY,
+    respond_id INTEGER NOT NULL,
+    question_id INTEGER NOT NULL,
+    answer varchar(10) NOT NULL,
+    FOREIGN KEY (respond_id) REFERENCES respond(id),
+    FOREIGN KEY (question_id) REFERENCES question(id)
+);
+
+create table respond_text(
+    id INTEGER PRIMARY KEY,
+    respond_id INTEGER NOT NULL,
+    question_id INTEGER NOT NULL,
+    answer varchar(255) NOT NULL,
+    FOREIGN KEY (respond_id) REFERENCES respond(id),
+    FOREIGN KEY (question_id) REFERENCES question(id)
 
 );
