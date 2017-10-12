@@ -155,7 +155,7 @@ def view_survey(survey_id=None):
         if selected_Qid and current_user.is_staff():
             # in the staff, they only can choose not mendatory_q
             # filter out all the mandertory question
-            q_force = q.find_q(q_id=selected_Qid, pool_id = None)
+            q_force = q.find_q(q_id=selected_Qid, pool_id = "0")
             # change the q_force to  normal type(ids) == str
             q_force = [str(this_q[0]) for this_q in q_force]
         # get all the selected question
