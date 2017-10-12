@@ -77,7 +77,7 @@ class Survey(SqlUtil):
         return self.save()
 
     def get_survey_by_user(self, user_id):
-        this_courses =self.__enrol.findById(user_id)
+        this_courses =self.__enrol.clear(True,True).findById(user_id)
         # getting the class of the user
         this_user = self.__user.findById(user_id)
 
@@ -87,21 +87,16 @@ class Survey(SqlUtil):
             # thie user dont enrolled to any courses
             return []
         survey_list =[]
-        for course in this_courses:
-            # status filter
-            if this_user[2] == "staff":
-                # only can reach the status echo to 1
-                self.findIn("status", ["1","3"], sign = "=")
-            elif this_user[2]== "student":
-                # only can reach the status echo to 2 and 3
-                self.findIn("status", ["2","3"], sign = "=")
-            # get the ongoning survey by course
-            this_sur =self.get_survey(course[1],course[2])
-            if this_sur:
-                # if it has survey, apppend in survey_list
-                survey_list += this_sur
-        # for l in survey_list:
-        #     print(l)
+        # status filter
+        if this_user[2] == "staff":
+            # only can reach the status echo to 1
+            self.findIn("status", ["1","3"], sign = "=")
+        elif this_user[2]== "student":
+            # only can reach the status echo to 2 and 3
+            self.findIn("status", ["2","3"], sign = "=")
+        # get the ongoning survey by course
+        survey_list =self.findIn("course_id", [this[1] for this in this_courses]).all()
+
         return survey_list
 
     def is_premitted(self, survey_id, user_id):
@@ -138,6 +133,7 @@ class Survey(SqlUtil):
         if type(sid)!= int:
             raise TypeError("input id must be int")
         self.id_filter(sid).delete()
+        return self
 
     def id_filter(self, sid):
         return self.find("survey.id",sid)

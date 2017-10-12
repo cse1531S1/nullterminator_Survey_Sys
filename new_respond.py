@@ -163,6 +163,11 @@ class Respond(SqlUtil):
                 result_l.append( self.__text.count_respond(survey_id,this_q[index]))
 
         return result_l
+    def is_submitted(self, survey_id, uid):
+        # check whether the user have submitted this survey
+        if self.find(["survey_id","user_id"],[survey_id,uid]).one():
+            return True
+        return False
 
 if __name__ == '__main__':
     # unitests

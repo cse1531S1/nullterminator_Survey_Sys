@@ -16,7 +16,7 @@ class enrol_Data(SqlUtil):
             self.col_name("user_id")
             # show the column in the course table
             self.col_name(["course_code","course_year"], table_name ="course")
-
+        return self
     def findById(self, uid):
         if not type(uid) in [int,str]:
             raise TypeError("ID for a user muset be a interger")

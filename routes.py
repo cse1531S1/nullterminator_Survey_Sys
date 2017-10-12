@@ -101,7 +101,7 @@ def survey_create(course_name=None,course_year=None):
             and request.form.get("e0") and request.form.get("e1")):
             # no specify survey time error
             error = "Please specify time for this survey"
-        else:
+        if not error:
             # not error
             start_time =request.form.get("s0")+" "+request.form.get("s1")
             end_time = request.form.get("e0")+" "+request.form.get("e1")
@@ -144,19 +144,31 @@ def view_survey(survey_id=None):
 
     q = Question()
     s = Survey()
-
+    error = None
 
     if request.method == "POST":
         # request for changing
+        selected_Qid = s.get_qids(survey_id)
+        # record the mandertory question
+        q_force = []
+
+        if selected_Qid:
+            # filter out all the mandertory question
+            q_force = q.find_q(q_id=selected_Qid, pool_id = None)
         # get all the selected question
         q_id = request.form.getlist("qid")
-        # save the changes
-        s.update_survey(survey_id, q_id)
+        # save the changes, by reconstruct the question list
+        s.update_survey(survey_id, q_id + q_force)
+        if not q_id:
+            error = ["Survey Create Error: Not Sufficient Question",\
+                    "Please select at least one question.",\
+                    url_for("view_survey",survey_id= survey_id),\
+                    "Continue Review This Survey"]
 
-        if request.form["submit_type"] == "save":
+        if not error and request.form["submit_type"] == "save":
             #  do nothing
             pass
-        elif request.form["submit_type"] == "post":
+        elif not error and request.form["submit_type"] == "post":
             #  post to next stage
             return redirect(url_for("post_survey",survey_id = survey_id))
     # find the specify survey by id
@@ -165,7 +177,7 @@ def view_survey(survey_id=None):
     # change the type to match the filter
     selected_Qid = s.get_qids(survey_id)
 
-    if not selected_Qid:
+    if selected_Qid:
         # filter the selected question
         q_force = q.find_q(q_id = selected_Qid,pool_id = "0")
         q_opt = q.find_q(q_id = selected_Qid,pool_id = "1")
@@ -174,20 +186,23 @@ def view_survey(survey_id=None):
         q_force = []
         q_opt = []
 
+    print(q_force)
 
     if current_user.is_admin():
         # have the right to edit all the added question
         return render_template("final_survey.html", course_name=this_survey[1],\
                     course_year = this_survey[2],\
                     mendatory_q = q.find_q(pool_id = "0"),list_type = ["check","check"],\
-                    optional_q = q.find_q(pool_id = "1"),select_q = selected_Qid,survey_id = survey_id)
+                    optional_q = q.find_q(pool_id = "1"),select_q = selected_Qid,\
+                    survey_id = survey_id,msg_err_l = error)
     elif current_user.is_staff():
         # only have the right to review the question
         # find the course that has recorded in the survey
         return render_template("final_survey.html", course_name=this_survey[1],\
                     course_year = this_survey[2],\
                     mendatory_q = q_force,list_type = ["num","check"],\
-                    optional_q = q.find_q(pool_id= "1"),select_q = selected_Qid,survey_id = survey_id)
+                    optional_q = q.find_q(pool_id= "1"),select_q = selected_Qid,\
+                    survey_id = survey_id,msg_err_l = error)
 
 
 # delect survey in this controller
@@ -251,6 +266,10 @@ def student(survey_id):
     s = Survey()
     res = Respond()
     error = None
+
+    if res.is_submitted(survey_id, current_user.get_id()) or \
+    not current_user.is_student():
+        return redirect(url_for("permission_deny"))
 
     # get the basic information for this survey_id
     this_survey = s.id_filter(survey_id).one()
