@@ -1,5 +1,5 @@
 from sql_uti import SqlUtil
-
+from flask_login import UserMixin
 
 class UserData(SqlUtil):
     """docstring for user."""
@@ -37,7 +37,7 @@ class UserData(SqlUtil):
         self.find("id",int(uid)).delete()
 
 
-class User(object):
+class User(UserMixin):
     """docstring for User."""
     def __init__(self, user_id):
         super(User, self).__init__()

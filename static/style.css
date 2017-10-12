@@ -6,7 +6,9 @@
 .nav-clear{
     height: 56px;
 }
-
+.nav-clear-footer{
+    height: 84px;
+}
 .footer{
     position: fixed;
     bottom: 0;

@@ -1,0 +1,7 @@
+{%extends "base.html"%}
+{%block title%}Not Permission{%endblock%}
+{% block body %}
+
+    {% set msg_err_l = ["Permission Deny","You have no permission for this page.",url_for("dashboard"),"Back to Dashboard"]%}
+    {% include 'comp/msg.html'%}
+{% endblock %}

@@ -1,0 +1,42 @@
+{%extends "base.html"%}
+{%block title %} Create: {{course_name}} {{course_year}} Survey{%endblock%}
+{%block header%}
+    <h1>Create: {{course_name}} {{course_year}} Survey</h1>
+{%endblock%}
+{%block body%}
+    <form class="" action="{{url_for("survey_create",course_name= course_name, course_year = course_year)}}" method="POST">
+        {% set list_type = ["check","check"]%}
+        {% include "comp/q_list.html"%}
+        <div class="form-group">
+            <label>
+                Start Time:
+            </label>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <input class ="form-control" type="text"  name="s0" placeholder="YYYY-MM-DD">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <input class="form-control" type="text"  name="s1" placeholder="HH:MM:SS">
+                </div>
+
+            </div>
+
+        </div>
+        <div class="form-group">
+            <label>
+                End Time:
+            </label>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <input class ="form-control" type="text"  name="e0" placeholder="YYYY-MM-DD">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <input class="form-control" type="text"  name="e1" placeholder="HH:MM:SS">
+                </div>
+
+            </div>
+        </div>
+        <button type="submit" class="btn btn-outline-success" name="button" >Create Survey!</button>
+    </From>
+
+{%endblock%}

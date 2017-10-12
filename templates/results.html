@@ -2,14 +2,15 @@
 {% block title %}Show Results{% endblock%}
 {%block header%}<h1>Results</h1> {% endblock %}
 {% block body%}
+
+    {% set q_count = 1%}
     {% for res in results %}
         <h4>
-            Q{{res[0]}}. {{res[1]}}
+            Q{{q_count}}. {{res[0]}}
         </h4>
-        {%for ans in res[2:]%}
+        {%for ans in res[1:]%}
         {{ans[1]}} {{ans[0]}} <br>
         {%endfor%}
-
-
+        {% set q_count = q_count + 1%}
     {% endfor %}
 {%endblock%}
