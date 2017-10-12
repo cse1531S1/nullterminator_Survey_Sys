@@ -130,16 +130,28 @@ def view_survey(survey_id=None,course_name=None,course_year=None):
     s = Survey()
     # find the specify survey by id
     this_survey = s.find("survey.id", survey_id).one()
+
     # find the selected question
-    selected_Qid = this_survey[3].split("&&")
-    print(this_survey)
+    # change the type to match the filter
+    selected_Qid = [int(qid) for qid in this_survey[3].split("&&")]
+
+    # filter the selected question
     q_force = q.find_q(q_id = selected_Qid,pool_id = "0")
     q_opt = q.find_q(q_id = selected_Qid,pool_id = "1")
-    # find the course that has recorded in the survey
-    return render_template("final_survey.html", course_name=this_survey[1],\
-                course_year = this_survey[2],\
-                mendatory_q = q_force,\
-                optional_q = q_opt,survey_id = survey_id)
+
+    if current_user.is_admin():
+        # have the right to edit all the added question
+        return render_template("final_survey.html", course_name=this_survey[1],\
+                    course_year = this_survey[2],\
+                    mendatory_q = q.find_q(pool_id = "0"),list_type = ["check","check"],\
+                    optional_q = q.find_q(pool_id = "1"),select_q = selected_Qid,survey_id = survey_id)
+    elif current_user.is_staff():
+        # only have the right to review the question
+        # find the course that has recorded in the survey
+        return render_template("final_survey.html", course_name=this_survey[1],\
+                    course_year = this_survey[2],\
+                    mendatory_q = q_force,list_type = ["num","check"],\
+                    optional_q = q.find_q(pool_id= "1"),select_q = selected_Qid,survey_id = survey_id)
 
 
 # delect survey in this controller
@@ -168,13 +180,17 @@ def post_survey(survey_id ):
         s.post(survey_id)
     elif current_user.is_staff():
         # staff try to post this survey to student
-        if s.is_premitted(survey_id, current_user.id):
+        if s.is_premitted(survey_id, current_user.get_id()):
             # the staff is in that course
             s.review(survey_id)
         else:
             # the staff have no right to change the code
             return redirect(url_for("premission_deny"))
-    return redirect(url_for("dashboard"))
+    # give a pront to show the successful message
+    return render_template("msg.html",title= "Successful Post a Survey",\
+                msg_suc_l=["Successful Post a Survey",\
+                "You were successfully posted survey "+str(survey_id)+".",\
+                url_for("dashboard"),"Review More"])
 
 
 

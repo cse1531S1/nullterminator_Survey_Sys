@@ -1,7 +1,15 @@
 {%extends "base.html"%}
 {%block title %} {{course_name}} {{course_year}} Survey{%endblock%}
 {%block header%}
-    <h1>{{course_name}} {{course_year}} Survey <span class="badge badge-success">Preview</span></h1>
+    <h1>{{course_name}} {{course_year}} Survey
+
+        {%- if current_user.is_admin() -%}
+            <span class="badge badge-success">Preview</span>
+        {% elif current_user.is_staff()%}
+            <span class="badge badge-success">Review</span>
+        {%- endif -%}
+
+    </h1>
 {%endblock%}
 {%block body%}
     {% if not list_type %}

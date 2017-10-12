@@ -77,7 +77,6 @@ class Survey(SqlUtil):
             elif this_user[2]== "student":
                 # only can reach the status echo to 2 and 3
                 self.findIn("status", ["2","3"], sign = "=")
-            self.test_exe()
 
             # get the ongoning survey by course
             this_sur =self.get_survey(course[1],course[2])
@@ -88,10 +87,10 @@ class Survey(SqlUtil):
             print(l)
         return survey_list
 
-    def is_premitted(self, user_id, survey_id):
-        this_sur = self.id_filter(survey_id)
+    def is_premitted(self, survey_id, user_id):
+        this_sur = self.id_filter(survey_id).test_exe().one()
         his_enrol = self.__enrol.find(["user_id","course_code","course_year"]\
-                        ,user_id,this_sur[1],this_sur[2]).one()
+                        ,[user_id,this_sur[1],this_sur[2]]).one()
         if his_enrol:
             return True
         return False
