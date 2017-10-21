@@ -8,9 +8,17 @@
         <h4>
             Q{{q_count}}. {{res[0]}}
         </h4>
-        {%for ans in res[1:]%}
-        {{ans[1]}} {{ans[0]}} <br>
-        {%endfor%}
+        {% if res[1]=="MCQ" %}
+            {%for ans in res[2:]%}
+                {{ans[1]}} {{ans[0]}} <br>
+            {%endfor%}
+        {% else %}
+            {%set ans_count = 1%}
+            {% for ans in res[2:]%}
+                {{ans_count}}. {{ans[0]}}
+                {% set ans_count = ans_count +1 %}
+            {% endfor%}
+        {%endif%}
         {% set q_count = q_count + 1%}
     {% endfor %}
 {%endblock%}

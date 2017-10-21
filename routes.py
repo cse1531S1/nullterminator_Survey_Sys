@@ -2,7 +2,7 @@ from flask import Flask, redirect, render_template, request, url_for,session
 from flask_login import LoginManager,login_user, current_user, login_required, logout_user
 from server import app
 from survey import *
-from new_respond import Respond
+from respond import Respond
 # from respond import respondent
 from user import User
 # import the new question
