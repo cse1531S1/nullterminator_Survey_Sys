@@ -71,7 +71,18 @@ class EnrolRequest(SqlUtil):
             raise TypeError("The enrol request is not exist")
         # enrol that course for that user
         enrol_Data().enrol(request[1], request[2])
+        # delete the record for require
+        self.id_filter(require_id).delete()
+        # if not andy error, would return True
         return True
+    def deny_request(self, require_id):
+        # try to find according enrol request
+        request = self.id_filter(require_id).one()
+        if not request:
+            # couln't handle this premit
+            raise TypeError("The enrol request is not exist")
+        return self.id_filter(require_id).delete()
+
     def enrol_user(self, uid, course_id):
         if enrol_Data().find(["user_id","course_id"],[uid,course_id]).all():
             raise TypeError("This course has been enrolled by yourself.")
@@ -129,9 +140,11 @@ class Admin(User):
     def deny_register(self, uid):
         self.__usr.id_filter(uid).delete()
     def premit_enrol(self, require_id):
-        pass
+        # call the function in EnrolRequest to do the enrolments
+        EnrolRequest().permit_register(require_id)
     def deny_enrol(self, require_id):
-        pass
+        # call the function in EnrolRequest to do this
+        EnrolRequest().deny_request(require_id)
 
 class Student(User):
     """docstring for Student."""

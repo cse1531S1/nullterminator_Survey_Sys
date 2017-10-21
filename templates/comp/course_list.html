@@ -16,13 +16,10 @@
                 <td>{{c[2]}}</td>
                 <td>
                     <a href="{{url_for("survey_create",course_name= c[1],course_year=c[2])}}" class="btn btn-sm btn-outline-success">Create Survey</a>
-
                 </td>
-
             </tr>
         {%endfor%}
     </table>
-
 
 {%else%}
     <p>Current have not running course</p>

@@ -58,8 +58,31 @@ def register():
     # Render pront for register
     return render_template("register.html",msg_err = error)
 
+@app.route("/reqest_approve/<int:require_id>")
+def request_approve(require_id):
+    # admin approve enrol request
+    if not current_user.is_admin:
+        return redirect(url_for('permission_deny'))
+    # use the admin privilage to approve a request
+    current_user.request_approve()
 
+    return render_template("msg.html",msg_suc_l=[
+            "Approve Request","Approve request for enrolment "+str(require_id),
+            url_for('dashboard'),'Back to Dashboard'
+            ])
 
+@app.route('/request_deny/<int:require_id>')
+def request_deny(require_id):
+    # admin approve enrol request
+    if not current_user.is_admin:
+        return redirect(url_for('permission_deny'))
+    # use the admin privilage to deny a enrol requested
+    current_user.deny_enrol()
+
+    return render_template("msg.html",msg_suc_l=[
+            "Denied Request","Deny the request for enrolment "+str(require_id),
+            url_for('dashboard'),'Back to Dashboard'
+            ])
 
 @app.route("/dash")
 @app.route("/dashboard")
@@ -164,7 +187,6 @@ def survey_create(course_name=None,course_year=None):
 def view_survey(survey_id=None):
     if current_user.is_student():
         return redirect(url_for("permission_deny"))
-
 
     q = Question()
     s = Survey()
