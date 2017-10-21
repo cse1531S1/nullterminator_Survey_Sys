@@ -1,4 +1,5 @@
 from sql_uti import SqlUtil
+import unittest
 from server import app
 from enrolment import enrol_Data
 from user import UserData
@@ -165,6 +166,19 @@ class Survey(SqlUtil):
         else:
             qids  =[]
         return qids
+
+
+
+
+
+class TestSurvey(unittest.TestCase):
+
+    def setUp(self):
+        self.survey = Survey()
+
+    def test_insert_empty_questions(self):
+        with self.assertRaises(TypeError):
+            self.survey.create_survey('0')
 
 if __name__ == '__main__':
     course = Course()
