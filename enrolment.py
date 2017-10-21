@@ -22,7 +22,8 @@ class enrol_Data(SqlUtil):
             raise TypeError("ID for a user muset be a interger")
         # simple case of mapping a function to dynamic execute SQL
         return self.find("user_id",int(uid)).all()
-
+    def enrol(self, uid, course_id):
+        return self.insert(['user_id','course_id'], [uid,course_id]).save()
 
 if __name__ == '__main__':
    enrol = enrol_Data()

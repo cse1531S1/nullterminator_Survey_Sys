@@ -4,7 +4,7 @@ from server import app
 from survey import *
 from respond import Respond
 # from respond import respondent
-from user import User
+from user import User,UserData
 # import the new question
 from question import Question
 from enrolment import enrol_Data
@@ -37,6 +37,28 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for("login"), code=302, Response=None)
+
+@app.route("/register",methods=["POST","GET"])
+def register():
+    error =None
+    if request.method == "POST":
+        if request.form['pw']== request.form['re_pw']:
+            try:
+                UserData().register(request.form['id'], request.form['pw'])
+                return render_template("msg.html",msg_suc_l=[
+                    'Successful Register',"Wait for admin to approve your request.",
+                    url_for('index'),"Return to Home Page"
+                ])
+            except Exception as e:
+                # extract the mesage of error
+                error = format(e)
+        else:
+            error = "Password provided is not same."
+
+    # Render pront for register
+    return render_template("register.html",msg_err = error)
+
+
 
 
 @app.route("/dash")
@@ -371,9 +393,6 @@ def del_question():
 @app.route("/results/<int:survey_id>",methods=["GET","POST"])
 @login_required
 def show_results(survey_id = None):
-
-
-
     if not survey_id:
         # not seeing the results
         return redirect("dash")
@@ -381,11 +400,9 @@ def show_results(survey_id = None):
     # instance for getting results
     res = Respond()
 
-
     return render_template("results.html",results=res.get_results(survey_id))
 
 # page for not permission
 @app.route("/permission")
 def permission_deny():
-
     return render_template("permission.html")

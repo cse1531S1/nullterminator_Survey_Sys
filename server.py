@@ -2,7 +2,7 @@ import os
 from flask import Flask,g
 import sqlite3
 from flask_login import LoginManager
-from user import User
+from user import UserData,Staff,Admin,Student,Guest
 
 
 app = Flask(__name__)
@@ -20,4 +20,14 @@ login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(userid):
-    return User(userid)
+    usr = UserData()
+    role = usr.findById(userid)[2]
+    # initialise the class by the role
+    if role == 'admin':
+        return Admin(userid)
+    elif role == 'student':
+        return Student(userid)
+    elif role in ["guest","unguest"] :
+        return Guest(userid)
+    elif role == 'staff':
+        return Staff(userid)

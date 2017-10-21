@@ -89,5 +89,10 @@ create table respond_text(
     answer varchar(255) NOT NULL,
     FOREIGN KEY (respond_id) REFERENCES respond(id),
     FOREIGN KEY (question_id) REFERENCES question(id)
+);
 
+create table enrol_request(
+    id INTEGER PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    course_id INTEGER NOT NULL
 );
