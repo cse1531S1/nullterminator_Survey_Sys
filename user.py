@@ -72,6 +72,13 @@ class EnrolRequest(SqlUtil):
         # enrol that course for that user
         enrol_Data().enrol(request[1], request[2])
         return True
+    def enrol_user(self, uid, course_id):
+        if enrol_Data().find(["user_id","course_id"],[uid,course_id]).all():
+            raise TypeError("This course has been enrolled by yourself.")
+        if self.find(["user_id","course_id"],[uid,course_id]).all():
+            raise TypeError("This course have been requested by yourself.")
+        # Success insert this request
+        self.insert(["user_id","course_id"], [uid,course_id]).save()
 
 
 class User(UserMixin):
@@ -135,6 +142,8 @@ class Guest(User):
     """docstring for Guest."""
     def is_guest(self):
         return True
+    def enrol(self,course_id):
+        EnrolRequest().enrol_user(self.uid, course_id)
 
 if __name__ == '__main__':
 

@@ -71,7 +71,6 @@ def dashboard():
     # get the survey instance
     s = Survey()
 
-
     # muti type of user respond
     if current_user.is_student():
         return render_template('dash/student.html',\
@@ -83,7 +82,10 @@ def dashboard():
         # get all the ongoning survey and all the courses
         return render_template('dash/admin.html',survey_l = s.get_survey(),\
                 course_l= c.get_course())
-
+    if current_user.is_guest():
+        return render_template('dash/guest.html',\
+                    survey_l = s.get_survey_by_user(current_user.uid),\
+                    course_l= c.get_course())
 
 
 
@@ -401,6 +403,30 @@ def show_results(survey_id = None):
     res = Respond()
 
     return render_template("results.html",results=res.get_results(survey_id))
+
+@app.route('/enrol/<int:course_id>')
+@login_required
+def enrol(course_id):
+    # enrol for guest
+    if not current_user.is_guest():
+        return redirect(url_for('permission_deny'))
+    # record the error message
+    error = None
+    # sent this request to system
+    try:
+        current_user.enrol(course_id)
+        # successful add this message
+    except Exception as e:
+        # not place to pront the error...
+        error = format(e)
+    if error:
+        return render_template("msg.html",msg_err_l = [
+            'Error:',error,url_for("dashboard"),'Return to Dashboard'])
+    else:
+        return render_template("msg.html",msg_suc_l=[
+            "Successful Request","Your enrol has been sent to admin.",\
+            url_for('dashboard'),"Return to Dashboard"
+            ])
 
 # page for not permission
 @app.route("/permission")
