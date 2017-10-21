@@ -5,15 +5,48 @@
 
     {% set q_count = 1%}
     {% for res in results %}
+        {%set ans_count = 1%}
+
         <h4>
             Q{{q_count}}. {{res[0]}}
         </h4>
         {% if res[1]=="MCQ" %}
-            {%for ans in res[2:]%}
-                {{ans[1]}} {{ans[0]}} <br>
-            {%endfor%}
+            <div style="width:50%">
+                <canvas id="chart{{q_count}}" width="300" height="300">
+            </div>
+            </canvas>
+            <script type="text/javascript">
+            var data = {
+            datasets: [{
+                data: [
+                    {%for ans in res[2:]%}
+                        {{ans[1]}},
+                    {%endfor%}
+
+                ],
+                backgroundColor: [
+                    {%for ans in res[2:]%}
+                        Samples.utils.color({{ans_count}}),
+                        {%set ans_count = ans_count + 1%}
+                    {%endfor%}
+                ],
+            }],
+
+            // These labels appear in the legend and in the tooltips when hovering different arcs
+            labels: [
+                {%for ans in res[2:]%}
+                    '{{ans[0]}}',
+                {%endfor%}
+            ]
+            };
+            var myPieChart = new Chart(document.getElementById("chart{{q_count}}"),{
+            type: 'pie',
+            data: data,
+            });
+            </script>
+
+
         {% else %}
-            {%set ans_count = 1%}
             {% for ans in res[2:]%}
                 {{ans_count}}. {{ans[0]}}
                 {% set ans_count = ans_count +1 %}
