@@ -38,7 +38,6 @@ class Survey(SqlUtil):
     def create_survey(self,course_code,course_year,Q_id,start_time,end_time):
         # getthing this course's id
         this_course = self.__course.get_course(course_code,course_year)
-        print(this_course)
         self.insert("course_id",this_course[0])\
                         .insert("Q_id","&&".join(Q_id))\
                         .insert("start_time",start_time)\
