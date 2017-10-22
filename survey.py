@@ -1,4 +1,5 @@
 from sql_uti import SqlUtil
+import unittest
 from server import app
 from enrolment import enrol_Data
 from user import UserData
@@ -56,7 +57,7 @@ class Survey(SqlUtil):
         # search all the survey provided by this course
         # join search and select all all the information
         # order by id, course_code, course_year, qid, start_time,end_time,status
-        this_sur = self.find(["survey.course_id"],[this_course[0]]).test_exe().all()
+        this_sur = self.find(["survey.course_id"],[this_course[0]]).test_exe().one()
         return this_sur
 
     # this might not using
