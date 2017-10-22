@@ -59,12 +59,13 @@ class Survey(SqlUtil):
         this_sur = self.find(["survey.course_id"],[this_course[0]]).test_exe().all()
         return this_sur
 
-    def get_survey_status(self,sid = None):
-        if not sid :
-            return 0
-        this_sur = self.find(["survey.id"],[sid]).test_exe().one()  
-        return this_sur[-1]
-        
+    # this might not using
+    # def get_survey_status(self,sid = None):
+    #     if not sid :
+    #         return 0
+    #     this_sur = self.find(["survey.id"],[sid]).test_exe().one()
+    #     return this_sur[-1]
+
     # for update the information of a survey
     def update_survey(self, survey_id, Q_id, start_time = None, end_time = None):
         # get the survey by id

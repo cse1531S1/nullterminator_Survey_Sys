@@ -171,9 +171,9 @@ def view_survey(survey_id=None):
                     "Continue Review This Survey"]
 
         if not error and request.form["submit_type"] == "save":
-            #  successfully save a survey
-            return redirect(url_for("save_survey",survey_id = survey_id))
-           
+            # show the saved survey
+            pass
+
         elif not error and request.form["submit_type"] == "post":
             #  post to next stage
             return redirect(url_for("post_survey",survey_id = survey_id))
@@ -249,32 +249,7 @@ def post_survey(survey_id ):
                 msg_suc_l=["Successful Post a Survey",\
                 "You were successfully posted survey "+str(survey_id)+".",\
                 url_for("dashboard"),"Review More"])
-                
-                
-# save survey in this controller
-@app.route("/save_survey/<int:survey_id>")
-@login_required
-def save_survey(survey_id ):
-    if current_user.is_student():
-        return redirect(url_for("permission_deny"))
 
-    s = Survey()
-    if current_user.is_admin():
-        # do nothing
-        pass
-    elif current_user.is_staff():
-        # staff try to post this survey to student
-        if s.is_premitted(survey_id, current_user.get_id()):
-            # do nothing
-            pass
-        else:
-            # the staff have no right to change the code
-            return redirect(url_for("permission_deny"))
-    # give a pront to show the successful message
-    return render_template("msg.html",title= "Successfully Save a Survey",\
-                msg_suc_l=["Successful Save a Survey",\
-                "You were successfully saved survey "+str(survey_id)+".",\
-                url_for("dashboard"),"Review More"])                
 
 @app.route("/close/<int:survey_id>")
 @login_required
