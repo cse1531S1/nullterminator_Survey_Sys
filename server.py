@@ -21,7 +21,12 @@ login_manager.login_view = 'login'
 @login_manager.user_loader
 def load_user(userid):
     usr = UserData()
-    role = usr.findById(userid)[2]
+    if not userid:
+        raise TypeError("Please provide your user id.")
+    try:
+        role = usr.findById(int(userid))[2]
+    except Exception as e:
+        raise TypeError("Wrong username/password, please try again.") 
     # initialise the class by the role
     if role == 'admin':
         return Admin(userid)

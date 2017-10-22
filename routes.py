@@ -1,10 +1,10 @@
 from flask import Flask, redirect, render_template, request, url_for,session
 from flask_login import LoginManager,login_user, current_user, login_required, logout_user
-from server import app
+from server import app,load_user
 from survey import *
 from respond import Respond
 # from respond import respondent
-from user import User,UserData
+from user import User,UserData,EnrolRequest
 # import the new question
 from question import Question
 from enrolment import enrol_Data
@@ -19,16 +19,17 @@ def login():
     # to record the error message
     error = None
     if request.method == "POST":
-        this_user = User(request.form.get("username",None))
+        try:
+            this_user = load_user(request.form.get("username",None))
+            if this_user.check_pass(request.form["password"]):
+                # valid usesr
 
-        if this_user.check_pass(request.form["password"]):
-            # valid usesr
+                login_user(User(request.form.get("username",None)))
+                return redirect(url_for("dashboard"))
+        except Exception as e:
+            # write the error pront
+            error = format(e)
 
-            login_user(User(request.form.get("username",None)))
-            return redirect(url_for("dashboard"))
-        else:
-            # print the pront
-            error = "Wrong username/password, please try again"
 
     return render_template("login.html",msg_err = error)
 
@@ -58,31 +59,7 @@ def register():
     # Render pront for register
     return render_template("register.html",msg_err = error)
 
-@app.route("/reqest_approve/<int:require_id>")
-def request_approve(require_id):
-    # admin approve enrol request
-    if not current_user.is_admin:
-        return redirect(url_for('permission_deny'))
-    # use the admin privilage to approve a request
-    current_user.request_approve()
 
-    return render_template("msg.html",msg_suc_l=[
-            "Approve Request","Approve request for enrolment "+str(require_id),
-            url_for('dashboard'),'Back to Dashboard'
-            ])
-
-@app.route('/request_deny/<int:require_id>')
-def request_deny(require_id):
-    # admin approve enrol request
-    if not current_user.is_admin:
-        return redirect(url_for('permission_deny'))
-    # use the admin privilage to deny a enrol requested
-    current_user.deny_enrol()
-
-    return render_template("msg.html",msg_suc_l=[
-            "Denied Request","Deny the request for enrolment "+str(require_id),
-            url_for('dashboard'),'Back to Dashboard'
-            ])
 
 @app.route("/dash")
 @app.route("/dashboard")
@@ -104,7 +81,8 @@ def dashboard():
     if current_user.is_admin():
         # get all the ongoning survey and all the courses
         return render_template('dash/admin.html',survey_l = s.get_survey(),\
-                course_l= c.get_course())
+                course_l= c.get_course(),guest_l = UserData().show_unguest(),\
+                enrol_l = EnrolRequest().get_requests())
     if current_user.is_guest():
         return render_template('dash/guest.html',\
                     survey_l = s.get_survey_by_user(current_user.uid),\
@@ -318,7 +296,7 @@ def student(survey_id):
     error = None
 
     if res.is_submitted(survey_id, current_user.get_id()) or \
-    not current_user.is_student():
+    not (current_user.is_student() or current_user.is_guest()):
         return redirect(url_for("permission_deny"))
 
     # get the basic information for this survey_id
@@ -449,6 +427,78 @@ def enrol(course_id):
             "Successful Request","Your enrol has been sent to admin.",\
             url_for('dashboard'),"Return to Dashboard"
             ])
+
+@app.route("/reqest_approve/<int:require_id>")
+def request_approve(require_id):
+    # admin approve enrol request
+    if not current_user.is_admin:
+        return redirect(url_for('permission_deny'))
+    try:
+        # use the admin privilage to approve a request
+        current_user.premit_enrol(require_id)
+        return render_template("msg.html",msg_suc_l=[
+            "Approve Request","Approve request for enrolment "+str(require_id),
+            url_for('dashboard'),'Back to Dashboard'
+            ])
+    except Exception as e:
+        error = format(e)
+    return render_template("msg.html",msg_err_l=[
+             "Error",error,
+             url_for('dashboard'),'Back to Dashboard'
+             ])
+
+
+
+@app.route('/request_deny/<int:require_id>')
+def request_deny(require_id):
+    # admin approve enrol request
+    if not current_user.is_admin:
+        return redirect(url_for('permission_deny'))
+    try:
+
+        # use the admin privilage to deny a enrol requested
+        current_user.deny_enrol(require_id)
+
+        return render_template("msg.html",msg_suc_l=[
+            "Denied Request","Deny the request for enrolment "+str(require_id),
+            url_for('dashboard'),'Back to Dashboard'
+            ])
+    except Exception as e:
+        error = format(e)
+    # print the error message
+    return render_template("msg.html",msg_err_l=[
+             "Error",error,
+             url_for('dashboard'),'Back to Dashboard'
+             ])
+
+
+
+@app.route('/premit_register/<int:user_id>')
+def premit_register(user_id):
+    # admin approve enrol request
+    if not current_user.is_admin:
+        return redirect(url_for('permission_deny'))
+    # admin to delete a user
+    current_user.permit_register(user_id)
+    # return the successful pront
+    return render_template("msg.html",msg_suc_l=['Successful Authentication',
+        "You have successfully authenticate user "+str(user_id)+" as a guest user.",
+        url_for('dashboard'),"Back to Dashboard"
+        ])
+
+@app.route('/deny_register/<int:user_id>')
+def deny_register(user_id):
+    # admin approve enrol request
+    if not current_user.is_admin:
+        return redirect(url_for('permission_deny'))
+    # delete that user in database by admin
+    current_user.deny_register(user_id)
+    # return the successful pront
+    return render_template("msg.html",msg_err_l=['Successful Delete',
+        "You have successfully delete user "+str(user_id)+" in database.",
+        url_for('dashboard'),"Back to Dashboard"
+        ])
+
 
 # page for not permission
 @app.route("/permission")
