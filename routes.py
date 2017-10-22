@@ -2,9 +2,9 @@ from flask import Flask, redirect, render_template, request, url_for,session
 from flask_login import LoginManager,login_user, current_user, login_required, logout_user
 from server import app
 from survey import *
-from new_respond import Respond
+from respond import Respond
 # from respond import respondent
-from user import User
+from user import User,UserData
 # import the new question
 from question import Question
 from enrolment import enrol_Data
@@ -38,6 +38,51 @@ def logout():
     logout_user()
     return redirect(url_for("login"), code=302, Response=None)
 
+@app.route("/register",methods=["POST","GET"])
+def register():
+    error =None
+    if request.method == "POST":
+        if request.form['pw']== request.form['re_pw']:
+            try:
+                UserData().register(request.form['id'], request.form['pw'])
+                return render_template("msg.html",msg_suc_l=[
+                    'Successful Register',"Wait for admin to approve your request.",
+                    url_for('index'),"Return to Home Page"
+                ])
+            except Exception as e:
+                # extract the mesage of error
+                error = format(e)
+        else:
+            error = "Password provided is not same."
+
+    # Render pront for register
+    return render_template("register.html",msg_err = error)
+
+@app.route("/reqest_approve/<int:require_id>")
+def request_approve(require_id):
+    # admin approve enrol request
+    if not current_user.is_admin:
+        return redirect(url_for('permission_deny'))
+    # use the admin privilage to approve a request
+    current_user.request_approve()
+
+    return render_template("msg.html",msg_suc_l=[
+            "Approve Request","Approve request for enrolment "+str(require_id),
+            url_for('dashboard'),'Back to Dashboard'
+            ])
+
+@app.route('/request_deny/<int:require_id>')
+def request_deny(require_id):
+    # admin approve enrol request
+    if not current_user.is_admin:
+        return redirect(url_for('permission_deny'))
+    # use the admin privilage to deny a enrol requested
+    current_user.deny_enrol()
+
+    return render_template("msg.html",msg_suc_l=[
+            "Denied Request","Deny the request for enrolment "+str(require_id),
+            url_for('dashboard'),'Back to Dashboard'
+            ])
 
 @app.route("/dash")
 @app.route("/dashboard")
@@ -48,7 +93,6 @@ def dashboard():
     c= Course()
     # get the survey instance
     s = Survey()
-
 
     # muti type of user respond
     if current_user.is_student():
@@ -61,7 +105,10 @@ def dashboard():
         # get all the ongoning survey and all the courses
         return render_template('dash/admin.html',survey_l = s.get_survey(),\
                 course_l= c.get_course())
-
+    if current_user.is_guest():
+        return render_template('dash/guest.html',\
+                    survey_l = s.get_survey_by_user(current_user.uid),\
+                    course_l= c.get_course())
 
 
 
@@ -140,7 +187,6 @@ def survey_create(course_name=None,course_year=None):
 def view_survey(survey_id=None):
     if current_user.is_student():
         return redirect(url_for("permission_deny"))
-
 
     q = Question()
     s = Survey()
@@ -371,9 +417,6 @@ def del_question():
 @app.route("/results/<int:survey_id>",methods=["GET","POST"])
 @login_required
 def show_results(survey_id = None):
-
-
-
     if not survey_id:
         # not seeing the results
         return redirect("dash")
@@ -381,11 +424,33 @@ def show_results(survey_id = None):
     # instance for getting results
     res = Respond()
 
-
     return render_template("results.html",results=res.get_results(survey_id))
+
+@app.route('/enrol/<int:course_id>')
+@login_required
+def enrol(course_id):
+    # enrol for guest
+    if not current_user.is_guest():
+        return redirect(url_for('permission_deny'))
+    # record the error message
+    error = None
+    # sent this request to system
+    try:
+        current_user.enrol(course_id)
+        # successful add this message
+    except Exception as e:
+        # not place to pront the error...
+        error = format(e)
+    if error:
+        return render_template("msg.html",msg_err_l = [
+            'Error:',error,url_for("dashboard"),'Return to Dashboard'])
+    else:
+        return render_template("msg.html",msg_suc_l=[
+            "Successful Request","Your enrol has been sent to admin.",\
+            url_for('dashboard'),"Return to Dashboard"
+            ])
 
 # page for not permission
 @app.route("/permission")
 def permission_deny():
-
     return render_template("permission.html")
