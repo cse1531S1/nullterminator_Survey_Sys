@@ -17,7 +17,7 @@
     {% endif %}
     <form action="{{url_for("view_survey",survey_id= survey_id)}}" method="POST">
         {% include "comp/q_list.html"%}
-        {% if not current_user.is_student()%}
+        {% if (current_user.is_admin() or current_user.is_staff() ) and survey_status < 2 %}
             <button type="submit" class="btn btn-primary" name="submit_type" value="save">Save Changes</button>
             <button type="submit" class="btn btn-success" name="submit_type" value="post">Post Survey</button>
         {%endif%}

@@ -60,6 +60,13 @@ class Survey(SqlUtil):
         this_sur = self.find(["survey.course_id"],[this_course[0]]).test_exe().one()
         return this_sur
 
+    # this might not using
+    # def get_survey_status(self,sid = None):
+    #     if not sid :
+    #         return 0
+    #     this_sur = self.find(["survey.id"],[sid]).test_exe().one()
+    #     return this_sur[-1]
+
     # for update the information of a survey
     def update_survey(self, survey_id, Q_id, start_time = None, end_time = None):
         # get the survey by id
@@ -94,7 +101,7 @@ class Survey(SqlUtil):
         # status filter
         if this_user[2] == "staff":
             # only can reach the status echo to 1
-            self.findIn("status", ["1","3"], sign = "=")
+            self.findIn("status", ["1","2","3"], sign = "=")
         elif this_user[2]== "student":
             # only can reach the status echo to 2 and 3
             self.findIn("status", ["2","3"], sign = "=")
