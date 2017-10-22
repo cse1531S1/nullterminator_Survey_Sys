@@ -57,7 +57,7 @@ class Survey(SqlUtil):
         # search all the survey provided by this course
         # join search and select all all the information
         # order by id, course_code, course_year, qid, start_time,end_time,status
-        this_sur = self.find(["survey.course_id"],[this_course[0]]).test_exe().all()
+        this_sur = self.find(["survey.course_id"],[this_course[0]]).test_exe().one()
         return this_sur
 
     # for update the information of a survey
@@ -167,7 +167,7 @@ class Survey(SqlUtil):
             qids  =[]
         return qids
 
-    if __name__ == '__main__':
+if __name__ == '__main__':
     course = Course()
     print(course.get_course("COMP1521","17s2"))
     survey = Survey()
