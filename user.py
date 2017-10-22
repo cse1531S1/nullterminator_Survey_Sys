@@ -14,6 +14,9 @@ class UserData(SqlUtil):
     def check_pass(self,uid,password):
         # get the users information by self function
         this_user = self.findById(uid)
+        if not this_user:
+            raise TypeError("Currently the database has not this user.")
+
         if password == this_user[1]:
             # check it's password and they are same
             return True
@@ -23,11 +26,14 @@ class UserData(SqlUtil):
     def new_user(self,uid, password,role):
         if not (uid and password and role):
             raise TypeError("The user_name, user_id, password must be all setted")
-        if not role in ["staff","student","admin"]:
+        if not role in ["staff","student","admin","unguest"]:
             raise TypeError("Undefined role for this user.")
-
-        # store the information in the class
-        self.insert(["id","password","role"],[uid,password,role]).save()
+        try:
+            # store the information in the class
+            self.insert(["id","password","role"],[uid,password,role]).save()
+        except Exception as e:
+            # The database couldn't isert
+            raise TypeError('This id Has been used.Please use another user id.')
         # return self to have the property of one online execution
         return self
     def deleteById(self, uid):
@@ -45,12 +51,9 @@ class UserData(SqlUtil):
             raise TypeError("Please provide password or user id.")
         if int(uid) < 0:
             raise TypeError("User id must be greater than 0.")
-        try:
-            # try to insert into database
-            self.insert(['id','password','role'],[uid,pw,'unguest']).save()
-        except Exception as e:
-            # The database couldn't isert
-            raise TypeError('This id Has been used.Please use another user id.')
+        # try to insert into database, by a defined function
+        self.new_user(uid, pw, 'unguest')
+
         return True
     def show_unguest(self):
         # return a list of all the unauthorised guest

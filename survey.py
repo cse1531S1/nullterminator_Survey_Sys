@@ -56,7 +56,7 @@ class Survey(SqlUtil):
         # search all the survey provided by this course
         # join search and select all all the information
         # order by id, course_code, course_year, qid, start_time,end_time,status
-        this_sur = self.find(["survey.course_id"],[this_course[0]]).test_exe().all()
+        this_sur = self.find(["survey.course_id"],[this_course[0]]).all()
         return this_sur
 
 
@@ -113,7 +113,7 @@ class Survey(SqlUtil):
         return survey_list
 
     def is_premitted(self, survey_id, user_id):
-        this_sur = self.id_filter(survey_id).test_exe().one()
+        this_sur = self.id_filter(survey_id).one()
         his_enrol = self.__enrol.find(["user_id","course_code","course_year"]\
                         ,[user_id,this_sur[1],this_sur[2]]).one()
         if his_enrol:
