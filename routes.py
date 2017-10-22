@@ -195,8 +195,9 @@ def view_survey(survey_id=None):
                     "Continue Review This Survey"]
 
         if not error and request.form["submit_type"] == "save":
-            #  do nothing
+            # show the saved survey
             pass
+
         elif not error and request.form["submit_type"] == "post":
             #  post to next stage
             return redirect(url_for("post_survey",survey_id = survey_id))
@@ -222,7 +223,8 @@ def view_survey(survey_id=None):
                     course_year = this_survey[2],\
                     mendatory_q = q.find_q(pool_id = "0"),list_type = ["check","check"],\
                     optional_q = q.find_q(pool_id = "1"),select_q = selected_Qid,\
-                    survey_id = survey_id,msg_err_l = error)
+                    survey_id = survey_id,msg_err_l = error,\
+                    survey_status = s.get_survey_status(survey_id))
     elif current_user.is_staff():
         # only have the right to review the question
         # find the course that has recorded in the survey
@@ -230,7 +232,8 @@ def view_survey(survey_id=None):
                     course_year = this_survey[2],\
                     mendatory_q = q_force,list_type = ["num","check"],\
                     optional_q = q.find_q(pool_id= "1"),select_q = selected_Qid,\
-                    survey_id = survey_id,msg_err_l = error)
+                    survey_id = survey_id,msg_err_l = error,\
+                    survey_status = s.get_survey_status(survey_id))
 
 
 # delect survey in this controller
@@ -266,10 +269,11 @@ def post_survey(survey_id ):
             # the staff have no right to change the code
             return redirect(url_for("permission_deny"))
     # give a pront to show the successful message
-    return render_template("msg.html",title= "Successful Post a Survey",\
+    return render_template("msg.html",title= "Successfully Post a Survey",\
                 msg_suc_l=["Successful Post a Survey",\
                 "You were successfully posted survey "+str(survey_id)+".",\
                 url_for("dashboard"),"Review More"])
+
 
 @app.route("/close/<int:survey_id>")
 @login_required
@@ -334,9 +338,9 @@ def student(survey_id):
 @app.route("/quest",methods = ["POST","GET"])
 @login_required
 def add_question():
-    if current_user.is_student():
+    if not current_user.is_admin():
+        # permission deny
         return redirect(url_for("permission_deny"))
-
     error = ""
     # else: the admin has logged_in
     if request.method == "POST":

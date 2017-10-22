@@ -59,6 +59,7 @@ class Survey(SqlUtil):
         this_sur = self.find(["survey.course_id"],[this_course[0]]).test_exe().all()
         return this_sur
 
+
     # for update the information of a survey
     def update_survey(self, survey_id, Q_id, start_time = None, end_time = None):
         # get the survey by id
@@ -93,7 +94,7 @@ class Survey(SqlUtil):
         # status filter
         if this_user[2] == "staff":
             # only can reach the status echo to 1
-            self.findIn("status", ["1","3"], sign = "=")
+            self.findIn("status", ["1","2","3"], sign = "=")
         elif this_user[2]== "student":
             # only can reach the status echo to 2 and 3
             self.findIn("status", ["2","3"], sign = "=")
@@ -107,12 +108,7 @@ class Survey(SqlUtil):
         # get the ongoning survey by course
         survey_list =self.findIn("course_id", [this[1] for this in this_courses]).all()
 
-        # # filter the survey_list by whether it have finish the survey
-        # final_survey_list = []
-        # for s in survey_list:
-        #     if not s[0] in filter_arr:
-        #         # filter out all the submitted survey
-        #         final_survey_list.append(s)
+
 
         return survey_list
 
