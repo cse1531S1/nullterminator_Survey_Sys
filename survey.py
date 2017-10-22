@@ -167,13 +167,13 @@ class Survey(SqlUtil):
             qids  =[]
         return qids
 
-    if __name__ == '__main__':
-    course = Course()
-    print(course.get_course("COMP1521","17s2"))
-    survey = Survey()
-    this_id = survey.create_survey("COMP1521","17s2",["1","2","3"],"2017-09-23 00:00:00","2017-09-23 23:59:59")
-    print(survey.get_survey("COMP1521","17s2"))
-    survey.test_exe().delete_survey(this_id)
-    print(survey.get_survey("COMP1521","17s2"))
+    # if __name__ == '__main__':
+    # course = Course()
+    # print(course.get_course("COMP1521","17s2"))
+    # survey = Survey()
+    # this_id = survey.create_survey("COMP1521","17s2",["1","2","3"],"2017-09-23 00:00:00","2017-09-23 23:59:59")
+    # print(survey.get_survey("COMP1521","17s2"))
+    # survey.test_exe().delete_survey(this_id)
+    # print(survey.get_survey("COMP1521","17s2"))
 
     # print(course.get_course())
