@@ -68,26 +68,28 @@ class TestEnrolment(unittest.TestCase):
 
 class TestLogin(unittest.TestCase):
 
-    def userInsert(self):
+    def test_userInsert(self):
         user = UserData()
         user.test_exe().new_user(1,"pass","admin")
         print(user.findById(1))
-    def loginCorrectPass(self):
+    def test_loginCorrectPass(self):
         user = UserData()
         self.assertEqual(user.check_pass(1,"pass"), True)
-    def loginInorrectPass(self):
+    def test_loginInorrectPass(self):
         user = UserData()
-        self.assertEqual(user.check_pass(1,"notvalid"), False)
+        self.assertEqual(user.check_pass(1,"notvalid"), asd)
 
-    def login_correctPass_incorrectId(self):
+    def test_login_correctPass_incorrectId(self):
         user = UserData()
         self.assertEqual(user.check_pass(25, "pass"), False)
 
-    def login_correctPass_invalidId(self):
+    def test_login_correctPass_invalidId(self):
         user = UserData()
         self.assertEqual(user.check_pass("4#&./\__~___==5tyh34jk2323d", "pass"), False)
 
-    def deleteUser(self):
+    #def testPermissionAdmin(self):
+
+    def test_deleteUser(self):
         # cleanup the added user
         user.deleteById(1)
         print(user.findById(1))
