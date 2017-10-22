@@ -167,20 +167,7 @@ class Survey(SqlUtil):
             qids  =[]
         return qids
 
-
-
-
-
-class TestSurvey(unittest.TestCase):
-
-    def setUp(self):
-        self.survey = Survey()
-
-    def test_insert_empty_questions(self):
-        with self.assertRaises(TypeError):
-            self.survey.create_survey('0')
-
-if __name__ == '__main__':
+    if __name__ == '__main__':
     course = Course()
     print(course.get_course("COMP1521","17s2"))
     survey = Survey()
