@@ -1,7 +1,13 @@
 {%extends "base.html"%}
 {%block title%}{{course_name}} Survey{%endblock%}
 {%block body%}
-    <h1>{{course_name}} Web Survey</h1>
+    {% set disbled = "" %}
+    <h1>{{course_name}} Survey
+        {%- if current_user.is_admin() or current_user.is_staff() %}
+            <span class="badge badge-success">Preview</span>
+            {%set disabled = "disabled"%}
+        {%- endif -%}
+    </h1>
     {%if error%}
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -23,21 +29,20 @@
                     {% for ans in quest[3:] %}
                         <div class="form-check">
                             <label class="form-check-label">
-                                <input type="radio" name="{{quest[0]}}" class="form-check-input" value="{{ans_count}}" />{{ans}}
+                                <input type="radio" name="{{quest[0]}}" class="form-check-input " value="{{ans_count}}" {{disabled}} />{{ans}}
                                 {% set ans_count= ans_count +1 %}
                             </label>
                         </div>
                     {%endfor%}
                 {% elif quest[2]== "TEXT" %}
 
-                        <input class="form-control" type="text" name="{{quest[0]}}" value="" placeholder="{{quest[1]}}" />
+                        <input class="form-control" {{disabled}} type="text" name="{{quest[0]}}" value="" placeholder="{{quest[1]}}" />
                 {%endif%}
                 {% set q_count= q_count +1 %}
                 </div>
 
             {%endfor%}
-
-            <button type="submit" class="btn btn-outline-success" name="button">I have finished this survey!</button>
+            <button type="submit" class="btn btn-outline-success" name="button" {{disabled}}>I have finished this survey!</button>
         </Form>
     {%else%}
         <div class="alert alert-danger " role="alert">

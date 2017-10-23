@@ -1,5 +1,4 @@
 from sql_uti import SqlUtil
-import unittest
 from server import app
 from enrolment import enrol_Data
 from user import UserData
@@ -62,7 +61,7 @@ class Survey(SqlUtil):
         # search all the survey provided by this course
         # join search and select all all the information
         # order by id, course_code, course_year, qid, start_time,end_time,status
-        this_sur = self.find(["survey.course_id"],[this_course[0]]).one()
+        this_sur = self.find(["survey.course_id"],[this_course[0]]).all()
         return this_sur
 
 
@@ -114,12 +113,7 @@ class Survey(SqlUtil):
         # get the ongoning survey by course
         survey_list =self.findIn("course_id", [this[1] for this in this_courses]).all()
 
-        # # filter the survey_list by whether it have finish the survey
-        # final_survey_list = []
-        # for s in survey_list:
-        #     if not s[0] in filter_arr:
-        #         # filter out all the submitted survey
-        #         final_survey_list.append(s)
+
 
         return survey_list
 

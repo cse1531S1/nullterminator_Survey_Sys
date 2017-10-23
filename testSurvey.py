@@ -77,6 +77,15 @@ class SurveyTest(unittest.TestCase):
         cur_num_survey = len(self.survey.get_survey())
         self.assertEqual(prev_num_survey, cur_num_survey)
 
+
+    def test_survey_post(self):
+        # try to review and post the survey
+        self.survey.post(1)
+        self.survey.review(1)
+    def test_survey_close(self):
+        # try to close a running survey
+        self.survey.close(1)
+
     def test_successfully_add_survey_to_db(self):
         """
         :post : new additions will appear in the db table

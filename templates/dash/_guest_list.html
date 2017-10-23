@@ -1,0 +1,27 @@
+<h3>Pending Guest</h3>
+{%if guest_l%}
+    <table class="table table-hover">
+        <thead class="thead-default">
+            <tr>
+                <th >User id</th>
+                <th>Course</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        {%for g in guest_l%}
+            <tr>
+                <td>{{g[0]}}</td>
+                <td>{{g[1]}}</td>
+                <td>
+                    <a href="{{url_for('premit_register',user_id=g[0])}}"
+                        class="btn btn-sm btn-success">Premit Register</a>
+                    <a href="{{url_for('deny_register',user_id=g[0])}}"
+                        class="btn btn-sm btn-outline-danger">Deny Register</a>
+
+                </td>
+            </tr>
+        {%endfor%}
+    </table>
+{% else %}
+    <p>Not Unauthorise Author</p>
+{% endif %}

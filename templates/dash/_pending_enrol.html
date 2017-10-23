@@ -1,0 +1,32 @@
+<h3>Pending Enrolments</h3>
+{%if enrol_l %}
+    <table class="table table-hover">
+        <thead class="thead-default">
+            <tr>
+                <th scope="row" style="width:30px">#</th>
+                <th>User id</th>
+                <th>Course</th>
+                <th>Semester</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        {%for r in enrol_l%}
+            <tr>
+                <td>{{r[0]}}</td>
+                <td>{{r[1]}}</td>
+                <td>{{r[2]}}</td>
+                <td>{{r[3]}}</td>
+                <td>
+                    <a href="{{url_for("request_approve",require_id=r[0])}}"
+                        class="btn btn-sm btn-success">Approve Enrol</a>
+                    <a href="{{url_for("request_deny",require_id=r[0])}}"
+                        class="btn btn-sm btn-outline-danger">Deny Enrol</a>
+                </td>
+            </tr>
+        {%endfor%}
+    </table>
+
+
+{%else%}
+    <p>Current have not opening course</p>
+{%endif%}

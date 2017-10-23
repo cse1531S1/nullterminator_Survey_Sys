@@ -1,18 +1,13 @@
 import unittest
+from testSurvey import *
+from testQuestion import *
+from testUser import *
+from testEnrolment import *
 import os
 
-""" All the test cases is written in here. """
-
-from testQuestion import *
-from testSurvey import *
-from testEnrolment import *
-from testUser import *
-
 if __name__ == '__main__':
-    # setup a database to this unittest
+    # startup a database to unittest
     os.system("sh init_db.sh")
-    # run all the unittest
     unittest.main()
-
-    # clean up the database
+    # reset the database that use in unittest
     os.system("sh init_db.sh")
