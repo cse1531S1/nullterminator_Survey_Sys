@@ -152,13 +152,13 @@ class TestAddStudent(unittest.TestCase):
 
     def setUp(self):
         os.system("db/init_db.sh")
-        self.user = SqlUtil("users")
+        self.user = UserData()
 
     def test_add_student_invalid_id(self):
         student_id = ""
         num_student = len(self.user.find("role","student").all())
         with self.assertRaises(TypeError):
-            self.user.insert(["id"],student_id).save()
+            self.user.new_user(student_id)
         curr_num_student = len(self.user.find("role","student").all())
         self.assertEqual(num_student, curr_num_student)
 
@@ -166,14 +166,31 @@ class TestAddStudent(unittest.TestCase):
         student_id = 1220
         student_pass = "student1220"
         student_role = "student"
-        # assert if student have not been inserted by comparing
-        # with empty list
-        self.assertEqual(self.user.find("id",student_id).all(), [])
+        self.assertEqual(self.user.findById(student_id), None)
         num_student = len(self.user.find("role","student").all())
-        self.user.insert(["id","password","role"],[student_id,student_pass,student_role]).save()
+        self.user.new_user(student_id,student_pass,student_role)
         curr_num_student = len(self.user.find("role","student").all())
         self.assertEqual(num_student + 1, curr_num_student)
-        self.assertNotEqual(self.user.find("id",student_id).all(), [])
+        self.assertNotEqual(self.user.findById(student_id), [])
+
+    def tearDown(self):
+        os.remove("db/survey.db")
+
+class TestCourses(unittest.TestCase):
+
+    def setUp(self):
+        os.system("db/init_db.sh")
+        self.course = Course()
+
+    def test_add_course_valid(self):
+        course_code = "COMP1531"
+        course_year = "20s1"
+        self.assertEqual(self.course.get_course(course_code,course_year), None)
+        num_course = len(self.course.get_course())
+        self.course.insert(["course_code","course_year"],[course_code,course_year]).save()
+        curr_num_course = len(self.course.get_course())
+        self.assertEqual(num_course + 1, curr_num_course)
+        self.assertNotEqual(self.course.get_course(course_code,course_year), None)
 
     def tearDown(self):
         os.remove("db/survey.db")
