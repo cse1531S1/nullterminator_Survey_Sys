@@ -35,9 +35,13 @@ class Survey(SqlUtil):
         return self
 
     def create_survey(self,course_code,course_year,Q_id,start_time,end_time):
+        # error handling
+        if not Q_id:
+            raise TypeError("You must select at least one question.")
+        if type(Q_id)!= list:
+            raise TypeError("Question id must bu a list.")
         # getthing this course's id
         this_course = self.__course.get_course(course_code,course_year)
-        print(this_course)
         self.insert("course_id",this_course[0])\
                         .insert("Q_id","&&".join(Q_id))\
                         .insert("start_time",start_time)\
@@ -45,6 +49,7 @@ class Survey(SqlUtil):
         this_survey = self.find(["course_id","Q_id","start_time","end_time"],\
                         [this_course[0],"&&".join(Q_id),start_time,end_time])\
                         .sort_by("survey.id",False).one()
+
         return this_survey[0]
     def get_survey(self,course_name= None,course_year = None):
         if not course_name and not course_year:
@@ -168,7 +173,7 @@ if __name__ == '__main__':
     survey = Survey()
     this_id = survey.create_survey("COMP1521","17s2",["1","2","3"],"2017-09-23 00:00:00","2017-09-23 23:59:59")
     print(survey.get_survey("COMP1521","17s2"))
-    survey.test_exe().delete_survey(this_id)
+    survey.delete_survey(this_id)
     print(survey.get_survey("COMP1521","17s2"))
 
     # print(course.get_course())

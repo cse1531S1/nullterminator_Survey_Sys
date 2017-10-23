@@ -119,9 +119,6 @@ def survey_create(course_name=None,course_year=None):
         # get all the selected question
         q_id = request.form.getlist("qid")
 
-        if not q_id:
-            # no specify question error
-            error = "Please add at least one question for this survey."
         if not  (request.form.get("s0") and request.form.get("s1")\
             and request.form.get("e0") and request.form.get("e1")):
             # no specify survey time error
@@ -130,10 +127,16 @@ def survey_create(course_name=None,course_year=None):
             # not error
             start_time =request.form.get("s0")+" "+request.form.get("s1")
             end_time = request.form.get("e0")+" "+request.form.get("e1")
-            # the admin has selected some questions for this survey
-            this_id = s.create_survey(course_name,course_year,q_id,start_time,end_time)
-            # renturn a preview of final survey
-            return redirect(url_for('view_survey', survey_id = this_id))
+            try:
+
+                # the admin has selected some questions for this survey
+                this_id = s.create_survey(course_name,course_year,q_id,start_time,end_time)
+                # if not error
+                # renturn a preview of final survey
+                return redirect(url_for('view_survey', survey_id = this_id))
+            except Exception as e:
+                # grep the error pront
+                error = format(e)
 
 
 
@@ -223,8 +226,7 @@ def view_survey(survey_id=None):
                     course_year = this_survey[2],\
                     mendatory_q = q.find_q(pool_id = "0"),list_type = ["check","check"],\
                     optional_q = q.find_q(pool_id = "1"),select_q = selected_Qid,\
-                    survey_id = survey_id,msg_err_l = error,\
-                    survey_status = s.get_survey_status(survey_id))
+                    survey_id = survey_id,msg_err_l = error)
     elif current_user.is_staff():
         # only have the right to review the question
         # find the course that has recorded in the survey
@@ -232,8 +234,7 @@ def view_survey(survey_id=None):
                     course_year = this_survey[2],\
                     mendatory_q = q_force,list_type = ["num","check"],\
                     optional_q = q.find_q(pool_id= "1"),select_q = selected_Qid,\
-                    survey_id = survey_id,msg_err_l = error,\
-                    survey_status = s.get_survey_status(survey_id))
+                    survey_id = survey_id,msg_err_l = error)
 
 
 # delect survey in this controller
