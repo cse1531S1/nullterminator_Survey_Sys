@@ -3,6 +3,7 @@ from testSurvey import *
 from testQuestion import *
 from testUser import *
 from testEnrolment import *
+import os
 
 if __name__ == '__main__':
     # startup a database to unittest

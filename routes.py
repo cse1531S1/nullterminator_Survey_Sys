@@ -209,6 +209,9 @@ def view_survey(survey_id=None):
     # find the selected question
     # change the type to match the filter
     selected_Qid = s.get_qids(survey_id)
+    # get the survey status by indent
+    survey_status = int(this_survey[6])
+
 
     if selected_Qid:
         # filter the selected question
@@ -226,7 +229,7 @@ def view_survey(survey_id=None):
                     course_year = this_survey[2],\
                     mendatory_q = q.find_q(pool_id = "0"),list_type = ["check","check"],\
                     optional_q = q.find_q(pool_id = "1"),select_q = selected_Qid,\
-                    survey_id = survey_id,msg_err_l = error)
+                    survey_id = survey_id,msg_err_l = error,survey_status= survey_status)
     elif current_user.is_staff():
         # only have the right to review the question
         # find the course that has recorded in the survey
@@ -234,7 +237,7 @@ def view_survey(survey_id=None):
                     course_year = this_survey[2],\
                     mendatory_q = q_force,list_type = ["num","check"],\
                     optional_q = q.find_q(pool_id= "1"),select_q = selected_Qid,\
-                    survey_id = survey_id,msg_err_l = error)
+                    survey_id = survey_id,msg_err_l = error,survey_status= survey_status)
 
 
 # delect survey in this controller
@@ -299,8 +302,10 @@ def student(survey_id):
     s = Survey()
     res = Respond()
     error = None
-
-    if res.is_submitted(survey_id, current_user.get_id()) or \
+    if current_user.is_admin() or current_user.is_staff():
+        # the Admin and staff can preview the survey
+        pass
+    elif res.is_submitted(survey_id, current_user.get_id()) or \
     not (current_user.is_student() or current_user.is_guest()):
         return redirect(url_for("permission_deny"))
 
