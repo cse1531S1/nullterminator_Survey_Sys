@@ -199,8 +199,7 @@ def view_survey(survey_id=None):
                     course_year = this_survey[2],\
                     mendatory_q = q.find_q(pool_id = "0"),list_type = ["check","check"],\
                     optional_q = q.find_q(pool_id = "1"),select_q = selected_Qid,\
-                    survey_id = survey_id,msg_err_l = error,\
-                    survey_status = s.get_survey_status(survey_id))
+                    survey_id = survey_id,msg_err_l = error)
     elif current_user.is_staff():
         # only have the right to review the question
         # find the course that has recorded in the survey
@@ -208,8 +207,7 @@ def view_survey(survey_id=None):
                     course_year = this_survey[2],\
                     mendatory_q = q_force,list_type = ["num","check"],\
                     optional_q = q.find_q(pool_id= "1"),select_q = selected_Qid,\
-                    survey_id = survey_id,msg_err_l = error,\
-                    survey_status = s.get_survey_status(survey_id))
+                    survey_id = survey_id,msg_err_l = error)
 
 
 # delect survey in this controller
