@@ -1,3 +1,33 @@
+Section-1
+python: python 3.5.2
+python libraries:
+    Flask==0.12.2
+    Jinja2==2.8
+    Flask-Login==0.4.0
+There are some libs are these lib's dependency, more info please check the requirements.txt.
+
+Section-2
+When you are in the root folder of this project, run these two command, you can see the website.
+# sh init_db.sh
+# python3 run.py
+You can see the survey system on http://localhost:8080/ or http://YOUR_HOST_IP:8080/
+
+Section-3
+Copy all the test files to the root folder(The file struct is supplied at the end.), then type in the command:
+# python3 tests.py
+Then you are expect to see these result:
+|......................
+|----------------------------------------------------------------------
+|Ran 22 tests in 0.169s
+|
+|OK
+
+The building database would cost some time.
+
+More info you can checkout the README.md or go to
+https://github.com/cse1531S1/nullterminator_Survey_Sys
+
+
 .:
 bin
 db
