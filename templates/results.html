@@ -48,8 +48,10 @@
 
         {% else %}
             {% for ans in res[2:]%}
-                {{ans_count}}. {{ans[0]}}
-                {% set ans_count = ans_count +1 %}
+                {% for a in ans %}
+                    <p>{{ans_count}}.{{a}}</p>
+                    {% set ans_count = ans_count +1 %}
+                {% endfor %}
             {% endfor%}
         {%endif%}
         {% set q_count = q_count + 1%}
